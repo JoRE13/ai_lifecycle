@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, Request
 from sqlmodel import Session
 
-from app.config import (
+from backend.config import (
     REFRESH_TOKEN_TTL_DAYS,
     REFRESH_COOKIE_NAME,
     COOKIE_SECURE,
@@ -22,7 +22,7 @@ from backend.repositories.auth_repo import (
 )
 from backend.auth.jwt import create_access_token
 from backend.auth.deps import get_current_user
-from backend.models.auth import User
+from backend.models.auth_models import User
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

@@ -9,9 +9,10 @@ from uuid import UUID
 from passlib.context import CryptContext
 from sqlmodel import Session, select
 
-from backend.models.auth import User, RefreshToken
+from backend.models.auth_models import User, RefreshToken
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Avoid bcrypt backend issues (and the 72-byte input limit) by using PBKDF2-SHA256.
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
 
 def utcnow() -> datetime:

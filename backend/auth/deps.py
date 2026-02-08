@@ -4,7 +4,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlmodel import Session
 
 from backend.db import get_session
-from backend.models.auth import User
+from backend.models.auth_models import User
 from backend.auth.jwt import decode_access_token
 
 bearer = HTTPBearer(auto_error=False)

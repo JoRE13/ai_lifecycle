@@ -5,7 +5,8 @@ from typing import Optional
 from uuid import UUID, uuid4
 
 from sqlmodel import SQLModel, Field, Relationship, Column
-from sqlalchemy import String, DateTime, Boolean, UniqueConstraint, Index
+from sqlalchemy import String, DateTime, Boolean, Index
+from sqlalchemy.orm import relationship
 
 
 def utcnow() -> datetime:
@@ -31,7 +32,9 @@ class User(SQLModel, table=True):
         sa_column=Column(DateTime(timezone=True), nullable=False),
     )
 
-    refresh_tokens: list["RefreshToken"] = Relationship(back_populates="user")
+    refresh_tokens: list["RefreshToken"] = Relationship(
+        sa_relationship=relationship("RefreshToken", back_populates="user")
+    )
 
 
 class RefreshToken(SQLModel, table=True):
@@ -41,8 +44,11 @@ class RefreshToken(SQLModel, table=True):
 
     user_id: UUID = Field(foreign_key="users.id", index=True)
 
-    # Store only a hash of the refresh token (like passwords)
-    token_hash: str = Field(sa_column=Column(String(255), nullable=False))
+    # Public token identifier (stored in cookie + DB lookup)
+    selector: str = Field(sa_column=Column(String(128), nullable=False))
+
+    # Secret token hash (validator portion); never store validator in plaintext
+    validator_hash: str = Field(sa_column=Column(String(255), nullable=False))
 
     # Optional metadata (nice to have)
     user_agent: Optional[str] = Field(default=None, sa_column=Column(String(512)))
@@ -60,10 +66,12 @@ class RefreshToken(SQLModel, table=True):
         sa_column=Column(DateTime(timezone=True), nullable=True),
     )
 
-    user: User = Relationship(back_populates="refresh_tokens")
+    user: User = Relationship(
+        sa_relationship=relationship("User", back_populates="refresh_tokens")
+    )
 
     # Helpful indexes/constraints
     __table_args__ = (
         Index("ix_refresh_tokens_user_id_expires_at", "user_id", "expires_at"),
-        Index("ix_refresh_tokens_token_hash", "token_hash"),
+        Index("ix_refresh_tokens_selector", "selector", unique=True),
     )
