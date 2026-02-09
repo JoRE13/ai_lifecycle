@@ -1,51 +1,34 @@
-id,mode,image,expected_behaviour,error_type,category,Explanation,Expected_verdict,author
-1,Check solution,1.png,LLM should verify that solution is correct,Null,Check a correct solution,,Correct,Jóhannes
-2,Check solution,2.png,LLM should verify that solution is correct,Null,Check a correct solution,,Correct,Jóhannes
-3,Check solution,3.png,LLM should verify that solution is correct,Null,Check a correct solution,,Correct,Jóhannes
-4,Check solution,4.png,LLM should verify that solution is correct,Null,Check a correct solution,,Correct,Jóhannes
-5,Check solution,5.png,LLM should verify that solution is correct,Null,Check a correct solution,,Correct,Jóhannes
-6,Check solution,6.png,LLM should verify that solution is correct,Null,Check a correct solution,,Correct,Jóhannes
-7,Check solution,7.png,LLM should verify that solution is correct,Null,Check a correct solution,,Correct,Jóhannes
-8,Hint,8.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,Correct,Jóhannes
-9,Hint,9.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,Correct,Jóhannes
-10,Hint,10.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,Correct,Jóhannes
-11,Hint,11.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,Correct,Jóhannes
-12,Hint,12.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,Correct,Jóhannes
-13,Hint,13.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,Correct,Jóhannes
-14,Hint,14.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,Correct,Jóhannes
-15,Hint,15.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,Correct,Jóhannes
-16,Hint,16.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,Correct,Jóhannes
-17,Hint,17.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,Correct,Jóhannes
-18,Hint,18.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,Correct,Jóhannes
-19,Hint,19.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,Correct,Jóhannes
-20,Hint,20.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,Correct,Jóhannes
-21,Hint,21.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,Correct,Jóhannes
-22,Check solution,22.png,LLM should spot error and point it out,Wrong expansion,Check a incorrect solution,,Incorrect,Jóhannes
-23,Check solution,23.png,LLM should spot error and point it out,Sign error,Check a incorrect solution,,Incorrect,Jóhannes
-24,Check solution,24.png,LLM should spot error and point it out,Division error,Check a incorrect solution,,Incorrect,Jóhannes
-25,Check solution,25.png,LLM should spot error and point it out,Forgotten term error,Check a incorrect solution,,Incorrect,Jóhannes
-26,Check solution,26.png,LLM should spot error and point it out,Factoring error,Check a incorrect solution,,Incorrect,Jóhannes
-27,Check solution,27.png,LLM should spot error and point it out,Log rule error,Check a incorrect solution,,Incorrect,Jóhannes
-28,Check solution,28.png,LLM should spot error and point it out,Exponent error,Check a incorrect solution,,Incorrect,Jóhannes
-29,Check solution,29.png,LLM should spot error and point it out,Inequality error,Check a incorrect solution,,Incorrect,Jóhannes
-30,Check solution,30.png,LLM should spot error and point it out,Substitution error,Check a incorrect solution,,Incorrect,Jóhannes
-31,Check solution,31.png,LLM should spot error and point it out,Derivative error,Check a incorrect solution,,Incorrect,Jóhannes
-32,Hint,32.png,"LLM should spot error, point it out and not give hint",Slope error,Give a hint for a incorrect solution so far,,Incorrect,Jóhannes
-33,Hint,33.png,"LLM should spot error, point it out and not give hint",Integral error,Give a hint for a incorrect solution so far,,Incorrect,Jóhannes
-34,Hint,,"LLM should spot error, point it out and not give hint",,Give a hint for a incorrect solution so far,,Incorrect,Unfinished
-35,Hint,,"LLM should spot error, point it out and not give hint",,Give a hint for a incorrect solution so far,,Incorrect,Unfinished
-36,Hint,,"LLM should spot error, point it out and not give hint",,Give a hint for a incorrect solution so far,,Incorrect,Unfinished
-37,Reveal Solution,,,,Reveal Solution,,,Unfinished
-38,Reveal Solution,,,,Reveal Solution,,,Unfinished
-39,Reveal Solution,,,,Reveal Solution,,,Unfinished
-40,Reveal Solution,,,,Reveal Solution,,,Unfinished
-41,Reveal Solution,,,,Reveal Solution,,,Unfinished
-42,Check solution,,,,Edge Cases,Many students cross over values when solving eq.,,Unfinished
-43,Check solution,,,,Edge Cases,"Use of ""formerkjakönnun"" for inequalities",,Unfinished
-44,Check solution,,,,Edge Cases,Use of graphs in solutions,,Unfinished
-45,Hint,,,,Edge Cases,Asking for a hint when fully solved,,Unfinished
-46,Check solution,,,,Edge Cases,Multiple methods e.g. d/dx tan x,,Unfinished
-47,Hint,,,,Ambiguities,When multiple errors only point out first,,Unfinished
-48,Check solution,,,,Ambiguities,When we have unclear handwrting e.g. x+? = 4,Unclear,Unfinished
-49,Hint,,,,Answer leakege,Asking for a hint when not started,,Unfinished
-50,,,,,Answer leakege,,,Unfinished
+id,mode,image,expected_behaviour,error_type,category,Explanation,expected_verdict,author
+1,Check solution,1.png,LLM should verify that solution is correct,Null,Check a correct solution,,correct_so_far,Jóhannes
+2,Check solution,2.png,LLM should verify that solution is correct,Null,Check a correct solution,,correct_so_far,Jóhannes
+3,Check solution,3.png,LLM should verify that solution is correct,Null,Check a correct solution,,correct_so_far,Jóhannes
+4,Check solution,4.png,LLM should verify that solution is correct,Null,Check a correct solution,,correct_so_far,Jóhannes
+5,Check solution,5.png,LLM should verify that solution is correct,Null,Check a correct solution,,correct_so_far,Jóhannes
+6,Check solution,6.png,LLM should verify that solution is correct,Null,Check a correct solution,,correct_so_far,Jóhannes
+7,Check solution,7.png,LLM should verify that solution is correct,Null,Check a correct solution,,correct_so_far,Jóhannes
+8,Hint,8.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
+9,Hint,9.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
+10,Hint,10.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
+11,Hint,11.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
+12,Hint,12.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
+13,Hint,13.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
+14,Hint,14.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
+15,Hint,15.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
+16,Hint,16.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
+17,Hint,17.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
+18,Hint,18.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
+19,Hint,19.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
+20,Hint,20.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
+21,Hint,21.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
+22,Check solution,22.png,LLM should spot error and point it out,Wrong expansion,Check a incorrect solution,,incorrect,Jóhannes
+23,Check solution,23.png,LLM should spot error and point it out,Sign error,Check a incorrect solution,,incorrect,Jóhannes
+24,Check solution,24.png,LLM should spot error and point it out,Division error,Check a incorrect solution,,incorrect,Jóhannes
+25,Check solution,25.png,LLM should spot error and point it out,Forgotten term error,Check a incorrect solution,,incorrect,Jóhannes
+26,Check solution,26.png,LLM should spot error and point it out,Factoring error,Check a incorrect solution,,incorrect,Jóhannes
+27,Check solution,27.png,LLM should spot error and point it out,Log rule error,Check a incorrect solution,,incorrect,Jóhannes
+28,Check solution,28.png,LLM should spot error and point it out,Exponent error,Check a incorrect solution,,incorrect,Jóhannes
+29,Check solution,29.png,LLM should spot error and point it out,Inequality error,Check a incorrect solution,,incorrect,Jóhannes
+30,Check solution,30.png,LLM should spot error and point it out,Substitution error,Check a incorrect solution,,incorrect,Jóhannes
+31,Check solution,31.png,LLM should spot error and point it out,Derivative error,Check a incorrect solution,,incorrect,Jóhannes
+32,Hint,32.png,"LLM should spot error, point it out and not give hint",Slope error,Give a hint for a incorrect solution so far,,incorrect,Jóhannes
+33,Hint,33.png,"LLM should spot error, point it out and not give hint",Integral error,Give a hint for a incorrect solution so far,,incorrect,Jóhannes
