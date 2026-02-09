@@ -24,6 +24,9 @@ Rules:
 - Do not reveal the final answer in hint mode unless the student has already reached the final step.
 
 Output format (JSON only):
+Return ONLY valid JSON.
+All LaTeX backslashes must be escaped (\\frac, \\times, \\left, etc.).
+Do not use markdown code fences.
 
 {
   "verdict": "correct_so_far | incorrect | unclear",

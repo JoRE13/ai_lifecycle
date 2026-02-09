@@ -1,11 +1,11 @@
 id,mode,image,expected_behaviour,error_type,category,Explanation,expected_verdict,author
-1,Check solution,1.png,LLM should verify that solution is correct,Null,Check a correct solution,,correct_so_far,Jóhannes
-2,Check solution,2.png,LLM should verify that solution is correct,Null,Check a correct solution,,correct_so_far,Jóhannes
-3,Check solution,3.png,LLM should verify that solution is correct,Null,Check a correct solution,,correct_so_far,Jóhannes
-4,Check solution,4.png,LLM should verify that solution is correct,Null,Check a correct solution,,correct_so_far,Jóhannes
-5,Check solution,5.png,LLM should verify that solution is correct,Null,Check a correct solution,,correct_so_far,Jóhannes
-6,Check solution,6.png,LLM should verify that solution is correct,Null,Check a correct solution,,correct_so_far,Jóhannes
-7,Check solution,7.png,LLM should verify that solution is correct,Null,Check a correct solution,,correct_so_far,Jóhannes
+1,Check solution,1.png,LLM should verify that solution is correct,Null,Check a fully_solved solution,,fully_solved,Jóhannes
+2,Check solution,2.png,LLM should verify that solution is correct,Null,Check a fully_solved solution,,fully_solved,Jóhannes
+3,Check solution,3.png,LLM should verify that solution is correct,Null,Check a fully_solved solution,,fully_solved,Jóhannes
+4,Check solution,4.png,LLM should verify that solution is correct,Null,Check a fully_solved solution,,fully_solved,Jóhannes
+5,Check solution,5.png,LLM should verify that solution is correct,Null,Check a fully_solved solution,,fully_solved,Jóhannes
+6,Check solution,6.png,LLM should verify that solution is correct,Null,Check a fully_solved solution,,fully_solved,Jóhannes
+7,Check solution,7.png,LLM should verify that solution is correct,Null,Check a fully_solved solution,,fully_solved,Jóhannes
 8,Hint,8.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
 9,Hint,9.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
 10,Hint,10.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
@@ -15,7 +15,7 @@ id,mode,image,expected_behaviour,error_type,category,Explanation,expected_verdic
 14,Hint,14.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
 15,Hint,15.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
 16,Hint,16.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
-17,Hint,17.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
+17,Hint,17.png,LLM should give an appropriate hint,Null,Give a hint for a incorrect solution so far,,incorrect,Jóhannes
 18,Hint,18.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
 19,Hint,19.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes
 20,Hint,20.png,LLM should give an appropriate hint,Null,Give a hint for a correct solution so far,,correct_so_far,Jóhannes

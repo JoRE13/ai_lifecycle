@@ -1,0 +1,3 @@
+verdict,response_type,message_is,file_path,expected_verdict,prompt_version
+fully_solved,explanation,Þetta er alveg rétt hjá þér! Þú hefur lagt saman stuðlana fyrir $y^5$ liðina rétt ($-1 - 5 - 2 = -8$) og haldið $xy$ liðnum sér.,./img/1.png,fully_solved,v3
+fully_solved,explanation,"Frábært hjá þér! Þetta er alveg rétt leyst. Þú fannst fyrst rétt sammengið $B \cup C = \{2, 6, 8, 10\}$ og síðan sniðmengið við $A$ sem gefur svarið $\{2, 6\}$.",./img/2.png,fully_solved,v3

@@ -1,70 +1,72 @@
 from google import genai
 from google.genai.errors import ServerError
 from PIL import Image
-from pathlib import Path
 import time
 import pandas as pd
-import json
-import re
+from pydantic import BaseModel
 
+class LLMResponse(BaseModel):
+    verdict: str
+    response_type: str
+    message_is: str
 
 client = genai.Client()
+df = pd.read_csv("assignment3.csv")
 
-df = pd.read_csv('assignment3.csv')
-
-
-
-with open("./prompts/v1.txt", "r") as file:
-    prompt_v1 = file.read()
-
-
-def call_model_with_retry(image,mode, max_retries=5):
+def call_model_with_retry(prompt: str, image, mode: str, max_retries=5) -> str:
     for attempt in range(max_retries):
         try:
             resp = client.models.generate_content(
                 model="models/gemini-3-flash-preview",
-                contents=[prompt_v1, mode, image],
+                contents=[prompt, mode, image],
+                config={
+                    "response_mime_type": "application/json",
+                    "response_json_schema": LLMResponse.model_json_schema(),
+                },
             )
             return resp.text
-
-        except ServerError as e:
+        except ServerError:
             if attempt == max_retries - 1:
                 raise
             wait = 2 ** attempt
             print(f"Server busy, retrying in {wait}s...")
             time.sleep(wait)
 
-result_df = pd.DataFrame()
+for v in ["v1", "v2", "v3"]:
+    with open(f"./prompts/{v}.txt", "r") as file:
+        prompt = file.read()
 
-for row in df.itertuples():
-    file_path = f"./img/{row.image}"
-    print(f"Processing {file_path}")
+    rows = []
 
-    with Image.open(file_path) as image:
+    for row in df.itertuples():
+        file_path = f"./img/{row.image}"
+        print(f"[{v}] Processing {file_path}")
+
         try:
-            result = call_model_with_retry(image, row.mode)
-            if result.startswith("```"):
-                result = re.sub(r"^```(?:json)?\s*", "", result)
-                result = re.sub(r"\s*```$", "", result).strip()
+            with Image.open(file_path) as image:
+                result = call_model_with_retry(prompt, image, row.mode)
 
-            # convert model response (string) to dict
-            result_json = json.loads(result)
+            parsed = LLMResponse.model_validate_json(result)  # pydantic model
+            out = parsed.model_dump()                         # dict
 
-            # add extra fields
-            result_json["file_path"] = file_path
-            result_json["expected_verdict"] = row.expected_verdict
-
-            # append to dataframe
-            result_df = pd.concat(
-                [result_df, pd.DataFrame([result_json])],
-                ignore_index=True
-            )
+            out["file_path"] = file_path
+            out["expected_verdict"] = row.expected_verdict
+            out["prompt_version"] = v
+            rows.append(out)
 
         except Exception as e:
             print(f"Failed on {file_path}: {e}")
+            #  keep failures in the output too
+            rows.append({
+                "file_path": file_path,
+                "expected_verdict": getattr(row, "expected_verdict", None),
+                "prompt_version": v,
+                "verdict": None,
+                "response_type": "error",
+                "message_is": str(e),
+            })
 
-    time.sleep(1)
+        time.sleep(1)
 
-print(result_df)
-result_df.to_csv('results_v1.csv')
-
+    result_df = pd.DataFrame(rows)
+    result_df.to_csv(f"results_{v}.csv", index=False)
