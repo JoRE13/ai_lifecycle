@@ -29,7 +29,7 @@ All LaTeX backslashes must be escaped (\\frac, \\times, \\left, etc.).
 Do not use markdown code fences.
 
 {
-  "verdict": "correct_so_far | incorrect | unclear",
+  "verdict": "fully_solved | correct_so_far | incorrect | unclear",
   "response_type": "hint | fix_first | explanation | full_solution",
   "message_is": "text in Icelandic"
 }

@@ -1,31 +1,83 @@
-,verdict,response_type,message_is,file_path,expected_verdict
-0,fully_solved,explanation,Frábært hjá þér! Þú hefur einfaldað stæðuna alveg rétt. Þú lagðir saman stuðlana fyrir $y^5$ ($-1 - 5 - 2 = -8$) og hélst $xy$ liðnum réttum. Vel gert!,./img/1.png,correct_so_far
-1,fully_solved,explanation,Frábært starf! Lausnin þín er alveg rétt. Þú fannst fyrst sammengið $B \cup C$ og síðan sniðmengi þess við $A$ á réttan hátt.,./img/2.png,correct_so_far
-2,fully_solved,explanation,Frábært! Þú hefur leyst dæmið alveg rétt. Rökstuðningurinn þinn með því að skipta jöfnunni upp í þrjú tilvik eftir núllstöðvum algildanna er hárréttur og lokasvarið sömuleiðis.,./img/3.png,correct_so_far
-3,fully_solved,explanation,Lausnin er alveg rétt hjá þér! Þú fylgdir réttum skrefum til að einangra $x$ og komst að réttri niðurstöðu.,./img/4.png,correct_so_far
-4,fully_solved,explanation,"Frábært! Þetta er alveg rétt hjá þér. Þú notar kósínusregluna á réttan hátt, reikningurinn er nákvæmur og niðurstaðan fyrir hornið $C$ er rétt.",./img/5.png,correct_so_far
-5,incorrect,explanation,Lausnin er röng. Villan liggur í því hvernig þú sameinar veldisvísana í þriðju línu. Þar breytir þú formerkinu á seinni hluta tvinnhlutans (imaginary part) úr plús í mínus fyrir mistök.,./img/6.png,correct_so_far
-6,fully_solved,explanation,Vel gert! Lausnin er alveg rétt hjá þér. Þú beittir keðjureglunni rétt fyrir alla liði fallsins og einföldunin á lokasvarinu er nákvæm.,./img/7.png,correct_so_far
-7,correct_so_far,hint,Þetta er rétt byrjun hjá þér! Manstu hvaða reglu er hægt að nota til að einfalda logrann frekar þegar það er veldi á stærðunum inni í honum?,./img/8.png,correct_so_far
-8,correct_so_far,hint,Þetta er góð byrjun! Mundu að fall er ekki samfellt þar sem það er ekki skilgreint. Hvað þarf að gilda um nefnarann í brotinu $\frac{\sin(x)}{\cos(x)}$ til þess að fallið sé ekki skilgreint?,./img/9.png,correct_so_far
-9,correct_so_far,hint,"Vel gert, þú hefur fundið rétta rót fyrir margliðuna. Ef þú veist að $x = -1$ er rót (og þar sem diskrimínantinn $d=0$ er hún tvöföld), hvernig geturðu þá notað það til að skrifa margliðuna sem margfeldi tveggja sviga?",./img/10.png,correct_so_far
-10,correct_so_far,hint,"Þú ert búin(n) að finna skilgreiningarmengið rétt, sem er góð byrjun. Nú þarftu að leysa sjálfa jöfnuna. Manstu hvaða gildi $u$ þarf að hafa svo að $\ln(u) = 0$?",./img/11.png,correct_so_far
-11,correct_so_far,hint,"Þú ert búin/n að finna hallatöluna rétt! Nú þegar þú veist hallatöluna ($h = -1$) og ert með tvo punkta, hvernig getur þú notað annan hvorn punktinn til að finna jöfnu línunnar (t.d. á forminu $y = hx + b$)?",./img/12.png,correct_so_far
-12,correct_so_far,hint,"Þetta er rétt byrjun hjá þér! Prófaðu að beita hlutheildun aftur á nýja heildið, $\int e^x \cos(x) dx$. Sérðu hvernig það gæti hjálpað þér að einangra upprunalega heildið?",./img/14.png,correct_so_far
-13,correct_so_far,hint,Þú ert með margfeldi af tveimur föllum: $2x^2$ og $\log(x)$. Manst þú eftir aðferð sem heitir hlutheildun (e. integration by parts)? Hvaða fall væri gott að velja sem $u$ og hvaða fall sem $dv$?,./img/15.png,correct_so_far
-14,correct_so_far,hint,Þetta er rétt byrjun hjá þér. Taktu eftir sambandinu á milli teljarans og nefnarans í upprunalega dæminu. Hvað færðu ef þú deildar nefnarann $8x^2-5x$?,./img/16.png,correct_so_far
-15,correct_so_far,hint,"Þú ert á réttri leið! Ef þú heldur áfram að deilda nokkrum sinnum í viðbót (t.d. upp í $f^{(4)}(x)$), sérðu þá eitthvað mynstur sem byrjar að endurtaka sig? Skoðaðu sérstaklega hvernig horfnaföllin breytast og hvað gerist við stuðulinn (töluna) fyrir framan í hverju skrefi.",./img/18.png,correct_so_far
-16,correct_so_far,hint,"Vel gert, þetta er hárrétt byrjun! Hvað gerist ef þú reynir að reikna markgildið fyrir nýja brotið $\frac{1 - \cos(x)}{3x^2}$? Er það ennþá á forminu $\frac{0}{0}$ og ef svo er, hvaða reglu geturðu beitt aftur?",./img/19.png,correct_so_far
-17,correct_so_far,hint,"Þetta er rétt samsetning á fallinu! Nú þarftu að finna afleiðuna $h'(x)$. Manstu hvaða reglu við notum þegar við deildum samsett föll, eða gætirðu einfaldað stæðuna með því að skrifa kvaðratrótina sem veldi áður en þú deildar?",./img/20.png,correct_so_far
-18,correct_so_far,hint,Þetta er góð byrjun. Manst þú eftir grundvallarreglu hornafalla (reglu Pýþagórasar) sem tengir saman $\sin^2(x)$ og $\cos^2(x)$ við töluna 1? Hvernig gætir þú nýtt þá reglu til að skipta út 1 í dæminu?,./img/21.png,correct_so_far
-19,incorrect,fix_first,Það er villa í öðru skrefinu hjá þér. Þegar þú margfaldar upp úr sviganum $2(x+3)$ þarftu að margfalda báða liðina inni í sviganum með 2. Þetta ætti að vera $2x + 6$ en ekki $2x + 3$.,./img/22.png,incorrect
-20,incorrect,fix_first,"Lausnin er röng. Skekkjan kemur fram þegar þú sameinar brotin í einn teljara. Þegar þú dregur brotið $\frac{-6x+3}{6}$ frá, þarf mínusinn fyrir framan að dreifast á báða liði teljarans. Það þýðir að $-(-6x+3)$ á að vera $6x-3$, en þú skrifaðir $+3$.",./img/23.png,incorrect
-21,incorrect,fix_first,"Þetta er ekki alveg rétt. Mundu að þegar þú deilir broti þarftu að deila báðum liðum í teljaranum með nefnaranum. Þú deildir $x^2$ með $x$, en gleymdir að deila $3$ með $x$.",./img/24.png,incorrect
-22,incorrect,fix_first,"Lausnin er röng. Í fyrsta skrefinu, þegar þú notar lograreglur til að sameina vinstri hliðina, gleymirðu að taka $\log(4)$ liðinn með í reikninginn.",./img/25.png,incorrect
-23,incorrect,explanation,"Lausnin er röng. Þú deildir fallið rétt og fékkst $f'(x) = x^2 + 5x + 6$, en þáttunin hjá þér er ekki rétt. Athugaðu að $(x+1)(x+6) = x^2 + 7x + 6$, sem er ekki það sama og $x^2 + 5x + 6$. Þú þarft að finna tvær tölur sem hafa summuna 5 og margfeldið 6 til að þátta rétt.",./img/26.png,incorrect
-24,incorrect,fix_first,"Lausnin er röng. Fyrsta villan kemur fram þegar þú reynir að einfalda teljarann. Þegar þú margfaldar saman veldi með sömu grunntölu átt þú að leggja veldisvísana saman, en ekki deila þeim eða stytta út: $a^6 \cdot a^{1/2} = a^{6 + 1/2} = a^{13/2}$ (eða $a^{6,5}$).",./img/28.png,incorrect
-25,incorrect,explanation,"Þetta er ekki alveg rétt. Þegar þú deilir báðum hliðum ójöfnu með neikvæðri tölu (í þessu tilfelli $-4$), þá verður þú að snúa ójöfnumerkinu við.",./img/29.png,incorrect
-26,incorrect,fix_first,"Síðasta skrefið er rangt. Þú fannst réttilega að $t = -1$, en þar sem $t = x^2$ þá þýðir það að $x^2 = -1$. Athugaðu hvort rauntalan $x = -1$ uppfylli það skilyrði, því $(-1)^2 = 1$.",./img/30.png,incorrect
-27,incorrect,fix_first,"Lausnin er ekki rétt. Fyrsta villan er í fyrsta skrefinu þegar þú beitir hlutheildun. Mundu að stofnfallið fyrir $\sin(x)$ er $-\cos(x)$, sem hefur áhrif á formerkin í reglunni.",./img/31.png,incorrect
-28,incorrect,hint,"Þú virðist hafa víxlað $x$ og $y$ gildunum í formúlunni fyrir hallatölu. Mundu að hallatalan er reiknuð sem breyting á $y$ deilt með breytingu á $x$, það er $\frac{y_2 - y_1}{x_2 - x_1}$.",./img/32.png,incorrect
-29,incorrect,hint,"Það er villa í fyrsta skrefinu hjá þér. Mundu að heildið af $\cos(x)$ er $\sin(x)$, ekki $-\sin(x)$. Farðu líka vel yfir formerkin í hlutheildunarreglunni $\int u \, dv = uv - \int v \, du$.",./img/33.png,incorrect
+verdict,response_type,message_is,file_path,expected_verdict,prompt_version
+fully_solved,explanation,"Þetta er alveg rétt hjá þér. Þú hefur lagt saman $y^5$ liðina á réttan hátt: $-1 - 5 - 2 = -8$, og geymt $xy$ liðinn sérstaklega þar sem hann er ekki samkynja hinum liðunum.",./img/1.png,fully_solved,v2
+fully_solved,explanation,Frábært! Þetta er alveg rétt leyst hjá þér. Þú fannst fyrst réttilega sammengi B og C og síðan sniðmengi þess við A.,./img/2.png,fully_solved,v2
+fully_solved,explanation,"Vel gert! Þú hefur leyst verkefnið fullkomlega. Þú skiptir jöfnunni rétt upp í tilvik miðað við núllstöðvar algildanna og dregur rétta ályktun í hverju tilfelli fyrir sig. Lokasvarið $x \in ]-\infty, -10]$ er hárrétt.",./img/3.png,fully_solved,v2
+fully_solved,explanation,Frábært hjá þér! Þú leystir jöfnuna alveg rétt. Svarið $x = 6$ er hárrétt.,./img/4.png,fully_solved,v2
+fully_solved,explanation,Frábært hjá þér! Þetta er alveg rétt leyst. Þú notar kósínusregluna á réttan hátt og allir útreikningar eru nákvæmir.,./img/5.png,fully_solved,v2
+incorrect,fix_first,"Lausnin er vel upp sett, en það er villa í fjórðu línu þegar þú sameinar veldisvísana. Þegar þú margfaldar saman tvö veldi með sömu grunntölu ($e^A \cdot e^B = e^{A+B}$) áttu að leggja veldisvísana saman. Þú virðist hafa breytt plúsnum í mínus fyrir framan seinna brotið í ímyndaða hlutanum, sem hefur áhrif á lokaniðurstöðuna.",./img/6.png,fully_solved,v2
+fully_solved,explanation,Þetta er alveg rétt hjá þér! Þú beittir keðjureglunni rétt í gegnum öll skrefin og sýnir góð tök á því hvernig á að diffra samsett föll. Vel gert.,./img/7.png,fully_solved,v2
+correct_so_far,hint,Þetta er alveg rétt byrjun hjá þér. Manstu hvaða reglu þú getur notað til að sýsla við veldisvísana inni í logrunum?,./img/8.png,correct_so_far,v2
+correct_so_far,hint,Þetta er góð byrjun að rita $\tan(x)$ sem $\frac{\sin(x)}{\cos(x)}$. Mundu að fall á forminu $\frac{u(x)}{v(x)}$ er ekki skilgreint þar sem nefnarinn er núll. Fyrir hvaða gildi á $x$ er $\cos(x) = 0$?,./img/9.png,correct_so_far,v2
+correct_so_far,hint,"Þú hefur réttilega fundið að $x = -1$ er tvöföld rót margliðunnar. Ef þú veist að tala $r$ er rót, hvernig geturðu notað þá vitneskju til að skrifa margliðuna sem margfeldi tveggja sviga?",./img/10.png,correct_so_far,v2
+correct_so_far,hint,"Þetta er rétt byrjun hjá þér og gott að skilgreina mengið fyrst. Til að halda áfram skaltu hugsa: hvaða gildi þarf stærðin inni í sviganum, $(3x - 4)$, að hafa svo að náttúrulegi logrinn af henni gefi 0?",./img/11.png,correct_so_far,v2
+correct_so_far,hint,"Frábært, þú ert með rétta hallatölu! Nú þegar þú veist að hallatalan er \(h = -1\), hvernig getur þú notað hana ásamt öðrum hvorum punktinum til þess að finna jöfnu línunnar á forminu \(y = hx + b\)?",./img/12.png,correct_so_far,v2
+correct_so_far,hint,Þú ert á réttri leið og þáttunin er rétt. Nú þarftu að finna leið til að takmarka stærðina á $|x+1|$. Hvað gerist ef þú gerir ráð fyrir að $\delta$ sé að hámarki 1?,./img/13.png,correct_so_far,v2
+correct_so_far,hint,Þetta er rétt byrjun hjá þér! Hvað gerist ef þú beitir hlutheildun aftur á nýja heildið $\int e^x \cos(x) dx$?,./img/14.png,correct_so_far,v2
+correct_so_far,hint,Þú ert með heildi af margfeldi tveggja ólíkra falla ($2x^2$ og $\log(x)$). Manstu hvaða aðferð er gott að nota þegar við heildum margfeldi? Hvaða hluta væri gott að velja sem $u$ til að deilda og hver væri $dv$ til að heilda?,./img/15.png,correct_so_far,v2
+correct_so_far,hint,Þetta er góð byrjun að þátta nefnarann. Prófaðu að skoða sambandið á milli nefnarans í upprunalega heildinu ($8x^2 - 5x$) og teljarans ($16x - 5$). Hvað gerist ef þú deildar nefnarann?,./img/16.png,correct_so_far,v2
+correct_so_far,hint,"Þú ert á réttri leið með að byrja á keðjureglunni. Mundu að fallið er samsett úr þremur hlutum: fastanum -4, logranum með grunntöluna 2 og kósínusfallinu. Hver er reglan fyrir afleiðu af $\log_2(u)$ og hvað er 'innra fallið' í þessu dæmi?",./img/17.png,incorrect,v2
+correct_so_far,hint,Þetta er góð byrjun! Prófaðu að halda áfram og finna þriðju og fjórðu afleiðuna. Sérðu eitthvað reglulegt munstur í því hvernig föllin (sin og cos) og stuðlarnir breytast? Geturðu notað það munstur til að átta þig á því hver 67. afleiðan er án þess að reikna þær allar?,./img/18.png,correct_so_far,v2
+correct_so_far,hint,Þetta er rétt hjá þér hingað til! Hvað gerist ef þú reynir að meta nýja markgildið $\lim_{x \to 0} \frac{1 - \cos(x)}{3x^2}$ með því að setja $0$ inn fyrir $x$? Er markgildið enn á óákvörðuðu formi?,./img/19.png,correct_so_far,v2
+correct_so_far,hint,Þetta er rétt hjá þér hingað til! Nú þarftu að finna afleiðuna h'(x). Manstu hvaða reglu við notum til að diffra samsett föll (þar sem eitt fall er inni í öðru)?,./img/20.png,correct_so_far,v2
+correct_so_far,hint,Þetta er góð byrjun. Manstu eftir hornafallareglunni sem tengir saman $\sin^2(x)$ og $\cos^2(x)$? Hvernig gætirðu notað hana til að skipta út tölunni 1 í jöfnunni þinni?,./img/21.png,correct_so_far,v2
+incorrect,fix_first,"Það er villa í öðru skrefinu hjá þér. Þegar þú margfaldar $2(x+3)$ þarftu að muna að margfalda báða liðina inni í sviganum með 2, ekki bara $x$.",./img/22.png,incorrect,v2
+incorrect,explanation,"Það er villa í útreikningunum þínum þegar þú sameinar brotin á vinstri hliðinni. Þegar þú dregur brotið \frac{-6x+3}{6} frá, þarftu að gæta þess að mínusmerkið á milli brotanna hafi áhrif á alla liði í teljaranum. Þannig verður -3 en ekki +3 í teljaranum þar sem - (+3) = -3.",./img/23.png,incorrect,v2
+incorrect,fix_first,Þetta er ekki alveg rétt. Þegar þú deilir broti með $x$ þarftu að deila öllum liðum teljarans með $x$. Hér deilir þú bara $x^2$ með $x$ en gleymir að deila $3$ með $x$ líka.,./img/24.png,incorrect,v2
+incorrect,fix_first,Þú gleymdir liðnum $\log(4)$ þegar þú sameinaðir lograna í fyrsta skrefinu. Mundu að $\log(a) + \log(b) + \log(c) = \log(a \cdot b \cdot c)$.,./img/25.png,incorrect,v2
+incorrect,explanation,"Þættingin á $x^2 + 5x + 6$ er ekki rétt hjá þér. Athugaðu að $(x+1)(x+6) = x^2 + 7x + 6$, en þú þarft að finna tvær tölur sem hafa summuna 5 og margfeldið 6.",./img/26.png,incorrect,v2
+incorrect,fix_first,"Fyrsta villan er að þú reynir að sameina logra með ólíkar grunntölur (\ln og \log_2) með margföldun, en það má aðeins gera ef grunntalan er sú sama. Athugaðu líka að þú skrifaðir óvart x í staðinn fyrir 3 úr upprunalega dæminu.",./img/27.png,incorrect,v2
+incorrect,explanation,"Villan er í skrefinu þar sem þú sameinar $a^6$ og $a^{1/2}$. Þegar veldi með sama grunntölu eru margfölduð saman áttu að leggja veldisvísana saman ($6 + \frac{1}{2}$), en það lítur út fyrir að þú hafir margfaldað þá saman til að fá $a^3$ í teljarann.",./img/28.png,incorrect,v2
+incorrect,explanation,"Þegar þú deilir báðum megin með neikvæðri tölu (-4), þá þarftu að snúa ójöfnumerkinu við.",./img/29.png,incorrect,v2
+incorrect,fix_first,"Lausnin er rétt fram að lokaskrefinu þar sem þú færð $t = -1$. Þar sem þú skilgreindir $t = x^2$, þá þýðir þetta að $x^2 = -1$. Athugaðu hvort til sé rauntala sem gildir fyrir þá jöfnu.",./img/30.png,incorrect,v2
+incorrect,fix_first,"Það er villa í fyrsta skrefinu hjá þér. Mundu að heildið af $\sin(x)$ er $-\cos(x)$, en ekki $\cos(x)$.",./img/31.png,incorrect,v2
+incorrect,hint,Þú hefur ruglað saman staðsetningu x- og y-gilda í formúlunni fyrir hallatölu. Mundu að hallatalan er reiknuð sem breyting á y-gildi deilt með breytingu á x-gildi: $h = \frac{y_2 - y_1}{x_2 - x_1}$. Geturðu prófað að setja tölurnar upp á nýtt í réttar tölustafi?,./img/32.png,incorrect,v2
+incorrect,hint,Það virðist vera villa í fyrsta skrefinu hjá þér þegar þú beitir hlutheildun. Athugaðu vel formerkin og hvort þú sért að heilda eða deilda $\cos(x)$ í fyrsta liðnum. Mundu að $\int \cos(x) dx = \sin(x)$.,./img/33.png,incorrect,v2
+incorrect,hint,"Það vantar að margfalda 2 við báða liðina inni í sviganum. Þú margfaldaðir 2 við x, en þú þarft líka að margfalda 2 við -3. Geturðu prófað aftur að leysa úr sviganum?",./img/34.png,incorrect,v2
+incorrect,hint,Síðasta skrefið þitt er ekki rétt. Þú getur ekki bara sleppt log-merkinu og jafnað stæðuna beint við töluna 2. Manstu hver grunntala lograns (log) er og hvernig hún tengist tölunni 2 þegar þú breytir lograjöfnu í veldisjöfnu?,./img/35.png,incorrect,v2
+incorrect,hint,"Það er villa í þáttuninni hjá þér. Athugaðu að $(x-2)^2$ er jafnt og $x^2 - 4x + 4$, en ekki $x^2 - 4$. Manstu eftir reglunni um mismun tveggja feritalna (samokureglunni) til að þátta $x^2 - 4$ rétt?",./img/36.png,incorrect,v2
+fully_solved,full_solution,"Hér er skref-fyrir-skref lausn á dæminu: 1. Við byrjum á því að þátta teljarann $x^2 - 9$. Þetta er mismunur tveggja fertalna sem má þátta með reglunni $a^2 - b^2 = (a - b)(a + b)$, svo $x^2 - 9 = (x - 3)(x + 3)$. 2. Við setjum þáttuðu stæðuna inn í upprunalega brotið: $\frac{x^2 - 9}{x - 3} = \frac{(x - 3)(x + 3)}{x - 3}$. 3. Við styttum út sameiginlega þáttinn $(x - 3)$ úr teljara og nefnara. Mikilvægt er að athuga að nefnarinn má ekki vera núll, því er $x \neq 3$. Við fáum þá einfölduðu stæðuna: $x + 3$. Lokasvarið er því $x + 3$ með skilyrðinu $x \neq 3$.",./img/37.png,fully_solved,v2
+fully_solved,full_solution,"Hér er skref-fyrir-skref lausn á dæminu:
+
+1. **Ákvörðum formengið:**
+Til þess að lografallið sé skilgreint verða tölurnar innan sviganna að vera jákvæðar:
+$x - 1 > 0 \Rightarrow x > 1$
+$x + 3 > 0 \Rightarrow x > -3$
+Sameiginlegt formengi er því $x > 1$.
+
+2. **Sameinum logra:**
+Notum regluna $\log(a) + \log(b) = \log(a \cdot b)$:
+$\log((x - 1)(x + 3)) = 2$
+
+3. **Losnum við logrann:**
+Logrinn er með grunninn 10, svo við hefjum 10 í veldi beggja vegna:
+$(x - 1)(x + 3) = 10^2$
+$x^2 + 3x - x - 3 = 100$
+$x^2 + 2x - 3 = 100$
+
+4. **Einangrum og leysum annars stigs jöfnu:**
+$x^2 + 2x - 103 = 0$
+
+Notum lausnarformúluna $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$:
+$x = \frac{-2 \pm \sqrt{2^2 - 4 \cdot 1 \cdot (-103)}}{2 \cdot 1}$
+$x = \frac{-2 \pm \sqrt{4 + 412}}{2}$
+$x = \frac{-2 \pm \sqrt{416}}{2}$
+
+5. **Einföldun og athugun á formengi:**
+Við getum einfaldað $\sqrt{416} = \sqrt{16 \cdot 26} = 4\sqrt{26}$.
+$x = \frac{-2 \pm 4\sqrt{26}}{2} = -1 \pm 2\sqrt{26}$
+
+Þar sem formengið er $x > 1$, þá útilokum við neikvæðu lausnina.
+Eina gilda lausnin er:
+$x = -1 + 2\sqrt{26}$ eða $x = \frac{-2 + \sqrt{416}}{2}$.",./img/38.png,fully_solved,v2
+fully_solved,full_solution,"Hér er skref-fyrir-skref lausn á jöfnunni $|2x - 3| = x + 1$: 1. Við leysum algildisjöfnuna með því að skoða tvö tilfelli, eftir því hvort stærðin innan algildismerkjanna er jákvæð eða neikvæð. 2. **Tilfelli 1:** Ef $2x - 3 \geq 0$ (það er $x \geq \frac{3}{2}$), þá fellur algildið einfaldlega brott: $2x - 3 = x + 1$. Við einangrum $x$: $2x - x = 1 + 3 \implies x = 4$. Þar sem $4 \geq \frac{3}{2}$ er þetta gild lausn. 3. **Tilfelli 2:** Ef $2x - 3 < 0$ (það er $x < \frac{3}{2}$), þá breytum við um formerki: $-(2x - 3) = x + 1$. Við leysum úr sviganum: $-2x + 3 = x + 1$. Við einangrum $x$: $-2x - x = 1 - 3 \implies -3x = -2 \implies x = \frac{2}{3}$. Þar sem $\frac{2}{3} < \frac{3}{2}$ er þetta einnig gild lausn. 4. **Niðurstaða:** Lausnir jöfnunnar eru $x = \frac{2}{3}$ og $x = 4$.",./img/39.png,fully_solved,v2
+fully_solved, explanation, Vel gert! Þetta er alveg rétt leyst hjá þér. Þú beittir keðjureglunni réttilega á fallið og afleiðan er fyllilega rétt fundin.,./img/40.png,fully_solved,v2
+fully_solved,full_solution,"Hér er skref-fyrir-skref lausn á dæminu:\n\nVið notum hlutheildun til að leysa heildið $\int x \sin(x) dx$.\n\nReglan um hlutheildun er: \n$$\int u \, dv = uv - \int v \, du$$\n\n1. Við veljum $u$ og $dv$:\n   Látum $u = x \implies du = dx$\n   Látum $dv = \sin(x) dx \implies v = -\cos(x)$\n\n2. Setjum inn í regluna:\n   $$\int x \sin(x) dx = x(-\cos(x)) - \int (-\cos(x)) dx$$\n\n3. Einföldum og leysum seinna heildið:\n   $$\int x \sin(x) dx = -x \cos(x) + \int \cos(x) dx$$\n\n4. Heildið af $\cos(x)$ er $\sin(x)$:\n   $$\int x \sin(x) dx = -x \cos(x) + \sin(x) + C$$\n\nLokasvarið er því: $-x \cos(x) + \sin(x) + C$",./img/41.png,fully_solved,v2
+fully_solved,explanation,Frábært! Þetta er alveg rétt leyst hjá þér. Þú þáttaðir teljarann rétt með samokureglunni og styttir út sameiginlega liðinn á réttan hátt.,./img/42.png,fully_solved,v2
+fully_solved,explanation,Vel gert! Þú hefur leyst ójöfnuna alveg rétt. Prófunarpunktarnir þínir eru réttir og þú gætir þess vel að hafa opið bil við 4 þar sem deilt er með núlli.,./img/43.png,fully_solved,v2
+fully_solved,explanation,"Vel gert! Þetta er rétt teiknað graf fyrir fallið f(x) = x^2. Þú hefur teiknað parabólu sem hefur topppunkt í (0,0) og opnast upp á við.",./img/44.png,fully_solved,v2
+fully_solved,explanation,Vel gert! Þú hefur leyst dæmið rétt.,./img/45.png,fully_solved,v2
+fully_solved,explanation,Þetta er fullkomlega rétt leyst hjá þér! Þú notaðir margfeldisregluna á réttan hátt og afleiðan af $\tan(x)$ er rétt fundin. Vel gert.,./img/46.png,fully_solved,v2
+incorrect,hint,"Þú gerir villu í fyrsta skrefinu þegar þú endurritar fallið. Fallið $\tan(x)$ er í nefnara, svo það er ekki hægt að færa það beint upp í teljara sem $\tan(x)$. Mundir þú eftir kvótareglunni (e. quotient rule) fyrir deilingu tveggja falla?",./img/47.png,incorrect,v2
+correct_so_far,explanation,Þetta er rétt hjá þér hingað til! Þú hefur liðað vinstri hliðina rétt og dregið $x^2$ frá báðum hliðum. Nú þarftu bara að klára að einangra $x$ í jöfnunni $x - 6 = -1$.,./img/48.png,unclear,v2
+correct_so_far,hint,"G%f byrjun! Til a% einfalda j%fnuna, hva% g&tir%u gert vi% b%%ar hli%ar til a% losna vi% deilinguna me% 3?",./img/49.png,correct_so_far,v2
+correct_so_far,hint,Til þess að auðvelda vinnuna er gott að byrja á því að losna við brotið. Hvað gætir þú gert við alla liði jöfnunnar til þess að eyða nefnaranum 3?,./img/50.png,correct_so_far,v2
