@@ -32,7 +32,7 @@ def call_model_with_retry(prompt: str, image, mode: str, max_retries=5) -> str:
             print(f"Server busy, retrying in {wait}s...")
             time.sleep(wait)
 
-for v in ["v1", "v2", "v3"]:
+for v in ["v1", "v2", "v3", "v4"]:
     with open(f"./prompts/{v}.txt", "r") as file:
         prompt = file.read()
 

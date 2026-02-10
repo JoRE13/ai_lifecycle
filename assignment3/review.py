@@ -3,7 +3,7 @@ Review the output of the three different prompting strategies
 """
 import pandas as pd
 
-for v in ['v1','v2','v3']:
+for v in ['v1','v2','v3', 'v4']:
     verdict_acc = 0
     non_feas = 0
     df = pd.read_csv(f"results_{v}.csv")
