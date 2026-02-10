@@ -4,10 +4,12 @@
 
 - `agentic.py`: Runs the model on all examples for each prompt version and saves outputs to CSV.
 - `review.py`: Computes evaluation metrics from each `results_*.csv` file.
+- `qualitative_review.py`: Runs rubric-based qualitative scoring and summary tables.
 - `assignment3.csv`: Ground-truth dataset metadata (`image`, `mode`, `expected_verdict`, etc.).
-- `prompts/v1.txt`, `prompts/v2.txt`, `prompts/v3.txt`: Prompt variants.
+- `prompts/v1.txt`, `prompts/v2.txt`, `prompts/v3.txt`, `prompts/v4.txt`: Prompt variants.
+- `prompts/version_notes.md`: Version notes describing what changed between prompts and why.
 - `img/`: Input images of problems and student solutions.
-- `results_v1.csv`, `results_v2.csv`, `results_v3.csv`: Model outputs per prompt version.
+- `results_v1.csv`, `results_v2.csv`, `results_v3.csv`, `results_v4.csv`: Model outputs per prompt version.
 
 ## How it works
 
@@ -44,13 +46,24 @@ The script retries on temporary server errors with exponential backoff.
   - `full_solution` must imply `verdict == fully_solved`
   - `ask_clarification` must imply `verdict == unclear`
 
-## Current results (from existing CSV files)
+## Current quantitative results (50 rows per prompt)
 
 | Prompt | Rows | Verdict accuracy | Non-feasible ratio |
 | ------ | ---: | ---------------: | -----------------: |
-| v1     |   31 |           0.9677 |             0.0000 |
-| v2     |   30 |           0.7667 |             0.0667 |
-| v3     |    2 |           1.0000 |             0.0000 |
+| v1     |   50 |            96.0% |               2.0% |
+| v2     |   50 |            94.0% |              12.0% |
+| v3     |   50 |            94.0% |               0.0% |
+| v4     |   50 |            96.0% |               0.0% |
+
+Note: This table is quantitative (`review.py`). Qualitative `Correctness %` in `qualitative_tables.md` is a separate rubric-based metric.
+
+## Current qualitative outputs
+
+- `qualitative_scores_all_prompts.csv`
+- `qualitative_summary_by_prompt.csv`
+- `qualitative_summary_by_prompt_and_mode.csv`
+- `qualitative_tables.md`
+- `manual_review_sample.csv`
 
 ## Run instructions
 
