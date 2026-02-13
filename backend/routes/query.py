@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import json
 from io import BytesIO
 from pathlib import Path
 from typing import Literal
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi.responses import JSONResponse
 from PIL import Image, UnidentifiedImageError
 
 from backend.auth.deps import get_current_user
@@ -59,11 +61,15 @@ async def query(
             mode=mode,
         )
     except Exception as exc:
-        raise HTTPException(status_code=502, detail="LLM request failed") from exc
+        raise HTTPException(status_code=502, detail=f"LLM request failed: {exc}") from exc
 
     if not result:
         raise HTTPException(status_code=502, detail="LLM request failed")
 
     resp_text = result[0] if isinstance(result, tuple) else result
-    return Response(content=resp_text, media_type="application/json")
+    try:
+        payload = json.loads(resp_text)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=502, detail=f"Model returned invalid JSON: {exc}") from exc
 
+    return JSONResponse(content=payload)

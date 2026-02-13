@@ -13,7 +13,10 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).resolve().parent / ".env")
 
 # Initialize Langfuse once
-langfuse = Langfuse()
+try:
+    langfuse = Langfuse()
+except Exception:
+    langfuse = None
 
 class LLMResponse(BaseModel):
     verdict: str
@@ -27,10 +30,15 @@ def call_model_with_retry(prompt: str, prob_image , sol_image, mode: str, max_re
     t0 = time.time()
 
     # Start a trace (one per call)
-    trace = langfuse.trace(
-        name="gemini-call",
-        input={"prompt": prompt, "mode": mode}
-    )
+    trace = None
+    if langfuse is not None:
+        try:
+            trace = langfuse.trace(
+                name="gemini-call",
+                input={"prompt": prompt, "mode": mode}
+            )
+        except Exception:
+            trace = None
 
     for attempt in range(max_retries):
         model = "gemini-3-pro-preview" if regenerate else "models/gemini-3-flash-preview"
@@ -53,22 +61,23 @@ def call_model_with_retry(prompt: str, prob_image , sol_image, mode: str, max_re
             latency = time.time() - t0
 
             # Log generation to Langfuse
-            trace.generation(
-                name="gemini-generation",
-                model=model,
-                input=prompt,
-                output=resp.text,
-                usage={
-                    "prompt_tokens": tokens_in,
-                    "completion_tokens": tokens_out,
-                    "total_tokens": tokens_total,
-                },
-                metadata={
-                    "mode": mode,
-                    "latency": latency,
-                    "thought_tokens": tokens_thoughts
-                }
-            )
+            if trace is not None:
+                trace.generation(
+                    name="gemini-generation",
+                    model=model,
+                    input=prompt,
+                    output=resp.text,
+                    usage={
+                        "prompt_tokens": tokens_in,
+                        "completion_tokens": tokens_out,
+                        "total_tokens": tokens_total,
+                    },
+                    metadata={
+                        "mode": mode,
+                        "latency": latency,
+                        "thought_tokens": tokens_thoughts
+                    }
+                )
 
             return (
                 resp.text,
@@ -87,7 +96,8 @@ def call_model_with_retry(prompt: str, prob_image , sol_image, mode: str, max_re
 
         except ServerError as e:
             if attempt == max_retries - 1:
-                trace.event(name="error", metadata={"error": str(e)})
+                if trace is not None:
+                    trace.event(name="error", metadata={"error": str(e)})
                 raise
 
             wait = 2 ** attempt

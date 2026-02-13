@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.routes.auth import router as auth_router
+from backend.routes.query import router as query_router
 
 app = FastAPI()
 
@@ -14,6 +15,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(query_router)
 
 @app.get("/health")
 def health():
