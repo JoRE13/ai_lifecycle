@@ -71,11 +71,18 @@ def call_model_with_retry(prompt: str, image, mode: str, max_retries=5) -> str:
 #    result_df = pd.DataFrame(rows)
 #    result_df.to_csv(f"results_{v}.csv", index=False)
 
-with open(f"./prompts/v4.txt", "r") as file:
-       prompt = file.read()
+#with open(f"./prompts/v4.txt", "r") as file:
+       #prompt = file.read()
+       #
+       #image = Image.open("./img/40.png")
+       #result = call_model_with_retry(prompt, image, "check_solution")
+       #parsed = LLMResponse.model_validate_json(result)  # pydantic model
+       #out = parsed.model_dump() 
+       #print(out)
        
-       image = Image.open("./img/40.png")
-       result = call_model_with_retry(prompt, image, "check_solution")
-       parsed = LLMResponse.model_validate_json(result)  # pydantic model
-       out = parsed.model_dump() 
-       print(out)
+resp = client.models.generate_content(
+         model="models/gemini-3-flash-preview",
+         contents=["What is your name"],
+     )
+
+print(resp.usage_metadata)

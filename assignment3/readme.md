@@ -50,6 +50,7 @@ The script retries on temporary server errors with exponential backoff.
 
 | Prompt | Rows | Verdict accuracy | Non-feasible ratio |
 | ------ | ---: | ---------------: | -----------------: |
+<<<<<<< HEAD
 | v1     |   50 |            96.0% |               2.0% |
 | v2     |   50 |            94.0% |              12.0% |
 | v3     |   50 |            94.0% |               0.0% |
@@ -64,6 +65,12 @@ Note: This table is quantitative (`review.py`). Qualitative `Correctness %` in `
 - `qualitative_summary_by_prompt_and_mode.csv`
 - `qualitative_tables.md`
 - `manual_review_sample.csv`
+=======
+| v1     |   50 |           ? |             ? |
+| v2     |   50 |           ? |             ? |
+| v3     |   50 |           ? |             ? |
+| v4     |   50 |           ? |             ? |
+>>>>>>> 3307e4a (prototype)
 
 ## Run instructions
 
