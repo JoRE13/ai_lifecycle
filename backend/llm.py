@@ -10,8 +10,12 @@ from typing import Any
 from dotenv import load_dotenv
 from google import genai
 from google.genai.errors import ServerError
-from langfuse import Langfuse
 from pydantic import BaseModel
+
+try:
+    from langfuse import Langfuse
+except Exception:  # pragma: no cover - defensive import guard for platform/library mismatch
+    Langfuse = None
 
 load_dotenv(Path(__file__).resolve().parent / ".env")
 
@@ -29,6 +33,10 @@ def _build_langfuse_client() -> Langfuse | None:
 
     Returns None if tracing is not configured or initialization fails.
     """
+    if Langfuse is None:
+        logger.warning("Langfuse disabled: import failed")
+        return None
+
     public_key = os.getenv("LANGFUSE_PUBLIC_KEY")
     secret_key = os.getenv("LANGFUSE_SECRET_KEY")
 
