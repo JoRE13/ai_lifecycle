@@ -91,6 +91,7 @@ def list_problem_attempts(
             problem_id=attempt.problem_id,
             user_id=attempt.user_id,
             mode=attempt.mode,
+            solution_image_key=attempt.solution_image_key,
             verdict=attempt.verdict,
             response_type=attempt.response_type,
             message_is=attempt.message_is,
