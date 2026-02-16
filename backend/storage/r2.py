@@ -45,3 +45,13 @@ def upload_bytes(*, key: str, data: bytes, content_type: str) -> str:
         ContentType=content_type,
     )
     return key
+
+
+def presigned_get_url(*, key: str, expires_in_seconds: int = 900) -> str:
+    bucket_name = _required_env("R2_BUCKET_NAME")
+    client = _build_s3_client()
+    return client.generate_presigned_url(
+        "get_object",
+        Params={"Bucket": bucket_name, "Key": key},
+        ExpiresIn=expires_in_seconds,
+    )

@@ -21,7 +21,7 @@ class AttemptResponse(BaseModel):
     problem_id: UUID
     user_id: UUID
     mode: str
-    solution_image_key: str | None
+    solution_image_url: str | None
     verdict: str | None
     response_type: str | None
     message_is: str | None

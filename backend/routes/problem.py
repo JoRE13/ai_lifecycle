@@ -12,6 +12,7 @@ from backend.schemas.problem import (
     ProblemCreateRequest,
     ProblemCreateResponse,
 )
+from backend.storage.r2 import R2ConfigurationError, presigned_get_url
 
 router = APIRouter(tags=["problem"])
 
@@ -91,7 +92,7 @@ def list_problem_attempts(
             problem_id=attempt.problem_id,
             user_id=attempt.user_id,
             mode=attempt.mode,
-            solution_image_key=attempt.solution_image_key,
+            solution_image_url=_attempt_solution_url(attempt),
             verdict=attempt.verdict,
             response_type=attempt.response_type,
             message_is=attempt.message_is,
@@ -99,3 +100,12 @@ def list_problem_attempts(
         )
         for attempt in attempts
     ]
+
+
+def _attempt_solution_url(attempt: Attempt) -> str | None:
+    if not attempt.solution_image_key:
+        return None
+    try:
+        return presigned_get_url(key=attempt.solution_image_key)
+    except R2ConfigurationError:
+        return None
