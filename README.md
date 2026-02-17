@@ -1,67 +1,95 @@
-# ai_lifecycle
+# Backend (FastAPI)
 
-Project repository for course The AI Lifecycle.
+This README covers the backend only (`backend/`).
 
-Team
+## Stack
 
-- Johannes Reykdal Einarsson | jre5@hi.is
-- Solvi Santos | sos106@hi.is
-- Saevar Breki Snorrason | sbs87@hi.is
+- FastAPI
+- SQLModel + SQLAlchemy
+- Alembic migrations
+- JWT access tokens + refresh-token cookies
+- Gemini API (for `/query`)
+- Cloudflare R2 (artifact storage for `/query`)
 
-Project architecture
+## Project structure
 
-- `backend/`: FastAPI + SQLModel + Alembic. API, auth, DB models, migrations.
-- `my_app/`: Frontend app (React/Next). UI and API client.
+- `backend/main.py`: FastAPI app entrypoint and router registration.
+- `backend/routes/`: API endpoints (`auth`, `problem`, `query`).
+- `backend/auth/`: JWT creation/validation and auth dependencies.
+- `backend/models/`: SQLModel table models.
+- `backend/schemas/`: Pydantic request/response schemas.
+- `backend/repositories/`: auth-related DB operations.
+- `backend/storage/`: R2 upload helpers.
+- `backend/alembic/`: DB migrations.
 
-Backend structure (high level)
+## Environment variables
 
-- `backend/main.py`: FastAPI entrypoint.
-- `backend/routes/`: HTTP routes.
-- `backend/auth/`: JWT utilities + auth dependencies.
-- `backend/models/`: SQLModel models.
-- `backend/repositories/`: DB access and auth logic.
-- `backend/alembic/`: migrations.
+Create `backend/.env` with the following:
 
-Frontend structure (high level)
+### Required
 
-- `my_app/api.ts`: API client used by components.
-- `my_app/components/`: UI components.
-- `my_app/app/`: Next app routes/pages (if used).
+- `DATABASE_URL`: Postgres connection string.
+- `JWT_SECRET`: JWT signing key.
+- `GEMINI_API_KEY`: Gemini API key (required by `backend/llm.py` at import time).
 
-Environment configuration
+### Auth and cookie settings
 
-Backend env (`backend/.env`)
+- `JWT_ALG` (default: `HS256`)
+- `ACCESS_TOKEN_TTL_MIN` (default: `15`)
+- `REFRESH_TOKEN_TTL_DAYS` (default: `30`)
+- `REFRESH_COOKIE_NAME` (default: `refresh_token`)
+- `COOKIE_SECURE` (default: `false`)
+- `COOKIE_SAMESITE` (default: `lax`)
+- `COOKIE_PATH` (default: `/`)
 
-- `DATABASE_URL`: Postgres connection string (required).
-- `JWT_SECRET`: secret used to sign tokens (required for real deployments).
-- `JWT_ALG`: JWT algorithm, default `HS256`.
-- `ACCESS_TOKEN_TTL_MIN`: access token TTL in minutes.
-- `REFRESH_TOKEN_TTL_DAYS`: refresh token TTL in days.
-- `REFRESH_COOKIE_NAME`: cookie name for refresh token.
-- `COOKIE_SECURE`: `true` on HTTPS, `false` for local dev.
-- `COOKIE_SAMESITE`: `lax` recommended for local dev; use `none` for cross-site.
-- `COOKIE_PATH`: usually `/`.
+### Required for `/query` artifact storage (Cloudflare R2)
 
-Frontend env (`my_app/.env`)
+- `R2_ACCOUNT_ID`
+- `R2_ACCESS_KEY_ID`
+- `R2_SECRET_ACCESS_KEY`
+- `R2_BUCKET_NAME`
 
-- `BASE_URL`: backend base URL, e.g. `http://127.0.0.1:8000`.
+### Optional R2 settings
 
-Important: do not commit real secrets for production. For shared setup, create a local `.env`
-with dev values or use a `.env.example` template.
+- `R2_ENDPOINT_URL` (default: `https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com`)
+- `R2_REGION` (default: `auto`)
 
-Local setup
+### Optional tracing (Langfuse)
 
-1. Create virtualenv and install backend deps:
-   `pip install -r requirements.txt`
-2. Set backend env in `backend/.env`.
+- `LANGFUSE_PUBLIC_KEY`
+- `LANGFUSE_SECRET_KEY`
+- `LANGFUSE_HOST` or `LANGFUSE_BASE_URL`
+
+## Local development
+
+From repo root:
+
+1. Create and activate a virtual environment.
+2. Install dependencies:
+   `pip install -r backend/requirements.txt`
 3. Run migrations:
    `cd backend && alembic upgrade head`
-4. Run backend:
+4. Start the API:
    `fastapi dev backend/main.py`
-5. Set frontend env in `my_app/.env`, then run frontend per its package manager.
 
-Notes
+Default local URL: `http://127.0.0.1:8000`
 
-- `COOKIE_SECURE=false` for local dev; set to `true` in prod.
-- If frontend and backend are on different domains, set `COOKIE_SAMESITE=none` and
-  `COOKIE_SECURE=true`.
+## API endpoints
+
+- `GET /health`: health check, returns `{ "ok": true }`.
+- `POST /auth/register`: register user, sets refresh cookie, returns access token.
+- `POST /auth/login`: login, sets refresh cookie, returns access token.
+- `POST /auth/refresh`: rotate refresh token cookie, return new access token.
+- `POST /auth/logout`: revoke refresh token (if present), clear cookie.
+- `GET /auth/me`: return authenticated user (`Bearer` token required).
+- `POST /problem`: create problem for current user (`Bearer` required).
+- `GET /problems`: list current user problems (`Bearer` required).
+- `GET /problems/{problem_id}/attempts`: list attempts for one problem (`Bearer` required).  
+  Each attempt includes `id`, `problem_id`, `user_id`, `mode`, `solution_image_key`, `verdict`, `response_type`, `message_is`, `created_at`.
+- `POST /query`: submit `problem_id`, `mode`, `prob_image`, `sol_image`, `drawing_data` (multipart, `Bearer` required). Calls LLM, stores artifacts in R2, saves attempt, returns model JSON.
+
+## Notes
+
+- `backend/db.py` requires `DATABASE_URL`; app startup fails if it is missing.
+- `backend/llm.py` initializes Gemini client at import time; app startup fails if `GEMINI_API_KEY` is missing.
+- For local HTTP dev, `COOKIE_SECURE=false` is expected. Use `true` in production over HTTPS.
