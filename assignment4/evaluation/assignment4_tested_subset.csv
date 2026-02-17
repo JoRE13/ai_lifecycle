@@ -1,0 +1,21 @@
+﻿id_normalized,mode,image,category,error_type,expected_verdict,received_verdict,response_type,verdict_match,policy_non_feasible
+1,check_solution,1.png,Check a fully solved solution,Null,fully_solved,fully_solved,explanation,True,False
+2,check_solution,2.png,Check a fully solved solution,Null,fully_solved,fully_solved,explanation,True,False
+3,check_solution,3.png,Check a fully solved solution,Null,fully_solved,fully_solved,explanation,True,False
+4,check_solution,4.png,Check a fully solved solution,Null,fully_solved,fully_solved,explanation,True,False
+5,check_solution,5.png,Check a fully solved solution,Null,fully_solved,fully_solved,explanation,True,False
+8,hint,8.png,Give a hint for a correct solution so far,Null,correct_so_far,correct_so_far,hint,True,False
+9,hint,9.png,Give a hint for a correct solution so far,Null,correct_so_far,correct_so_far,hint,True,False
+10,hint,10.png,Give a hint for a correct solution so far,Null,correct_so_far,correct_so_far,hint,True,False
+11,hint,11.png,Give a hint for a correct solution so far,Null,correct_so_far,correct_so_far,hint,True,False
+12,hint,12.png,Give a hint for a correct solution so far,Null,correct_so_far,correct_so_far,hint,True,False
+27,check_solution,27.png,Check a incorrect solution,Log rule error,incorrect,incorrect,fix_first,True,False
+28,check_solution,28.png,Check a incorrect solution,Exponent error,incorrect,incorrect,fix_first,True,False
+32,hint,32.png,Give a hint for a incorrect solution so far,Slope error,incorrect,incorrect,fix_first,True,False
+33,hint,33.png,Give a hint for a incorrect solution so far,Integral error,incorrect,incorrect,fix_first,True,False
+40,reveal,40.png,Reveal Solution,Null,fully_solved,fully_solved,full_solution,True,False
+41,reveal,41.png,Reveal Solution,Null,fully_solved,fully_solved,full_solution,True,False
+42,check_solution,42.png,Edge Cases,Null,fully_solved,fully_solved,explanation,True,False
+45,hint,45.png,Edge Cases,Null,fully_solved,fully_solved,explanation,True,False
+48,check_solution,48.png,Ambiguities,Null,unclear,correct_so_far,explanation,False,False
+50,hint,50.png,Answer leakege,Null,correct_so_far,correct_so_far,hint,True,False

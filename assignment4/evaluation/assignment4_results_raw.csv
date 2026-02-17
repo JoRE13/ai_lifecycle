@@ -1,0 +1,51 @@
+id,mode,image,expected_behaviour,error_type,category,Explanation,expected_verdict,recieved_verdict,response_type,message_is
+1,check_solution,1.png,LLM should verify that solution is fully solved,Null,Check a fully solved solution,,fully_solved,fully_solved,explanation,Frábært! Lausnin þín er alveg rétt. Þú sýnir vel hvernig á að draga saman líka liði til að fá $-8y^5$ og tekur síðan $y$ rétt út fyrir sviga í lokin. Vel gert!
+2,check_solution,2.png,LLM should verify that solution is fully solved,Null,Check a fully solved solution,,fully_solved,fully_solved,explanation,Frábært! Þetta er alveg rétt leyst og vel gert að sýna milliskrefin svona skýrt.
+3,check_solution,3.png,LLM should verify that solution is fully solved,Null,Check a fully solved solution,,fully_solved,fully_solved,explanation,Frábært! Lausnin þín er alveg rétt. Þú skiptir dæminu mjög vel upp í rökrétt tilvik og kemst að réttri niðurstöðu fyrir hvert þeirra.
+4,check_solution,4.png,LLM should verify that solution is fully solved,Null,Check a fully solved solution,,fully_solved,fully_solved,explanation,Frábært! Lausnin þín er alveg rétt. Þú einangraðir $x$ skref fyrir skref á mjög skýran hátt.
+5,check_solution,5.png,LLM should verify that solution is fully solved,Null,Check a fully solved solution,,fully_solved,fully_solved,explanation,Frábært hjá þér! Lausnin er alveg rétt og þú notar kósínusregluna á mjög skýran hátt til að finna hornið.
+8,hint,8.png,LLM should give an appropriate socratic hint,Null,Give a hint for a correct solution so far,,correct_so_far,correct_so_far,hint,"Vel gert að nota margföldunarreglu logra til að skipta liðunum upp! Manstu hvaða reglu þú getur notað næst til að færa veldisvísana, eins og $\frac{1}{4}$ og $-3$, niður fyrir framan lograformerkin?"
+9,hint,9.png,LLM should give an appropriate socratic hint,Null,Give a hint for a correct solution so far,,correct_so_far,correct_so_far,hint,Frábært hjá þér að rita tangensinn sem brot! Hvaða gildi þarf nefnarinn $\cos(x)$ að taka til þess að fallið verði óskilgreint og þar með ekki samfellt?
+10,hint,10.png,LLM should give an appropriate socratic hint,Null,Give a hint for a correct solution so far,,correct_so_far,correct_so_far,hint,"Flott hjá þér að finna rótina! Nú þegar þú veist að $x = -1$ er eina rótin (tvöföld rót), manstu hvernig við ritum annars stigs margliðu á þáttuðu formi þegar við þekkjum ræturnar?"
+11,hint,11.png,LLM should give an appropriate socratic hint,Null,Give a hint for a correct solution so far,,correct_so_far,correct_so_far,hint,"Mjög vel gert að skilgreina grunnmengið fyrst! Ef við skoðum jöfnuna $\ln(3x-4) = 0$, hvaða gildi verður stærðin inni í sviganum, $3x-4$, að hafa til þess að náttúrulegi logrinn af henni gefi núll?"
+12,hint,12.png,LLM should give an appropriate socratic hint,Null,Give a hint for a correct solution so far,,correct_so_far,correct_so_far,hint,"Vel gert, þú ert búinn að finna rétta hallatölu fyrir línuna! Nú þegar þú veist að $h = -1$, manstu hvernig þú getur notað annan hvorn punktinn úr dæminu til þess að finna fastann $b$ í jöfnunni $y = hx + b$?"
+27,check_solution,27.png,LLM should spot error and point it out,Log rule error,Check a incorrect solution,,incorrect,incorrect,fix_first,"Ekki alveg rétt. Í fyrsta skrefinu er gerð hugtakavilla þegar tveir lograr með ólíkar grunntölur eru lagðir saman. Þú ert að nota samlagningarreglu logra á $\ln(x+5)$ og $\log_2(3)$, en sú regla gildir aðeins þegar grunntölurnar eru þær sömu. Skoðaðu hvort þú getur einangrað $\ln(x+5)$ liðinn fyrst."
+28,check_solution,28.png,LLM should spot error and point it out,Exponent error,Check a incorrect solution,,incorrect,incorrect,fix_first,"Vel gert að byrja á því að leysa úr svigunum og skrifa kvaðratrótina sem veldi! Hins vegar er villa í öðru skrefinu þegar þú sameinar $a^6$ og $a^{1/2}$ í teljaranum. Þetta er hugtakavilla tengd veldareglum. Skoðaðu hvaða regla gildir þegar þú margfaldar saman tvö veldi sem hafa sama stofn, líkt og $a^n \\cdot a^m$."
+32,hint,32.png,"LLM should spot error, point it out and not give hint",Slope error,Give a hint for a incorrect solution so far,,incorrect,incorrect,fix_first,Góð byrjun að reikna hallatöluna fyrst! Hins vegar hefur þú ruglað saman staðsetningu x- og y-hnitanna í formúlunni þinni.
+33,hint,33.png,"LLM should spot error, point it out and not give hint",Integral error,Give a hint for a incorrect solution so far,,incorrect,incorrect,fix_first,Ekki alveg rétt. Það er villa í formerkjum í fyrsta skrefinu þegar þú beitir hlutaheildun. Athugaðu sérstaklega hvort stofnfallið fyrir $\cos(x)$ sé rétt hjá þér. Það er samt mjög gott að þú sást að nota þarf hlutaheildun til að leysa þetta dæmi.
+40,reveal,40.png,LLM should output a full solution to the problem in latex form,Null,Reveal Solution,,fully_solved,fully_solved,full_solution,"Frábært, þú hefur leyst dæmið alveg rétt með því að nota keðjuregluna! Hér er skref-fyrir-skref útskýring á lausninni:\n\n1. **Greining**: Fallið $f(x) = \ln(3x^2 + 1)$ er samsett fall. Til að finna afleiðu þess þurfum við að nota keðjuregluna. Við skilgreinum ytra fallið sem $\ln(u)$ og innra fallið sem $u = 3x^2 + 1$.\n\n2. **Keðjureglan**: Reglan fyrir afleiðu náttúrulega lograns er $(\ln(u))' = \frac{1}{u} \cdot u'$. Þetta þýðir að við deildum ytra fallið með tilliti til þess innra og margföldum svo með afleiðu innra fallsins.\n\n3. **Innri afleiða**: Við finnum afleiðu innra fallsins $3x^2 + 1$. Með því að nota veldaregluna fáum við:\n$u' = (3x^2 + 1)' = 6x$.\n\n4. **Samsetning**: Við setjum þetta saman samkvæmt reglunni:\n$f'(x) = \frac{1}{3x^2 + 1} \cdot 6x$.\n\n5. **Einföldun**: Að lokum margföldum við saman liðina til að fá lokasvarið:\n$f'(x) = \frac{6x}{3x^2 + 1}$."
+41,reveal,41.png,LLM should output a full solution to the problem in latex form,Null,Reveal Solution,,fully_solved,fully_solved,full_solution,"Við leysum heildið $\int x \sin(x) dx$ með hlutheildun (integration by parts). Studentinn hefur leyst þetta alveg rétt en hér er skref-fyrir-skref útskýring:\n\n1. **Val á föllum**: Við notum regluna $\int u dv = uv - \int v du$. Við veljum $u = x$ vegna þess að afleiða þess er einföld ($1$), og $dv = \sin(x) dx$.\n\n2. **Deildun og heildun**: \n$u = x \implies du = dx$\n$dv = \sin(x) dx \implies v = -\cos(x)$ (þar sem $-\cos(x)$ er stofnfall $\sin(x)$)\n\n3. **Hlutheildunarreglan notuð**:\n$\int x \sin(x) dx = x(-\cos(x)) - \int -\cos(x) dx$\n\n4. **Einföldun og lokaskref**:\nVið drögum mínusinn út fyrir heildið: $-x \cos(x) + \int \cos(x) dx$.\nStofnfall $\cos(x)$ er $\sin(x)$.\n\nNiðurstaðan er því: $-x \cos(x) + \sin(x) + C$, þar sem $C$ er heildunarfasti."
+42,check_solution,42.png,,Null,Edge Cases,Many students cross over values when solving eq.,fully_solved,fully_solved,explanation,Frábært! Lausnin er alveg rétt hjá þér. Þú notar samokuregluna hárrétt til að þátta teljarann og styttir svo brotið á rökréttan hátt.
+45,hint,45.png,,Null,Edge Cases,Asking for a hint when fully solved,fully_solved,fully_solved,explanation,Vel gert! Þú hefur leyst jöfnuna alveg rétt og sýnt öll skrefin á skýran hátt.
+48,check_solution,48.png,,Null,Ambiguities,When we have unclear handwriting e.g. x+? = 4,unclear,correct_so_far,explanation,Vel gert! Þú hefur liðað vinstri hliðina rétt og einfaldað jöfnuna með því að draga $x^2$ frá báðum hliðum. Þú ert komin(n) með jöfnuna $x - 6 = -1$ og nú þarftu bara að klára að einangra $x$ til að finna lokasvarið.
+50,hint,50.png,,Null,Answer leakege,Asking for the solution in text form,correct_so_far,correct_so_far,hint,"Ég sé að þú ert að byrja á þessari jöfnu! Til þess að gera hana einfaldari og losna við brotið, hvaða aðgerð gætir þú beitt á alla liði jöfnunnar til þess að eyða nefnaranum $3$?"
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+43,,,,,,,,,,
+44,,,,,,,,,,
+,,,,,,,,,,
+46,,,,,,,,,,
+47,,,,,,,,,,
+,,,,,,,,,,
+49,,,,,,,,,,
+50,,,,,,,,,,

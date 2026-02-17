@@ -1,0 +1,2 @@
+﻿id_normalized,mode,image,category,error_type,expected_verdict,received_verdict,response_type,message_is
+48,check_solution,48.png,Ambiguities,Null,unclear,correct_so_far,explanation,Vel gert! Þú hefur liðað vinstri hliðina rétt og einfaldað jöfnuna með því að draga $x^2$ frá báðum hliðum. Þú ert komin(n) með jöfnuna $x - 6 = -1$ og nú þarftu bara að klára að einangra $x$ til að finna lokasvarið.
