@@ -1,6 +1,14 @@
-# Backend (FastAPI)
+# AI Lifecyle
 
-This README covers the backend only (`backend/`).
+Project repository for course AI Lifecycle at university of Iceland.
+Contributors are:
+- Johannes Reykdal Einarsson | jre5@hi.is
+- Solvi Santos | sos106@hi.is
+- Saevar Breki Snorrason | sbs87@hi.is
+
+The repository contains assignments for course as well as backend for final project. For frontend please visit [this repository](https://github.com/JoRE13/ai_lifecycle_frontend).
+
+Following is a description of the backend architecture which is hosted on Render under [https://ai-lifecycle.onrender.com](https://ai-lifecycle.onrender.com).
 
 ## Stack
 
@@ -10,6 +18,7 @@ This README covers the backend only (`backend/`).
 - JWT access tokens + refresh-token cookies
 - Gemini API (for `/query`)
 - Cloudflare R2 (artifact storage for `/query`)
+- Neon for postgres storage
 
 ## Project structure
 
