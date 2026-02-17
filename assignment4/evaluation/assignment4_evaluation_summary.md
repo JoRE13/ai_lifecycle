@@ -14,6 +14,12 @@
 - Mismatch count: 1
 - Mismatch IDs: ["48"]
 
+## App-Layer Reliability (tested rows only)
+
+- UI-breaking failures observed: 0
+- UI failure rate: 0.00%
+- UI reliability rate: 100.00%
+
 ## Comparison to A3 v4 Baseline (same tested subset)
 
 - A3 v4 subset rows: 20

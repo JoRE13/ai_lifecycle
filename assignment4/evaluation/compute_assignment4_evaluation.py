@@ -63,6 +63,12 @@ def main() -> None:
     parser.add_argument("--out-summary-csv", required=True, help="Path to one-row summary CSV")
     parser.add_argument("--out-summary-md", required=True, help="Path to markdown summary")
     parser.add_argument("--out-mismatches", required=True, help="Path to mismatch breakdown CSV")
+    parser.add_argument(
+        "--ui-breaking-failures",
+        type=int,
+        default=0,
+        help="Count of UI-breaking app-layer failures observed during tested prototype runs",
+    )
     args = parser.parse_args()
 
     input_path = Path(args.input)
@@ -130,18 +136,29 @@ def main() -> None:
     mismatches[mismatch_cols].rename(columns={pred_col: "received_verdict"}).to_csv(args.out_mismatches, index=False, encoding="utf-8-sig")
 
     mode_counts = tested["mode"].value_counts().to_dict() if "mode" in tested.columns else {}
+    ui_breaking_failures_count = max(0, int(args.ui_breaking_failures))
+    tested_rows = int(len(tested))
+    if tested_rows > 0:
+        ui_failure_rate = ui_breaking_failures_count / tested_rows
+        ui_reliability_rate = 1.0 - ui_failure_rate
+    else:
+        ui_failure_rate = 0.0
+        ui_reliability_rate = 0.0
 
     summary = {
         "source_file": str(input_path),
         "template_rows": int(len(a4)),
-        "tested_rows": int(len(tested)),
-        "meets_min_20_cases": bool(len(tested) >= 20),
+        "tested_rows": tested_rows,
+        "meets_min_20_cases": bool(tested_rows >= 20),
         "tested_mode_counts": json.dumps(mode_counts, ensure_ascii=True),
         "a4_verdict_accuracy": a4_metrics["verdict_accuracy"],
         "a4_non_feasible_count": a4_metrics["non_feasible_count"],
         "a4_non_feasible_ratio": a4_metrics["non_feasible_ratio"],
         "a4_mismatch_count": int(len(mismatches)),
         "a4_mismatch_ids": json.dumps(mismatches["id_normalized"].tolist(), ensure_ascii=True),
+        "app_layer_ui_breaking_failures_count": ui_breaking_failures_count,
+        "app_layer_ui_failure_rate": ui_failure_rate,
+        "app_layer_ui_reliability_rate": ui_reliability_rate,
         "a3_v4_subset_rows": a3_subset_metrics["rows"],
         "a3_v4_subset_verdict_accuracy": a3_subset_metrics["verdict_accuracy"],
         "a3_v4_subset_non_feasible_ratio": a3_subset_metrics["non_feasible_ratio"],
@@ -174,6 +191,12 @@ def main() -> None:
         f"- Non-feasible ratio: {summary['a4_non_feasible_ratio']:.2%}",
         f"- Mismatch count: {summary['a4_mismatch_count']}",
         f"- Mismatch IDs: {summary['a4_mismatch_ids']}",
+        "",
+        "## App-Layer Reliability (tested rows only)",
+        "",
+        f"- UI-breaking failures observed: {summary['app_layer_ui_breaking_failures_count']}",
+        f"- UI failure rate: {summary['app_layer_ui_failure_rate']:.2%}",
+        f"- UI reliability rate: {summary['app_layer_ui_reliability_rate']:.2%}",
         "",
         "## Comparison to A3 v4 Baseline (same tested subset)",
         "",
