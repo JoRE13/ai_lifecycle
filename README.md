@@ -1,104 +1,132 @@
-# AI Lifecyle
+# REI603M Assignment 4 Prototype
 
-Project repository for course AI Lifecycle at university of Iceland.
-Contributors are:
-- Johannes Reykdal Einarsson | jre5@hi.is
-- Solvi Santos | sos106@hi.is
-- Saevar Breki Snorrason | sbs87@hi.is
+AI Lifecycle course project (University of Iceland): an AI math coach with an iOS frontend and a FastAPI backend using real Gemini API calls.
 
-The repository contains assignments for course as well as backend for final project. For frontend please visit [this repository](https://github.com/JoRE13/ai_lifecycle_frontend).
+## Team
+- Johannes Reykdal Einarsson (`jre5`)
+- Solvi Santos (`sos106`)
+- Saevar Breki Snorrason (`sbs87`)
 
-Following is a description of the backend architecture which is hosted on Render under [https://ai-lifecycle.onrender.com](https://ai-lifecycle.onrender.com).
+## Repositories
+- Backend + assignment artifacts (this repo): `ai_lifecycle`
+- Frontend (iOS SwiftUI): `ai_lifecycle_frontend`  
+  Public repo: `https://github.com/JoRE13/ai_lifecycle_frontend`
 
-## Stack
+For final submission zip, include both source trees.
 
-- FastAPI
-- SQLModel + SQLAlchemy
-- Alembic migrations
-- JWT access tokens + refresh-token cookies
-- Gemini API (for `/query`)
-- Cloudflare R2 (artifact storage for `/query`)
-- Neon for postgres storage
+## What Is Implemented
+- Interactive user flow with authentication, problem creation, notebook/canvas, and tutor response display.
+- Real LLM integration (`Gemini`) via backend `/query` endpoint.
+- Prompt management in file-based prompt template (`backend/prompt.txt`).
+- Basic API error handling (no raw stack traces to users).
+- Observability via Langfuse traces/observations.
+- Assignment 4 evaluation artifacts (20 tested cases through prototype flow).
 
-## Project structure
+## High-Level Architecture
+- Frontend: SwiftUI iOS app (`MathCoach`) with PencilKit canvas and API client.
+- Backend: FastAPI + SQLModel + Alembic + JWT auth.
+- LLM: Google Gemini (`models/gemini-3-flash-preview`) with structured JSON output.
+- Storage: Neon Postgres + Cloudflare R2 for uploaded artifacts.
+- Observability: Langfuse tracing + exported observations.
 
-- `backend/main.py`: FastAPI app entrypoint and router registration.
-- `backend/routes/`: API endpoints (`auth`, `problem`, `query`).
-- `backend/auth/`: JWT creation/validation and auth dependencies.
-- `backend/models/`: SQLModel table models.
-- `backend/schemas/`: Pydantic request/response schemas.
-- `backend/repositories/`: auth-related DB operations.
-- `backend/storage/`: R2 upload helpers.
-- `backend/alembic/`: DB migrations.
+## Repository Structure
+- `backend/`: FastAPI app, DB models/migrations, auth, LLM, storage.
+- `assignment2/`: PRD.
+- `assignment3/`: prompt engineering and A3 evaluation artifacts.
+- `assignment4/observability/`: Langfuse export + metrics script + summaries.
+- `assignment4/evaluation/`: A4 20-case test export + evaluation comparison summaries.
 
-## Environment variables
+## Backend Setup
+1. Create `backend/.env` from template:
+   - Copy `backend/.env.example` to `backend/.env`
+2. Install Python dependencies:
+   - `pip install -r backend/requirements.txt`
+3. Run DB migrations:
+   - `cd backend && alembic upgrade head`
+4. Start backend:
+   - `fastapi dev backend/main.py`
 
-Create `backend/.env` with the following:
+Default backend URL: `http://127.0.0.1:8000`
 
-### Required
-
-- `DATABASE_URL`: Postgres connection string.
-- `JWT_SECRET`: JWT signing key.
-- `GEMINI_API_KEY`: Gemini API key (required by `backend/llm.py` at import time).
-
-### Auth and cookie settings
-
-- `JWT_ALG` (default: `HS256`)
-- `ACCESS_TOKEN_TTL_MIN` (default: `15`)
-- `REFRESH_TOKEN_TTL_DAYS` (default: `30`)
-- `REFRESH_COOKIE_NAME` (default: `refresh_token`)
-- `COOKIE_SECURE` (default: `false`)
-- `COOKIE_SAMESITE` (default: `lax`)
-- `COOKIE_PATH` (default: `/`)
-
-### Required for `/query` artifact storage (Cloudflare R2)
-
+## Required Backend Env Vars
+From `backend/.env.example`:
+- `DATABASE_URL`
+- `JWT_SECRET`
+- `GEMINI_API_KEY`
 - `R2_ACCOUNT_ID`
 - `R2_ACCESS_KEY_ID`
 - `R2_SECRET_ACCESS_KEY`
 - `R2_BUCKET_NAME`
 
-### Optional R2 settings
-
-- `R2_ENDPOINT_URL` (default: `https://<R2_ACCOUNT_ID>.r2.cloudflarestorage.com`)
-- `R2_REGION` (default: `auto`)
-
-### Optional tracing (Langfuse)
-
+Optional:
 - `LANGFUSE_PUBLIC_KEY`
 - `LANGFUSE_SECRET_KEY`
-- `LANGFUSE_HOST` or `LANGFUSE_BASE_URL`
+- `LANGFUSE_HOST` / `LANGFUSE_BASE_URL`
 
-## Local development
+## Frontend Setup (iOS)
+In the frontend repo (`ai_lifecycle_frontend`):
+1. Open `ratatoskur.xcodeproj` in Xcode.
+2. Set `BACKEND_BASE_URL` in Info settings (or use default).
+3. Build and run the `ratatoskur` scheme.
 
-From repo root:
+Frontend app flow:
+- Register/Login
+- Create/open problem
+- Upload problem image
+- Write solution on canvas
+- Submit mode: `Hint` / `Check Step` / `Reveal`
+- View tutor response and attempt history
 
-1. Create and activate a virtual environment.
-2. Install dependencies:
-   `pip install -r backend/requirements.txt`
-3. Run migrations:
-   `cd backend && alembic upgrade head`
-4. Start the API:
-   `fastapi dev backend/main.py`
+## API Endpoints Used
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /auth/refresh`
+- `GET /auth/me`
+- `POST /auth/logout`
+- `POST /problem`
+- `GET /problems`
+- `GET /problems/{problem_id}/attempts`
+- `POST /query`
 
-Default local URL: `http://127.0.0.1:8000`
+## Assignment 4 Observability Artifacts
+- Raw observations export:  
+  `assignment4/observability/langfuse_observations_export.csv`
+- Metrics script:  
+  `assignment4/observability/compute_langfuse_metrics.py`
+- Metrics summary:  
+  `assignment4/observability/langfuse_metrics_summary.md`
 
-## API endpoints
+### Cost Methodology Used
+Pricing basis (Gemini 3 Flash Preview, paid tier):
+- Input: `$0.50 / 1M tokens`
+- Output: `$3.00 / 1M tokens` (output includes thought tokens)
 
-- `GET /health`: health check, returns `{ "ok": true }`.
-- `POST /auth/register`: register user, sets refresh cookie, returns access token.
-- `POST /auth/login`: login, sets refresh cookie, returns access token.
-- `POST /auth/refresh`: rotate refresh token cookie, return new access token.
-- `POST /auth/logout`: revoke refresh token (if present), clear cookie.
-- `GET /auth/me`: return authenticated user (`Bearer` token required).
-- `POST /problem`: create problem for current user (`Bearer` required).
-- `GET /problems`: list current user problems (`Bearer` required).
-- `GET /problems/{problem_id}/attempts`: list attempts for one problem (`Bearer` required).  
-  Each attempt includes `id`, `problem_id`, `user_id`, `mode`, `solution_image_key`, `verdict`, `response_type`, `message_is`, `created_at`.
-- `POST /query`: submit `problem_id`, `mode`, `prob_image`, `sol_image`, `drawing_data` (multipart, `Bearer` required). Calls LLM, stores artifacts in R2, saves attempt, returns model JSON.
+Formula:
+- `estimated_total_cost = (input_tokens / 1_000_000 * input_rate) + ((output_tokens + thought_tokens) / 1_000_000 * output_rate)`
+- `estimated_cost_per_interaction = estimated_total_cost / generation_calls`
+
+Note:
+- If Langfuse pricing tiers are not configured, `logged_total_cost` may be `0`; use estimated cost fields.
+
+## Assignment 4 Evaluation Artifacts
+- Raw A4 test file:  
+  `assignment4/evaluation/assignment4_results_raw.csv`
+- Evaluation script:  
+  `assignment4/evaluation/compute_assignment4_evaluation.py`
+- Tested subset (20 cases):  
+  `assignment4/evaluation/assignment4_tested_subset.csv`
+- Summary (A4 vs A3 v4 subset):  
+  `assignment4/evaluation/assignment4_evaluation_summary.md`
+- Mismatch breakdown:  
+  `assignment4/evaluation/assignment4_mismatches.csv`
+
+## Current A4 Headline Metrics
+- Tested rows: `20` (requirement satisfied)
+- A4 verdict accuracy: `95.00%`
+- A4 non-feasible ratio: `0.00%`
+- A3 v4 subset (same 20 images): `95.00%`, non-feasible `0.00%`
+- A4 vs A3 subset delta: no change
 
 ## Notes
-
-- `backend/db.py` requires `DATABASE_URL`; app startup fails if it is missing.
-- `backend/llm.py` initializes Gemini client at import time; app startup fails if `GEMINI_API_KEY` is missing.
-- For local HTTP dev, `COOKIE_SECURE=false` is expected. Use `true` in production over HTTPS.
+- Keep secrets out of git (`.env` files are ignored).
+- For local HTTP development, `COOKIE_SECURE=false` is expected.
