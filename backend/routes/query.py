@@ -20,14 +20,18 @@ from backend.storage.r2 import R2ConfigurationError, upload_bytes
 
 router = APIRouter(tags=["query"])
 
-PROMPT_PATH = Path(__file__).resolve().parents[1] / "prompt.txt"
+PROMPTS_ROOT = Path(__file__).resolve().parents[1] / "propmts" / "modes"
 
 
-def _load_prompt() -> str:
+def _load_prompt(mode: Literal["hint", "check_solution", "reveal"]) -> str:
+    prompt_path = PROMPTS_ROOT / mode / "prompt.txt"
     try:
-        return PROMPT_PATH.read_text(encoding="utf-8")
+        return prompt_path.read_text(encoding="utf-8")
     except FileNotFoundError as exc:
-        raise HTTPException(status_code=500, detail="Prompt file not found") from exc
+        raise HTTPException(
+            status_code=500,
+            detail=f"Prompt file not found for mode '{mode}'",
+        ) from exc
 
 
 def _to_pil_image(upload: UploadFile, data: bytes) -> Image.Image:
@@ -68,7 +72,7 @@ async def query(
     session: Session = Depends(get_session),
     user: User = Depends(get_current_user),
 ):
-    prompt = _load_prompt()
+    prompt = _load_prompt(mode)
 
     prob_bytes = await prob_image.read()
     sol_bytes = await sol_image.read()

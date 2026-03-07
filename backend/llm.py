@@ -186,7 +186,7 @@ def call_model_with_retry(
         try:
             resp = client.models.generate_content(
                 model=model,
-                contents=[prompt, mode, prob_image, sol_image],
+                contents=[prompt, prob_image, sol_image],
                 config={
                     "response_mime_type": "application/json",
                     "response_json_schema": LLMResponse.model_json_schema(),
