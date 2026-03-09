@@ -20,7 +20,7 @@ from backend.storage.r2 import R2ConfigurationError, upload_bytes
 
 router = APIRouter(tags=["query"])
 
-PROMPTS_ROOT = Path(__file__).resolve().parents[1] / "propmts" / "modes"
+PROMPTS_ROOT = Path(__file__).resolve().parents[1] / "prompts" / "modes"
 
 
 def _load_prompt(mode: Literal["hint", "check_solution", "reveal"]) -> str:

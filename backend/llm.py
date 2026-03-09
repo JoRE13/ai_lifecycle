@@ -26,6 +26,7 @@ class LLMResponse(BaseModel):
     verdict: str
     response_type: str
     message_is: str
+    error_type: str
 
 
 def _build_langfuse_client() -> Langfuse | None:

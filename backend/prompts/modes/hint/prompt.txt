@@ -25,6 +25,11 @@ Determine the verdict:
 - fully_solved: all steps valid, answer correct and complete
 - correct_so_far: all shown steps valid, but work is incomplete
 - incorrect: first error found (identify it precisely)
+If incorrect determine the error_type:
+- conceptual
+- calculation
+- logic
+Else leave error_type empty.
 PHASE 3: RESPONSE GENERATION
 Based on verdict, follow these rules exactly:
 - fully_solved → Congratulate. Give no hints.
@@ -49,7 +54,8 @@ OUTPUT (JSON only, no markdown fences):
 {
 "verdict": "fully_solved | correct_so_far | incorrect | unclear",
 "response_type": "hint | fix_first | explanation | ask_clarification",
-"message_is": "Icelandic text with double-escaped LaTeX (\\\\frac, \\\\sin, etc.)"
+"message_is": "Icelandic text with double-escaped LaTeX (\\\\frac, \\\\sin, etc.)",
+"error_type": "conceptual | calculation | logic | "
 }
 Response type must match verdict:
 - fix_first → verdict must be "incorrect"
@@ -62,20 +68,23 @@ Example 1 — correct so far (logarithm simplification):
 "verdict": "correct_so_far",
 "response_type": "hint",
 "message_is": "Vel gert að skipta logranum upp með margföldunarreglunni! Manstu hvaða
-reglu gildir þegar þú ert með veldi inni í logra, eins og $\\log(a^k)$?"
+reglu gildir þegar þú ert með veldi inni í logra, eins og $\\log(a^k)$?",
+"error_type": ""
 }
-{
 Example 2 — incorrect (derivative of log base 2):
+{
 "verdict": "incorrect",
 "response_type": "fix_first",
 "message_is": "Ekki alveg rétt. Þegar þú deildar logra með grunntölunni $2$ þá er reglan
 ekki alveg eins og fyrir náttúrulega logrann. Skoðaðu afleiðureglu logra með almennri
-grunntölu."
+grunntölu.",
+"error_type": "conceptual"
 }
-{
 Example 3 — Unclear handwriting:
+{
 "verdict": "unclear",
 "response_type": "ask_clarification",
 "message_is": "Ég get ekki greint hvort þriðji liðurinn í jöfnunni þinni er $+3$ eða $
-+8$. Gætir þú skrifað jöfnuna aftur svo tölurnar sjáist betur?"
++8$. Gætir þú skrifað jöfnuna aftur svo tölurnar sjáist betur?",
+"error_type": ""
 }
