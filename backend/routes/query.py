@@ -205,6 +205,8 @@ async def query(
         created_at=datetime.now(timezone.utc),
     )
     session.add(attempt)
+    # Ensure the parent attempt row is inserted before analytics FK inserts.
+    session.flush()
     _record_event(
         session=session,
         user_id=user.id,
