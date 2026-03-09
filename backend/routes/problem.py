@@ -65,6 +65,8 @@ def create_problem(
         updated_at=now,
     )
     session.add(problem)
+    # Ensure the parent row exists before inserting analytics rows with FK refs.
+    session.flush()
     _record_event(
         session=session,
         user_id=user.id,
