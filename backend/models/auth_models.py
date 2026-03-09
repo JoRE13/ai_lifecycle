@@ -5,7 +5,7 @@ from typing import Optional
 from uuid import UUID, uuid4
 
 from sqlmodel import SQLModel, Field, Relationship, Column
-from sqlalchemy import String, DateTime, Boolean, Index
+from sqlalchemy import String, DateTime, Boolean, Index, Integer, Float
 from sqlalchemy.orm import relationship
 
 
@@ -120,6 +120,14 @@ class Attempt(SQLModel, table=True):
 
     verdict: Optional[str] = Field(default=None, sa_column=Column(String(64)))
     response_type: Optional[str] = Field(default=None, sa_column=Column(String(64)))
+    error_type: Optional[str] = Field(default=None, sa_column=Column(String(64)))
+    model_name: Optional[str] = Field(default=None, sa_column=Column(String(128)))
+    prompt_version: Optional[str] = Field(default=None, sa_column=Column(String(64)))
+    latency_ms: Optional[int] = Field(default=None, sa_column=Column(Integer))
+    tokens_in: Optional[int] = Field(default=None, sa_column=Column(Integer))
+    tokens_out: Optional[int] = Field(default=None, sa_column=Column(Integer))
+    tokens_thoughts: Optional[int] = Field(default=None, sa_column=Column(Integer))
+    tokens_total: Optional[int] = Field(default=None, sa_column=Column(Integer))
     message_is: Optional[str] = Field(default=None, sa_column=Column(String))
     created_at: datetime = Field(
         default_factory=utcnow,
@@ -131,4 +139,53 @@ class Attempt(SQLModel, table=True):
     )
     user: User = Relationship(
         sa_relationship=relationship("User", back_populates="attempts")
+    )
+
+
+class AttemptFeedback(SQLModel, table=True):
+    __tablename__ = "attempt_feedback"
+
+    id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
+    attempt_id: UUID = Field(foreign_key="attempts.id", index=True)
+    user_id: UUID = Field(foreign_key="users.id", index=True)
+    rating: Optional[str] = Field(default=None, sa_column=Column(String(16)))
+    comment: Optional[str] = Field(default=None, sa_column=Column(String))
+    created_at: datetime = Field(
+        default_factory=utcnow,
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+    )
+
+
+class AnalyticsEvent(SQLModel, table=True):
+    __tablename__ = "analytics_events"
+
+    id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
+    user_id: UUID = Field(foreign_key="users.id", index=True)
+    problem_id: Optional[UUID] = Field(default=None, foreign_key="problems.id", index=True)
+    attempt_id: Optional[UUID] = Field(default=None, foreign_key="attempts.id", index=True)
+    event_type: Optional[str] = Field(default=None, sa_column=Column(String(64)))
+    mode: Optional[str] = Field(default=None, sa_column=Column(String(32)))
+    verdict: Optional[str] = Field(default=None, sa_column=Column(String(64)))
+    metadata_json: Optional[str] = Field(default=None, sa_column=Column(String))
+    created_at: datetime = Field(
+        default_factory=utcnow,
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+    )
+
+
+class ErrorEvent(SQLModel, table=True):
+    __tablename__ = "error_events"
+
+    id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
+    attempt_id: UUID = Field(foreign_key="attempts.id", index=True)
+    user_id: UUID = Field(foreign_key="users.id", index=True)
+    topic: Optional[str] = Field(default=None, sa_column=Column(String(128)))
+    subtopic: Optional[str] = Field(default=None, sa_column=Column(String(128)))
+    wrong_step: Optional[str] = Field(default=None, sa_column=Column(String))
+    correct_step: Optional[str] = Field(default=None, sa_column=Column(String))
+    error_type: Optional[str] = Field(default=None, sa_column=Column(String(64)))
+    confidence: Optional[float] = Field(default=None, sa_column=Column(Float))
+    created_at: datetime = Field(
+        default_factory=utcnow,
+        sa_column=Column(DateTime(timezone=True), nullable=False),
     )
