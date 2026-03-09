@@ -15,7 +15,7 @@ from sqlmodel import Session, select
 from backend.auth.deps import get_current_user
 from backend.db import get_session
 from backend.llm import call_model_with_retry
-from backend.models.auth_models import Attempt, Problem, User
+from backend.models.auth_models import AnalyticsEvent, Attempt, Problem, User
 from backend.storage.r2 import R2ConfigurationError, upload_bytes
 
 router = APIRouter(tags=["query"])
@@ -60,6 +60,41 @@ def _text_or_none(value: object, max_len: int | None = None) -> str | None:
     if max_len is not None:
         return text[:max_len]
     return text
+
+
+def _record_event(
+    *,
+    session: Session,
+    user_id: UUID,
+    problem_id: UUID,
+    attempt_id: UUID,
+    event_type: str,
+    mode: str,
+    verdict: str | None = None,
+    metadata_json: str | None = None,
+) -> None:
+    session.add(
+        AnalyticsEvent(
+            id=uuid4(),
+            user_id=user_id,
+            problem_id=problem_id,
+            attempt_id=attempt_id,
+            event_type=event_type,
+            mode=mode,
+            verdict=verdict,
+            metadata_json=metadata_json,
+            created_at=datetime.now(timezone.utc),
+        )
+    )
+
+
+def _as_int_or_none(value: object) -> int | None:
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
 
 
 @router.post("/query")
@@ -112,6 +147,16 @@ async def query(
         raise HTTPException(status_code=502, detail=f"Model returned invalid JSON: {exc}") from exc
 
     attempt_id = uuid4()
+    model_name = _text_or_none(result[5], max_len=128) if isinstance(result, tuple) else None
+    latency_seconds = float(result[7]) if isinstance(result, tuple) and result[7] is not None else None
+    latency_ms = int(latency_seconds * 1000) if latency_seconds is not None else None
+    tokens_in = _as_int_or_none(result[8]) if isinstance(result, tuple) else None
+    tokens_out = _as_int_or_none(result[9]) if isinstance(result, tuple) else None
+    tokens_thoughts = _as_int_or_none(result[10]) if isinstance(result, tuple) else None
+    tokens_total = _as_int_or_none(result[11]) if isinstance(result, tuple) else None
+    prompt_version = _text_or_none(f"{mode}/prompt.txt", max_len=64)
+    error_type = _text_or_none(payload.get("error_type"), max_len=64)
+
     base_key = f"users/{user.id}/problems/{problem.id}/attempts/{attempt_id}"
     problem_image_key = f"{base_key}/problem_image{_safe_suffix(prob_image, '.png')}"
     solution_image_key = f"{base_key}/solution_image{_safe_suffix(sol_image, '.png')}"
@@ -148,10 +193,36 @@ async def query(
         drawing_data_key=drawing_data_key,
         verdict=_text_or_none(payload.get("verdict"), max_len=64),
         response_type=_text_or_none(payload.get("response_type"), max_len=64),
+        error_type=error_type,
+        model_name=model_name,
+        prompt_version=prompt_version,
+        latency_ms=latency_ms,
+        tokens_in=tokens_in,
+        tokens_out=tokens_out,
+        tokens_thoughts=tokens_thoughts,
+        tokens_total=tokens_total,
         message_is=_text_or_none(payload.get("message_is")),
         created_at=datetime.now(timezone.utc),
     )
     session.add(attempt)
+    _record_event(
+        session=session,
+        user_id=user.id,
+        problem_id=problem.id,
+        attempt_id=attempt_id,
+        event_type="attempt_submitted",
+        mode=mode,
+        verdict=attempt.verdict,
+    )
+    _record_event(
+        session=session,
+        user_id=user.id,
+        problem_id=problem.id,
+        attempt_id=attempt_id,
+        event_type="attempt_failed" if attempt.verdict in {"incorrect", "unclear"} else "attempt_succeeded",
+        mode=mode,
+        verdict=attempt.verdict,
+    )
     session.commit()
 
     return JSONResponse(content=payload)
