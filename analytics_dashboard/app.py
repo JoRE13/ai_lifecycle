@@ -183,8 +183,8 @@ def get_feedback_trend(start_date: date, end_date: date) -> pd.DataFrame:
         """
         SELECT
             DATE(a.created_at) AS day,
-            COUNT(*) FILTER (WHERE LOWER(af.rating) = 'up') AS ups,
-            COUNT(*) FILTER (WHERE LOWER(af.rating) = 'down') AS downs
+            COUNT(*) FILTER (WHERE LOWER(af.rating) = 'thumbs_up') AS ups,
+            COUNT(*) FILTER (WHERE LOWER(af.rating) = 'thumbs_down') AS downs
         FROM attempt_feedback af
         JOIN attempts a ON a.id = af.attempt_id
         WHERE DATE(a.created_at) BETWEEN :start_date AND :end_date
@@ -594,8 +594,8 @@ def get_first_solve_kpis(start_date: date, end_date: date) -> dict[str, float]:
         ),
         first_problem_feedback_stats AS (
             SELECT
-                COUNT(*) FILTER (WHERE LOWER(af.rating) = 'up') AS up_count,
-                COUNT(*) FILTER (WHERE LOWER(af.rating) = 'down') AS down_count
+                COUNT(*) FILTER (WHERE LOWER(af.rating) = 'thumbs_up') AS up_count,
+                COUNT(*) FILTER (WHERE LOWER(af.rating) = 'thumbs_down') AS down_count
             FROM first_problem_candidates fp
             JOIN attempts a ON a.problem_id = fp.problem_id
             JOIN attempt_feedback af ON af.attempt_id = a.id
@@ -734,39 +734,41 @@ def get_hint_and_fix_rates(start_date: date, end_date: date) -> dict[str, float]
         SELECT
             COALESCE(
                 (
-                    COUNT(*) FILTER (
-                        WHERE EXISTS (
-                            SELECT 1
-                            FROM attempts_in_range later
-                            WHERE later.problem_id = h.problem_id
-                              AND later.created_at > h.created_at
-                              AND later.verdict IN ('fully_correct', 'fully_solved', 'correct_so_far')
-                        )
-                    )::float
-                    /
-                    NULLIF(COUNT(*), 0)::float
+                    SELECT
+                        COUNT(*) FILTER (
+                            WHERE EXISTS (
+                                SELECT 1
+                                FROM attempts_in_range later
+                                WHERE later.problem_id = h.problem_id
+                                  AND later.created_at > h.created_at
+                                  AND later.verdict IN ('fully_correct', 'fully_solved', 'correct_so_far')
+                            )
+                        )::float
+                        /
+                        NULLIF(COUNT(*), 0)::float
+                    FROM hint_attempts h
                 ),
                 0
             ) AS useful_hint_ratio,
             COALESCE(
                 (
-                    COUNT(*) FILTER (
-                        WHERE EXISTS (
-                            SELECT 1
-                            FROM attempts_in_range later
-                            WHERE later.problem_id = u.problem_id
-                              AND later.created_at > u.created_at
-                              AND later.verdict IS NOT NULL
-                              AND later.verdict <> 'unclear'
-                        )
-                    )::float
-                    /
-                    NULLIF(COUNT(*), 0)::float
+                    SELECT
+                        COUNT(*) FILTER (
+                            WHERE EXISTS (
+                                SELECT 1
+                                FROM attempts_in_range later
+                                WHERE later.problem_id = u.problem_id
+                                  AND later.created_at > u.created_at
+                                  AND later.verdict IS NOT NULL
+                                  AND later.verdict <> 'unclear'
+                            )
+                        )::float
+                        /
+                        NULLIF(COUNT(*), 0)::float
+                    FROM unclear_attempts u
                 ),
                 0
             ) AS unclear_fix_rate
-        FROM hint_attempts h
-        FULL OUTER JOIN unclear_attempts u ON FALSE
         """
     )
     with engine.connect() as conn:

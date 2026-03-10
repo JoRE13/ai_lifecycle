@@ -118,8 +118,8 @@ def compute_metrics(conn: psycopg.Connection, start_date: date, end_date: date) 
             ),
             feedback_stats AS (
                 SELECT
-                    COUNT(*) FILTER (WHERE LOWER(af.rating) = 'up') AS up_count,
-                    COUNT(*) FILTER (WHERE LOWER(af.rating) = 'down') AS down_count
+                    COUNT(*) FILTER (WHERE LOWER(af.rating) = 'thumbs_up') AS up_count,
+                    COUNT(*) FILTER (WHERE LOWER(af.rating) = 'thumbs_down') AS down_count
                 FROM attempt_feedback af
                 JOIN attempts a ON a.id = af.attempt_id
                 WHERE DATE(a.created_at) BETWEEN %s AND %s
