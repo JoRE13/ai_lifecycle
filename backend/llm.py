@@ -29,6 +29,10 @@ class LLMResponse(BaseModel):
     error_type: str
 
 
+def is_langfuse_enabled() -> bool:
+    return langfuse is not None
+
+
 def _build_langfuse_client() -> Langfuse | None:
     """Create a Langfuse client when credentials are available.
 
@@ -84,19 +88,88 @@ def _trace_event(trace: Any, name: str, metadata: dict[str, Any]) -> None:
         logger.exception("Failed to send Langfuse trace event")
 
 
-def _start_trace(prompt: str, mode: str) -> Any:
+def _extract_entity_id(entity: Any) -> str | None:
+    if entity is None:
+        return None
+    for attr in ("id", "trace_id", "observation_id"):
+        value = getattr(entity, attr, None)
+        if value:
+            return str(value)
+    if isinstance(entity, dict):
+        for key in ("id", "trace_id", "observation_id"):
+            value = entity.get(key)
+            if value:
+                return str(value)
+    return None
+
+
+def _start_trace(
+    *,
+    prompt: str,
+    mode: str,
+    name: str,
+    request_id: str | None,
+    user_id: str | None,
+    session_id: str | None,
+    metadata: dict[str, Any] | None,
+) -> tuple[Any, str | None]:
     if langfuse is None:
-        return None
+        return None, None
+    trace_input = {"prompt": prompt, "mode": mode}
+    base_kwargs: dict[str, Any] = {"name": name, "input": trace_input}
+    if metadata:
+        base_kwargs["metadata"] = metadata
     try:
+        # Legacy clients with explicit trace objects.
         if hasattr(langfuse, "trace"):
-            return langfuse.trace(name="gemini-call", input={"prompt": prompt, "mode": mode})
+            trace_kwargs = dict(base_kwargs)
+            if user_id:
+                trace_kwargs["user_id"] = user_id
+            if session_id:
+                trace_kwargs["session_id"] = session_id
+            if request_id:
+                trace_kwargs["id"] = request_id
+            trace = langfuse.trace(**trace_kwargs)
+            return trace, _extract_entity_id(trace) or request_id
+        if hasattr(langfuse, "create_trace"):
+            trace_kwargs = dict(base_kwargs)
+            if user_id:
+                trace_kwargs["user_id"] = user_id
+            if session_id:
+                trace_kwargs["session_id"] = session_id
+            if request_id:
+                trace_kwargs["id"] = request_id
+            trace = langfuse.create_trace(**trace_kwargs)
+            return trace, _extract_entity_id(trace) or request_id
+
+        # Langfuse v3 OTEL-style clients: use spans and attach trace metadata explicitly.
         if hasattr(langfuse, "start_span"):
-            return langfuse.start_span(name="gemini-call", input={"prompt": prompt, "mode": mode})
+            trace_context = None
+            if hasattr(langfuse, "create_trace_id"):
+                if request_id:
+                    trace_context = {"trace_id": langfuse.create_trace_id(seed=request_id)}
+                else:
+                    trace_context = {"trace_id": langfuse.create_trace_id()}
+            trace = langfuse.start_span(trace_context=trace_context, **base_kwargs)
+            if hasattr(trace, "update_trace"):
+                trace.update_trace(
+                    user_id=user_id,
+                    session_id=session_id,
+                    metadata=metadata,
+                    input=trace_input,
+                )
+            resolved_trace_id = (
+                getattr(trace, "trace_id", None)
+                or _extract_entity_id(trace)
+                or (trace_context or {}).get("trace_id")
+                or request_id
+            )
+            return trace, resolved_trace_id
         logger.warning("No compatible Langfuse trace/span API found")
-        return None
+        return None, None
     except Exception:
         logger.exception("Failed to start Langfuse trace/span")
-        return None
+        return None, None
 
 
 def _trace_generation(
@@ -111,13 +184,13 @@ def _trace_generation(
     tokens_out: int,
     tokens_total: int,
     tokens_thoughts: int,
-) -> None:
+) -> str | None:
     if trace is None:
-        return
+        return None
 
     try:
         if hasattr(trace, "generation"):
-            trace.generation(
+            generation = trace.generation(
                 name="gemini-generation",
                 model=model,
                 input=prompt,
@@ -133,7 +206,7 @@ def _trace_generation(
                     "thought_tokens": tokens_thoughts,
                 },
             )
-            return
+            return _extract_entity_id(generation)
 
         if hasattr(trace, "start_generation"):
             generation = trace.start_generation(
@@ -154,11 +227,101 @@ def _trace_generation(
             )
             if hasattr(generation, "end"):
                 generation.end()
-            return
+            return _extract_entity_id(generation)
 
         logger.warning("No compatible Langfuse generation API found")
     except Exception:
         logger.exception("Failed to send Langfuse generation")
+    return None
+
+
+def _end_trace(trace: Any, *, output: Any = None, metadata: dict[str, Any] | None = None) -> None:
+    if trace is None:
+        return
+    try:
+        # Langfuse v3 span API: update trace attrs first, then end span.
+        if hasattr(trace, "update_trace") and hasattr(trace, "end"):
+            trace.update_trace(output=output, metadata=metadata)
+            trace.end()
+            return
+        if hasattr(trace, "end"):
+            kwargs: dict[str, Any] = {}
+            if output is not None:
+                kwargs["output"] = output
+            if metadata:
+                kwargs["metadata"] = metadata
+            trace.end(**kwargs)
+            return
+        if hasattr(trace, "update"):
+            kwargs = {}
+            if output is not None:
+                kwargs["output"] = output
+            if metadata:
+                kwargs["metadata"] = metadata
+            trace.update(**kwargs)
+    except Exception:
+        logger.exception("Failed to finalize Langfuse trace")
+
+
+def submit_langfuse_score(
+    *,
+    name: str,
+    value: float,
+    observation_id: str | None = None,
+    trace_id: str | None = None,
+    comment: str | None = None,
+    metadata: dict[str, Any] | None = None,
+) -> tuple[bool, str | None]:
+    if langfuse is None:
+        return False, "Langfuse client not initialized"
+    if not observation_id and not trace_id:
+        return False, "Missing trace_id and observation_id"
+
+    base_kwargs: dict[str, Any] = {
+        "name": name,
+        "value": value,
+    }
+    if comment:
+        base_kwargs["comment"] = comment
+    if metadata:
+        base_kwargs["metadata"] = metadata
+
+    target_kwargs: list[dict[str, str]] = []
+    if trace_id and observation_id:
+        target_kwargs.append({"trace_id": trace_id, "observation_id": observation_id})
+        target_kwargs.append({"traceId": trace_id, "observationId": observation_id})
+    if observation_id:
+        target_kwargs.append({"observation_id": observation_id})
+        target_kwargs.append({"observationId": observation_id})
+    if trace_id:
+        target_kwargs.append({"trace_id": trace_id})
+        target_kwargs.append({"traceId": trace_id})
+
+    score_methods = []
+    if hasattr(langfuse, "score"):
+        score_methods.append(langfuse.score)
+    if hasattr(langfuse, "create_score"):
+        score_methods.append(langfuse.create_score)
+
+    last_error: str | None = None
+    for method in score_methods:
+        for target in target_kwargs:
+            try:
+                method(**base_kwargs, **target)
+                if hasattr(langfuse, "flush"):
+                    langfuse.flush()
+                return True, None
+            except TypeError:
+                continue
+            except Exception as exc:
+                last_error = f"{type(exc).__name__}: {exc}"
+                logger.warning("Langfuse score submission attempt failed: %s", last_error)
+                continue
+
+    if last_error:
+        logger.error("Langfuse score submission failed after all attempts: %s", last_error)
+        return False, last_error
+    return False, "No compatible Langfuse score method/parameters found"
 
 
 def call_model_with_retry(
@@ -168,18 +331,26 @@ def call_model_with_retry(
     mode: str,
     max_retries: int = 5,
     regenerate: bool = False,
+    trace_name: str = "gemini-call",
+    trace_metadata: dict[str, Any] | None = None,
+    trace_user_id: str | None = None,
+    trace_session_id: str | None = None,
+    request_id: str | None = None,
 ):
-    """Call Gemini with retries and optional Langfuse tracing.
-
-    Returns the same tuple shape as before for compatibility.
-    """
+    """Call Gemini with retries and optional Langfuse tracing."""
     if max_retries < 1:
         raise ValueError("max_retries must be >= 1")
 
     t0 = time.time()
-    trace = None
-
-    trace = _start_trace(prompt=prompt, mode=mode)
+    trace, trace_id = _start_trace(
+        prompt=prompt,
+        mode=mode,
+        name=trace_name,
+        request_id=request_id,
+        user_id=trace_user_id,
+        session_id=trace_session_id,
+        metadata=trace_metadata,
+    )
 
     model = "gemini-3-pro-preview" if regenerate else "models/gemini-3-flash-preview"
 
@@ -200,8 +371,9 @@ def call_model_with_retry(
             tokens_total = getattr(usage, "total_token_count", 0)
             tokens_thoughts = getattr(usage, "thoughts_token_count", 0)
             latency = time.time() - t0
+            retry_count = attempt
 
-            _trace_generation(
+            observation_id = _trace_generation(
                 trace,
                 model=model,
                 prompt=prompt,
@@ -213,29 +385,32 @@ def call_model_with_retry(
                 tokens_total=tokens_total,
                 tokens_thoughts=tokens_thoughts,
             )
+            end_metadata = dict(trace_metadata or {})
+            end_metadata.update({"success": True, "retryCount": retry_count})
+            _end_trace(trace, output=resp.text, metadata=end_metadata)
             if langfuse is not None and hasattr(langfuse, "flush"):
                 # Useful during local debugging and short-lived runs.
                 langfuse.flush()
-            if trace is not None and hasattr(trace, "end"):
-                try:
-                    trace.end()
-                except Exception:
-                    logger.exception("Failed to end Langfuse trace/span")
 
-            return (
-                resp.text,
-                prompt,
-                prob_image,
-                sol_image,
-                mode,
-                model,
-                datetime.now(),
-                latency,
-                tokens_in,
-                tokens_out,
-                tokens_thoughts,
-                tokens_total,
-            )
+            return {
+                "response_text": resp.text,
+                "prompt": prompt,
+                "prob_image": prob_image,
+                "sol_image": sol_image,
+                "mode": mode,
+                "model_name": model,
+                "timestamp": datetime.now(),
+                "latency_seconds": latency,
+                "tokens_in": tokens_in,
+                "tokens_out": tokens_out,
+                "tokens_thoughts": tokens_thoughts,
+                "tokens_total": tokens_total,
+                "retry_count": retry_count,
+                "trace_id": trace_id,
+                "observation_id": observation_id,
+                "message_id": None,
+                "request_id": request_id,
+            }
 
         except ServerError as exc:
             is_last_attempt = attempt == max_retries - 1
@@ -247,11 +422,13 @@ def call_model_with_retry(
 
             if is_last_attempt:
                 logger.exception("Gemini server error after %s attempts", max_retries)
-                if trace is not None and hasattr(trace, "end"):
-                    try:
-                        trace.end()
-                    except Exception:
-                        logger.exception("Failed to end Langfuse trace/span")
+                end_metadata = dict(trace_metadata or {})
+                end_metadata.update({"success": False, "retryCount": attempt + 1, "error": str(exc)})
+                _end_trace(
+                    trace,
+                    output={"error": str(exc)},
+                    metadata=end_metadata,
+                )
                 raise
 
             wait_seconds = 2**attempt
@@ -266,11 +443,13 @@ def call_model_with_retry(
         except Exception as exc:
             _trace_event(trace, name="unexpected_error", metadata={"error": str(exc)})
             logger.exception("Gemini request failed with non-retryable error")
-            if trace is not None and hasattr(trace, "end"):
-                try:
-                    trace.end()
-                except Exception:
-                    logger.exception("Failed to end Langfuse trace/span")
+            end_metadata = dict(trace_metadata or {})
+            end_metadata.update({"success": False, "retryCount": attempt, "error": str(exc)})
+            _end_trace(
+                trace,
+                output={"error": str(exc)},
+                metadata=end_metadata,
+            )
             raise
 
     # This point should be unreachable because we either return or raise.

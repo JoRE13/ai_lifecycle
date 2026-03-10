@@ -6,3 +6,4 @@ test_samples/
 my_app/
 ios_math_coach/
 .DS_Store
+.env
