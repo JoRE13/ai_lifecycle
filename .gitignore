@@ -5,3 +5,4 @@ test_samples/
 */.env
 my_app/
 ios_math_coach/
+.DS_Store
