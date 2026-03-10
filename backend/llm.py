@@ -21,6 +21,16 @@ load_dotenv(Path(__file__).resolve().parent / ".env")
 
 logger = logging.getLogger(__name__)
 
+# Gemini 3 Flash Preview paid-tier rates used elsewhere in this project docs.
+INPUT_COST_PER_1M_TOKENS_USD = float(os.getenv("INPUT_COST_PER_1M_TOKENS_USD", "0.50"))
+OUTPUT_COST_PER_1M_TOKENS_USD = float(os.getenv("OUTPUT_COST_PER_1M_TOKENS_USD", "3.00"))
+
+# Alert if estimated per-call cost jumps above this delta compared to previous call.
+COST_SPIKE_THRESHOLD_USD = float(os.getenv("COST_SPIKE_THRESHOLD_USD", "0.005"))
+
+# In-memory baseline for simple spike detection (first call seeds baseline only).
+previous_estimated_call_cost_usd: float | None = None
+
 
 class LLMResponse(BaseModel):
     verdict: str
@@ -101,6 +111,30 @@ def _extract_entity_id(entity: Any) -> str | None:
             if value:
                 return str(value)
     return None
+
+
+def _estimate_call_cost_usd(*, tokens_in: int, tokens_out: int, tokens_thoughts: int) -> float:
+    billed_output_tokens = max(0, tokens_out) + max(0, tokens_thoughts)
+    return (max(0, tokens_in) / 1_000_000.0) * INPUT_COST_PER_1M_TOKENS_USD + (
+        billed_output_tokens / 1_000_000.0
+    ) * OUTPUT_COST_PER_1M_TOKENS_USD
+
+
+def _warn_if_cost_spike(current_cost_usd: float) -> None:
+    global previous_estimated_call_cost_usd
+    if previous_estimated_call_cost_usd is None:
+        previous_estimated_call_cost_usd = current_cost_usd
+        return
+
+    increase = current_cost_usd - previous_estimated_call_cost_usd
+    if increase > COST_SPIKE_THRESHOLD_USD:
+        logger.warning(
+            "COST SPIKE DETECTED\nPrevious cost: $%.6f\nCurrent cost: $%.6f\nIncrease: $%.6f",
+            previous_estimated_call_cost_usd,
+            current_cost_usd,
+            increase,
+        )
+    previous_estimated_call_cost_usd = current_cost_usd
 
 
 def _start_trace(
@@ -372,6 +406,12 @@ def call_model_with_retry(
             tokens_thoughts = getattr(usage, "thoughts_token_count", 0)
             latency = time.time() - t0
             retry_count = attempt
+            estimated_call_cost_usd = _estimate_call_cost_usd(
+                tokens_in=tokens_in,
+                tokens_out=tokens_out,
+                tokens_thoughts=tokens_thoughts,
+            )
+            _warn_if_cost_spike(estimated_call_cost_usd)
 
             observation_id = _trace_generation(
                 trace,
@@ -405,6 +445,7 @@ def call_model_with_retry(
                 "tokens_out": tokens_out,
                 "tokens_thoughts": tokens_thoughts,
                 "tokens_total": tokens_total,
+                "estimated_call_cost_usd": estimated_call_cost_usd,
                 "retry_count": retry_count,
                 "trace_id": trace_id,
                 "observation_id": observation_id,
