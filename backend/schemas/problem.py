@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 
 class ProblemCreateRequest(BaseModel):
@@ -37,8 +37,74 @@ class AttemptResponse(BaseModel):
 
 
 class AttemptFeedbackCreateRequest(BaseModel):
-    rating: str | None = Field(default=None, max_length=16)
+    model_config = ConfigDict(populate_by_name=True)
+
+    rating: str = Field(min_length=1, max_length=16)
     comment: str | None = None
+    trace_id: str | None = Field(
+        default=None,
+        max_length=128,
+        validation_alias=AliasChoices("traceId", "trace_id"),
+    )
+    observation_id: str | None = Field(
+        default=None,
+        max_length=128,
+        validation_alias=AliasChoices("observationId", "observation_id"),
+    )
+    message_id: str | None = Field(
+        default=None,
+        max_length=128,
+        validation_alias=AliasChoices("messageId", "message_id"),
+    )
+    request_id: str | None = Field(
+        default=None,
+        max_length=128,
+        validation_alias=AliasChoices("requestId", "request_id"),
+    )
+    client_request_id: str | None = Field(
+        default=None,
+        max_length=128,
+        validation_alias=AliasChoices("clientRequestId", "client_request_id"),
+    )
+    session_id: str | None = Field(
+        default=None,
+        max_length=128,
+        validation_alias=AliasChoices("sessionId", "session_id"),
+    )
+    feature: str | None = Field(default=None, max_length=64)
+    flow: str | None = Field(default=None, max_length=64)
+    route_name: str | None = Field(
+        default=None,
+        max_length=128,
+        validation_alias=AliasChoices("routeName", "route_name"),
+    )
+    mode: str | None = Field(default=None, max_length=32)
+    model_name: str | None = Field(
+        default=None,
+        max_length=128,
+        validation_alias=AliasChoices("modelName", "model_name"),
+    )
+    prompt_version: str | None = Field(
+        default=None,
+        max_length=64,
+        validation_alias=AliasChoices("promptVersion", "prompt_version"),
+    )
+    latency_ms: int | None = Field(
+        default=None,
+        validation_alias=AliasChoices("latencyMs", "latency_ms"),
+    )
+    tokens_in: int | None = Field(
+        default=None,
+        validation_alias=AliasChoices("tokensIn", "tokens_in"),
+    )
+    tokens_out: int | None = Field(
+        default=None,
+        validation_alias=AliasChoices("tokensOut", "tokens_out"),
+    )
+    tokens_total: int | None = Field(
+        default=None,
+        validation_alias=AliasChoices("tokensTotal", "tokens_total"),
+    )
 
 
 class AttemptFeedbackResponse(BaseModel):

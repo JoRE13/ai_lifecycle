@@ -128,6 +128,9 @@ class Attempt(SQLModel, table=True):
     tokens_out: Optional[int] = Field(default=None, sa_column=Column(Integer))
     tokens_thoughts: Optional[int] = Field(default=None, sa_column=Column(Integer))
     tokens_total: Optional[int] = Field(default=None, sa_column=Column(Integer))
+    trace_id: Optional[str] = Field(default=None, sa_column=Column(String(128)))
+    observation_id: Optional[str] = Field(default=None, sa_column=Column(String(128)))
+    request_id: Optional[str] = Field(default=None, sa_column=Column(String(128)))
     message_is: Optional[str] = Field(default=None, sa_column=Column(String))
     created_at: datetime = Field(
         default_factory=utcnow,
@@ -150,6 +153,21 @@ class AttemptFeedback(SQLModel, table=True):
     user_id: UUID = Field(foreign_key="users.id", index=True)
     rating: Optional[str] = Field(default=None, sa_column=Column(String(16)))
     comment: Optional[str] = Field(default=None, sa_column=Column(String))
+    trace_id: Optional[str] = Field(default=None, sa_column=Column(String(128)))
+    observation_id: Optional[str] = Field(default=None, sa_column=Column(String(128)))
+    request_id: Optional[str] = Field(default=None, sa_column=Column(String(128)))
+    client_request_id: Optional[str] = Field(default=None, sa_column=Column(String(128)))
+    session_id: Optional[str] = Field(default=None, sa_column=Column(String(128)))
+    feature: Optional[str] = Field(default=None, sa_column=Column(String(64)))
+    flow: Optional[str] = Field(default=None, sa_column=Column(String(64)))
+    route_name: Optional[str] = Field(default=None, sa_column=Column(String(128)))
+    mode: Optional[str] = Field(default=None, sa_column=Column(String(32)))
+    model_name: Optional[str] = Field(default=None, sa_column=Column(String(128)))
+    prompt_version: Optional[str] = Field(default=None, sa_column=Column(String(64)))
+    latency_ms: Optional[int] = Field(default=None, sa_column=Column(Integer))
+    tokens_in: Optional[int] = Field(default=None, sa_column=Column(Integer))
+    tokens_out: Optional[int] = Field(default=None, sa_column=Column(Integer))
+    tokens_total: Optional[int] = Field(default=None, sa_column=Column(Integer))
     created_at: datetime = Field(
         default_factory=utcnow,
         sa_column=Column(DateTime(timezone=True), nullable=False),

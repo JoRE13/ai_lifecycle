@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import logging
 from uuid import UUID
 from uuid import uuid4
 
@@ -7,6 +8,7 @@ from sqlmodel import Session, select
 
 from backend.auth.deps import get_current_user
 from backend.db import get_session
+from backend.llm import submit_langfuse_score
 from backend.models.auth_models import AnalyticsEvent, Attempt, AttemptFeedback, Problem, User
 from backend.schemas.problem import (
     AnalyticsEventResponse,
@@ -19,6 +21,7 @@ from backend.schemas.problem import (
 from backend.storage.r2 import R2ConfigurationError, presigned_get_url
 
 router = APIRouter(tags=["problem"])
+logger = logging.getLogger(__name__)
 
 
 def _record_event(
@@ -174,12 +177,31 @@ def submit_attempt_feedback(
     if not attempt:
         raise HTTPException(status_code=404, detail="Attempt not found")
 
+    trace_id = payload.trace_id or attempt.trace_id
+    observation_id = payload.observation_id or attempt.observation_id
+    request_id = payload.request_id or attempt.request_id
+
     feedback = AttemptFeedback(
         id=uuid4(),
         attempt_id=attempt.id,
         user_id=user.id,
         rating=payload.rating,
         comment=payload.comment,
+        trace_id=trace_id,
+        observation_id=observation_id,
+        request_id=request_id,
+        client_request_id=payload.client_request_id,
+        session_id=payload.session_id,
+        feature=payload.feature,
+        flow=payload.flow,
+        route_name=payload.route_name,
+        mode=payload.mode or attempt.mode,
+        model_name=payload.model_name or attempt.model_name,
+        prompt_version=payload.prompt_version or attempt.prompt_version,
+        latency_ms=payload.latency_ms if payload.latency_ms is not None else attempt.latency_ms,
+        tokens_in=payload.tokens_in if payload.tokens_in is not None else attempt.tokens_in,
+        tokens_out=payload.tokens_out if payload.tokens_out is not None else attempt.tokens_out,
+        tokens_total=payload.tokens_total if payload.tokens_total is not None else attempt.tokens_total,
         created_at=datetime.now(timezone.utc),
     )
     session.add(feedback)
@@ -193,6 +215,49 @@ def submit_attempt_feedback(
         verdict=attempt.verdict,
     )
     session.commit()
+
+    rating_value = (payload.rating or "").strip().lower()
+    thumbs_up_values = {"thumb_up", "thumbs_up", "up", "like", "positive"}
+    thumbs_down_values = {"thumb_down", "thumbs_down", "down", "dislike", "negative"}
+
+    score_metadata = {
+        "attempt_id": str(attempt.id),
+        "problem_id": str(attempt.problem_id),
+        "user_id": str(user.id),
+        "request_id": request_id,
+    }
+
+    try:
+        if rating_value in thumbs_up_values:
+            submit_langfuse_score(
+                name="thumbs_up",
+                value=1.0,
+                observation_id=observation_id,
+                trace_id=trace_id,
+                comment=payload.comment,
+                metadata=score_metadata,
+            )
+        elif rating_value in thumbs_down_values:
+            submit_langfuse_score(
+                name="thumbs_down",
+                value=1.0,
+                observation_id=observation_id,
+                trace_id=trace_id,
+                comment=payload.comment,
+                metadata=score_metadata,
+            )
+
+        if payload.comment and payload.comment.strip():
+            submit_langfuse_score(
+                name="corrected",
+                value=1.0,
+                observation_id=observation_id,
+                trace_id=trace_id,
+                comment=payload.comment,
+                metadata=score_metadata,
+            )
+    except Exception:
+        logger.exception("Failed to submit Langfuse feedback scores")
 
     return AttemptFeedbackResponse(
         id=feedback.id,
