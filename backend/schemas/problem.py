@@ -114,6 +114,8 @@ class AttemptFeedbackResponse(BaseModel):
     rating: str | None
     comment: str | None
     created_at: datetime
+    score_submitted: bool | None = None
+    score_error: str | None = None
 
 
 class AnalyticsEventResponse(BaseModel):

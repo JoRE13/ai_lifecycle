@@ -271,11 +271,11 @@ def submit_langfuse_score(
     trace_id: str | None = None,
     comment: str | None = None,
     metadata: dict[str, Any] | None = None,
-) -> bool:
+) -> tuple[bool, str | None]:
     if langfuse is None:
-        return False
+        return False, "Langfuse client not initialized"
     if not observation_id and not trace_id:
-        return False
+        return False, "Missing trace_id and observation_id"
 
     base_kwargs: dict[str, Any] = {
         "name": name,
@@ -286,7 +286,10 @@ def submit_langfuse_score(
     if metadata:
         base_kwargs["metadata"] = metadata
 
-    target_kwargs = []
+    target_kwargs: list[dict[str, str]] = []
+    if trace_id and observation_id:
+        target_kwargs.append({"trace_id": trace_id, "observation_id": observation_id})
+        target_kwargs.append({"traceId": trace_id, "observationId": observation_id})
     if observation_id:
         target_kwargs.append({"observation_id": observation_id})
         target_kwargs.append({"observationId": observation_id})
@@ -300,19 +303,25 @@ def submit_langfuse_score(
     if hasattr(langfuse, "create_score"):
         score_methods.append(langfuse.create_score)
 
+    last_error: str | None = None
     for method in score_methods:
         for target in target_kwargs:
             try:
                 method(**base_kwargs, **target)
                 if hasattr(langfuse, "flush"):
                     langfuse.flush()
-                return True
+                return True, None
             except TypeError:
                 continue
-            except Exception:
-                logger.exception("Langfuse score submission failed")
-                return False
-    return False
+            except Exception as exc:
+                last_error = f"{type(exc).__name__}: {exc}"
+                logger.warning("Langfuse score submission attempt failed: %s", last_error)
+                continue
+
+    if last_error:
+        logger.error("Langfuse score submission failed after all attempts: %s", last_error)
+        return False, last_error
+    return False, "No compatible Langfuse score method/parameters found"
 
 
 def call_model_with_retry(

@@ -226,38 +226,63 @@ def submit_attempt_feedback(
         "user_id": str(user.id),
         "request_id": request_id,
     }
+    score_attempted = False
+    score_successes: list[bool] = []
+    score_errors: list[str] = []
+
+    def _capture_score_result(result: tuple[bool, str | None]) -> None:
+        success, error = result
+        score_successes.append(success)
+        if not success and error:
+            score_errors.append(error)
 
     try:
         if rating_value in thumbs_up_values:
-            submit_langfuse_score(
-                name="thumbs_up",
-                value=1.0,
-                observation_id=observation_id,
-                trace_id=trace_id,
-                comment=payload.comment,
-                metadata=score_metadata,
+            score_attempted = True
+            _capture_score_result(
+                submit_langfuse_score(
+                    name="thumbs_up",
+                    value=1.0,
+                    observation_id=observation_id,
+                    trace_id=trace_id,
+                    comment=payload.comment,
+                    metadata=score_metadata,
+                )
             )
         elif rating_value in thumbs_down_values:
-            submit_langfuse_score(
-                name="thumbs_down",
-                value=1.0,
-                observation_id=observation_id,
-                trace_id=trace_id,
-                comment=payload.comment,
-                metadata=score_metadata,
+            score_attempted = True
+            _capture_score_result(
+                submit_langfuse_score(
+                    name="thumbs_down",
+                    value=1.0,
+                    observation_id=observation_id,
+                    trace_id=trace_id,
+                    comment=payload.comment,
+                    metadata=score_metadata,
+                )
             )
 
         if payload.comment and payload.comment.strip():
-            submit_langfuse_score(
-                name="corrected",
-                value=1.0,
-                observation_id=observation_id,
-                trace_id=trace_id,
-                comment=payload.comment,
-                metadata=score_metadata,
+            score_attempted = True
+            _capture_score_result(
+                submit_langfuse_score(
+                    name="corrected",
+                    value=1.0,
+                    observation_id=observation_id,
+                    trace_id=trace_id,
+                    comment=payload.comment,
+                    metadata=score_metadata,
+                )
             )
     except Exception:
         logger.exception("Failed to submit Langfuse feedback scores")
+
+    score_submitted = None
+    score_error = None
+    if score_attempted:
+        score_submitted = all(score_successes) if score_successes else False
+        if not score_submitted and score_errors:
+            score_error = " | ".join(dict.fromkeys(score_errors))
 
     return AttemptFeedbackResponse(
         id=feedback.id,
@@ -266,6 +291,8 @@ def submit_attempt_feedback(
         rating=feedback.rating,
         comment=feedback.comment,
         created_at=feedback.created_at,
+        score_submitted=score_submitted,
+        score_error=score_error,
     )
 
 
