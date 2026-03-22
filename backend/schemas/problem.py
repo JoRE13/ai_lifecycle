@@ -21,6 +21,8 @@ class AttemptResponse(BaseModel):
     problem_id: UUID
     user_id: UUID
     mode: str
+    page_count: int | None = None
+    problem_image_url: str | None
     solution_image_url: str | None
     verdict: str | None
     response_type: str | None

@@ -134,7 +134,9 @@ def list_problem_attempts(
             problem_id=attempt.problem_id,
             user_id=attempt.user_id,
             mode=attempt.mode,
-            solution_image_url=_attempt_solution_url(attempt),
+            page_count=attempt.page_count or 1,
+            problem_image_url=_attempt_asset_url(attempt.problem_image_key),
+            solution_image_url=_attempt_asset_url(attempt.solution_image_key),
             verdict=attempt.verdict,
             response_type=attempt.response_type,
             message_is=attempt.message_is,
@@ -152,11 +154,11 @@ def list_problem_attempts(
     ]
 
 
-def _attempt_solution_url(attempt: Attempt) -> str | None:
-    if not attempt.solution_image_key:
+def _attempt_asset_url(asset_key: str | None) -> str | None:
+    if not asset_key:
         return None
     try:
-        return presigned_get_url(key=attempt.solution_image_key)
+        return presigned_get_url(key=asset_key)
     except R2ConfigurationError:
         return None
 

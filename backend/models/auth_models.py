@@ -21,6 +21,7 @@ class User(SQLModel, table=True):
     email: str = Field(
         sa_column=Column(String(320), nullable=False, unique=True, index=True)
     )
+    full_name: Optional[str] = Field(default=None, sa_column=Column(String(128)))
 
     # Store a bcrypt hash, never the raw password
     password_hash: str = Field(sa_column=Column(String(255), nullable=False))
@@ -113,6 +114,7 @@ class Attempt(SQLModel, table=True):
     problem_id: UUID = Field(foreign_key="problems.id", index=True)
     user_id: UUID = Field(foreign_key="users.id", index=True)
     mode: str = Field(sa_column=Column(String(32), nullable=False))
+    page_count: Optional[int] = Field(default=None, sa_column=Column(Integer))
 
     problem_image_key: Optional[str] = Field(default=None, sa_column=Column(String(1024)))
     solution_image_key: Optional[str] = Field(default=None, sa_column=Column(String(1024)))

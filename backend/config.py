@@ -15,3 +15,8 @@ COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() == "true"
 # "lax" is usually good; if frontend/backend are truly cross-site you may need "none"
 COOKIE_SAMESITE = os.getenv("COOKIE_SAMESITE", "lax")  # "lax" | "strict" | "none"
 COOKIE_PATH = os.getenv("COOKIE_PATH", "/")
+
+# Query upload safety limits (bytes)
+QUERY_MAX_SINGLE_FILE_BYTES = int(os.getenv("QUERY_MAX_SINGLE_FILE_BYTES", str(7 * 1024 * 1024)))
+QUERY_MAX_TOTAL_BYTES = int(os.getenv("QUERY_MAX_TOTAL_BYTES", str(15 * 1024 * 1024)))
+QUERY_MAX_PAGE_COUNT = int(os.getenv("QUERY_MAX_PAGE_COUNT", "12"))

@@ -5,12 +5,12 @@ import os
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Sequence
 
 from dotenv import load_dotenv
 from google import genai
 from google.genai.errors import ServerError
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 try:
     from langfuse import Langfuse
@@ -37,6 +37,22 @@ class LLMResponse(BaseModel):
     response_type: str
     message_is: str
     error_type: str
+    all_readable: bool
+    ambiguous_regions: list["LegibilityRegion"] = Field(default_factory=list)
+    missing_parts: list[str] = Field(default_factory=list)
+
+
+class LegibilityRegion(BaseModel):
+    page: int | None = None
+    snippet: str | None = None
+    reason: str | None = None
+
+
+class LegibilityResponse(BaseModel):
+    all_readable: bool
+    ambiguous_regions: list[LegibilityRegion] = Field(default_factory=list)
+    missing_parts: list[str] = Field(default_factory=list)
+    message_is: str | None = None
 
 
 def is_langfuse_enabled() -> bool:
@@ -358,11 +374,26 @@ def submit_langfuse_score(
     return False, "No compatible Langfuse score method/parameters found"
 
 
-def call_model_with_retry(
+def _build_multipage_contents(*, prompt: str, prob_image: Any, sol_images: Sequence[Any]) -> list[Any]:
+    sol_images_list = list(sol_images)
+    if not sol_images_list:
+        raise ValueError("At least one solution image is required")
+
+    contents: list[Any] = [prompt, "Problem image:", prob_image]
+    total_solution_pages = len(sol_images_list)
+    for page_index, page_image in enumerate(sol_images_list, start=1):
+        contents.append(f"Student solution page {page_index} of {total_solution_pages} (ordered).")
+        contents.append(page_image)
+    return contents
+
+
+def _call_model_with_retry_internal(
+    *,
     prompt: str,
     prob_image: Any,
-    sol_image: Any,
+    sol_images: Sequence[Any],
     mode: str,
+    response_schema: type[BaseModel],
     max_retries: int = 5,
     regenerate: bool = False,
     trace_name: str = "gemini-call",
@@ -370,10 +401,12 @@ def call_model_with_retry(
     trace_user_id: str | None = None,
     trace_session_id: str | None = None,
     request_id: str | None = None,
-):
-    """Call Gemini with retries and optional Langfuse tracing."""
+) -> dict[str, Any]:
     if max_retries < 1:
         raise ValueError("max_retries must be >= 1")
+
+    sol_images_list = list(sol_images)
+    contents = _build_multipage_contents(prompt=prompt, prob_image=prob_image, sol_images=sol_images_list)
 
     t0 = time.time()
     trace, trace_id = _start_trace(
@@ -392,10 +425,10 @@ def call_model_with_retry(
         try:
             resp = client.models.generate_content(
                 model=model,
-                contents=[prompt, prob_image, sol_image],
+                contents=contents,
                 config={
                     "response_mime_type": "application/json",
-                    "response_json_schema": LLMResponse.model_json_schema(),
+                    "response_json_schema": response_schema.model_json_schema(),
                 },
             )
 
@@ -429,14 +462,13 @@ def call_model_with_retry(
             end_metadata.update({"success": True, "retryCount": retry_count})
             _end_trace(trace, output=resp.text, metadata=end_metadata)
             if langfuse is not None and hasattr(langfuse, "flush"):
-                # Useful during local debugging and short-lived runs.
                 langfuse.flush()
 
             return {
                 "response_text": resp.text,
                 "prompt": prompt,
                 "prob_image": prob_image,
-                "sol_image": sol_image,
+                "sol_images": sol_images_list,
                 "mode": mode,
                 "model_name": model,
                 "timestamp": datetime.now(),
@@ -460,16 +492,11 @@ def call_model_with_retry(
                 name="server_error",
                 metadata={"attempt": attempt + 1, "max_retries": max_retries, "error": str(exc)},
             )
-
             if is_last_attempt:
                 logger.exception("Gemini server error after %s attempts", max_retries)
                 end_metadata = dict(trace_metadata or {})
                 end_metadata.update({"success": False, "retryCount": attempt + 1, "error": str(exc)})
-                _end_trace(
-                    trace,
-                    output={"error": str(exc)},
-                    metadata=end_metadata,
-                )
+                _end_trace(trace, output={"error": str(exc)}, metadata=end_metadata)
                 raise
 
             wait_seconds = 2**attempt
@@ -486,12 +513,66 @@ def call_model_with_retry(
             logger.exception("Gemini request failed with non-retryable error")
             end_metadata = dict(trace_metadata or {})
             end_metadata.update({"success": False, "retryCount": attempt, "error": str(exc)})
-            _end_trace(
-                trace,
-                output={"error": str(exc)},
-                metadata=end_metadata,
-            )
+            _end_trace(trace, output={"error": str(exc)}, metadata=end_metadata)
             raise
 
-    # This point should be unreachable because we either return or raise.
     raise RuntimeError("Gemini request failed unexpectedly")
+
+
+def call_legibility_with_retry(
+    prompt: str,
+    prob_image: Any,
+    sol_images: Sequence[Any],
+    mode: str,
+    max_retries: int = 5,
+    regenerate: bool = False,
+    trace_name: str = "gemini-legibility",
+    trace_metadata: dict[str, Any] | None = None,
+    trace_user_id: str | None = None,
+    trace_session_id: str | None = None,
+    request_id: str | None = None,
+) -> dict[str, Any]:
+    return _call_model_with_retry_internal(
+        prompt=prompt,
+        prob_image=prob_image,
+        sol_images=sol_images,
+        mode=mode,
+        response_schema=LegibilityResponse,
+        max_retries=max_retries,
+        regenerate=regenerate,
+        trace_name=trace_name,
+        trace_metadata=trace_metadata,
+        trace_user_id=trace_user_id,
+        trace_session_id=trace_session_id,
+        request_id=request_id,
+    )
+
+
+def call_model_with_retry(
+    prompt: str,
+    prob_image: Any,
+    sol_images: Sequence[Any],
+    mode: str,
+    max_retries: int = 5,
+    regenerate: bool = False,
+    trace_name: str = "gemini-call",
+    trace_metadata: dict[str, Any] | None = None,
+    trace_user_id: str | None = None,
+    trace_session_id: str | None = None,
+    request_id: str | None = None,
+):
+    """Call Gemini with retries and optional Langfuse tracing."""
+    return _call_model_with_retry_internal(
+        prompt=prompt,
+        prob_image=prob_image,
+        sol_images=sol_images,
+        mode=mode,
+        response_schema=LLMResponse,
+        max_retries=max_retries,
+        regenerate=regenerate,
+        trace_name=trace_name,
+        trace_metadata=trace_metadata,
+        trace_user_id=trace_user_id,
+        trace_session_id=trace_session_id,
+        request_id=request_id,
+    )

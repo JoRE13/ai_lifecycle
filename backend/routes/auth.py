@@ -10,7 +10,13 @@ from backend.config import (
     COOKIE_PATH,
 )
 from backend.db import get_session
-from backend.schemas.auth import RegisterRequest, LoginRequest, TokenResponse, MeResponse
+from backend.schemas.auth import (
+    RegisterRequest,
+    LoginRequest,
+    UpdateMeRequest,
+    TokenResponse,
+    MeResponse,
+)
 from backend.repositories.auth_repo import (
     get_user_by_email,
     create_user,
@@ -139,4 +145,22 @@ def logout(resp: Response, request: Request, session: Session = Depends(get_sess
 
 @router.get("/me", response_model=MeResponse)
 def me(user: User = Depends(get_current_user)):
-    return MeResponse(id=str(user.id), email=user.email)
+    return MeResponse(id=str(user.id), email=user.email, full_name=user.full_name)
+
+
+@router.patch("/me", response_model=MeResponse)
+def update_me(
+    payload: UpdateMeRequest,
+    session: Session = Depends(get_session),
+    user: User = Depends(get_current_user),
+):
+    full_name = payload.full_name
+    if full_name is not None:
+        full_name = full_name.strip() or None
+
+    user.full_name = full_name
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    return MeResponse(id=str(user.id), email=user.email, full_name=user.full_name)
