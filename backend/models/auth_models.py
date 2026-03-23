@@ -5,7 +5,7 @@ from typing import Optional
 from uuid import UUID, uuid4
 
 from sqlmodel import SQLModel, Field, Relationship, Column
-from sqlalchemy import String, DateTime, Boolean, Index, Integer, Float
+from sqlalchemy import String, DateTime, Boolean, Index, Integer, Float, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 
@@ -38,6 +38,9 @@ class User(SQLModel, table=True):
     )
     problems: list["Problem"] = Relationship(
         sa_relationship=relationship("Problem", back_populates="user")
+    )
+    folders: list["Folder"] = Relationship(
+        sa_relationship=relationship("Folder", back_populates="user")
     )
     attempts: list["Attempt"] = Relationship(
         sa_relationship=relationship("Attempt", back_populates="user")
@@ -89,6 +92,7 @@ class Problem(SQLModel, table=True):
 
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
     user_id: UUID = Field(foreign_key="users.id", index=True)
+    folder_id: Optional[UUID] = Field(default=None, foreign_key="folders.id", index=True)
     title: Optional[str] = Field(default=None, sa_column=Column(String(255)))
     created_at: datetime = Field(
         default_factory=utcnow,
@@ -102,8 +106,43 @@ class Problem(SQLModel, table=True):
     user: User = Relationship(
         sa_relationship=relationship("User", back_populates="problems")
     )
+    folder: Optional["Folder"] = Relationship(
+        sa_relationship=relationship("Folder", back_populates="problems")
+    )
     attempts: list["Attempt"] = Relationship(
         sa_relationship=relationship("Attempt", back_populates="problem")
+    )
+
+
+class Folder(SQLModel, table=True):
+    __tablename__ = "folders"
+
+    id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
+    user_id: UUID = Field(foreign_key="users.id", index=True)
+    name: str = Field(sa_column=Column(String(128), nullable=False))
+    color: Optional[str] = Field(default=None, sa_column=Column(String(32)))
+    created_at: datetime = Field(
+        default_factory=utcnow,
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+    )
+    updated_at: datetime = Field(
+        default_factory=utcnow,
+        sa_column=Column(DateTime(timezone=True), nullable=False),
+    )
+    archived_at: Optional[datetime] = Field(
+        default=None,
+        sa_column=Column(DateTime(timezone=True), nullable=True),
+    )
+
+    user: User = Relationship(
+        sa_relationship=relationship("User", back_populates="folders")
+    )
+    problems: list[Problem] = Relationship(
+        sa_relationship=relationship("Problem", back_populates="folder")
+    )
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "name", name="uq_folders_user_id_name"),
     )
 
 

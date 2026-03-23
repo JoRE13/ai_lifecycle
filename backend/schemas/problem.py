@@ -6,14 +6,51 @@ from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 class ProblemCreateRequest(BaseModel):
     title: str = Field(min_length=1, max_length=255)
+    folder_id: UUID | None = None
 
 
 class ProblemCreateResponse(BaseModel):
     id: UUID
     user_id: UUID
+    folder_id: UUID | None = None
+    folder_name: str | None = None
     title: str
     created_at: datetime
     updated_at: datetime
+
+
+class FolderCreateRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=128)
+    color: str | None = Field(default=None, max_length=32)
+
+
+class FolderUpdateRequest(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=128)
+    color: str | None = Field(default=None, max_length=32)
+
+
+class FolderResponse(BaseModel):
+    id: UUID
+    user_id: UUID
+    name: str
+    color: str | None = None
+    created_at: datetime
+    updated_at: datetime
+    archived_at: datetime | None = None
+    problem_count: int | None = None
+
+
+class ProblemMoveRequest(BaseModel):
+    folder_id: UUID
+
+
+class ProblemBatchMoveRequest(BaseModel):
+    problem_ids: list[UUID] = Field(min_length=1, max_length=200)
+    folder_id: UUID
+
+
+class ProblemBatchMoveResponse(BaseModel):
+    moved_count: int
 
 
 class AttemptResponse(BaseModel):
