@@ -40,6 +40,12 @@ class LLMResponse(BaseModel):
     all_readable: bool
     ambiguous_regions: list["LegibilityRegion"] = Field(default_factory=list)
     missing_parts: list[str] = Field(default_factory=list)
+    clarity_warning: bool | None = None
+    missing_justification: bool | None = None
+    concept_tag: str | None = None
+    suggested_justification: str | None = None
+    step_reference: str | None = None
+    can_skip: bool | None = None
 
 
 class LegibilityRegion(BaseModel):

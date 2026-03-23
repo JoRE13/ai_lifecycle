@@ -25,9 +25,11 @@ router = APIRouter(tags=["query"])
 PROMPTS_BASE = Path(__file__).resolve().parents[1] / "prompts"
 PROMPTS_ROOT_V1 = PROMPTS_BASE / "modes"
 PROMPTS_ROOT_V2 = PROMPTS_BASE / "modes_v2"
+PROMPTS_ROOT_V2_EXPERT = PROMPTS_BASE / "modes_v2_expert"
 LEGIBILITY_PROMPT_PATH_V2 = PROMPTS_BASE / "legibility_v2" / "prompt.txt"
 DEFAULT_PROMPT_VARIANT = (os.getenv("QUERY_PROMPT_VARIANT") or "v2").strip().lower()
 DEFAULT_PIPELINE_MODE = (os.getenv("QUERY_PIPELINE_MODE") or "two_pass").strip().lower()
+ExpertMode = Literal["off", "clarity", "strict"]
 
 
 def _resolve_prompt_variant() -> Literal["v1", "v2"]:
@@ -44,11 +46,29 @@ def _resolve_pipeline_mode() -> Literal["single_pass", "two_pass"]:
     return "two_pass"
 
 
+def _normalize_expert_mode(value: str | None) -> ExpertMode:
+    normalized = (value or "off").strip().lower()
+    if normalized == "clarity":
+        return "clarity"
+    if normalized == "strict":
+        return "strict"
+    return "off"
+
+
 def _load_prompt(
     mode: Literal["hint", "check_solution", "reveal"],
     *,
     prompt_variant: Literal["v1", "v2"],
+    expert_mode: ExpertMode,
 ) -> str:
+    if prompt_variant == "v2" and mode == "check_solution" and expert_mode != "off":
+        expert_prompt_path = PROMPTS_ROOT_V2_EXPERT / expert_mode / mode / "prompt.txt"
+        if expert_prompt_path.exists():
+            try:
+                return expert_prompt_path.read_text(encoding="utf-8")
+            except FileNotFoundError:
+                pass
+
     prompt_root = PROMPTS_ROOT_V1 if prompt_variant == "v1" else PROMPTS_ROOT_V2
     prompt_path = prompt_root / mode / "prompt.txt"
     try:
@@ -439,6 +459,7 @@ async def query(
     sol_images: list[UploadFile] | None = File(default=None),
     drawing_data_pages: list[UploadFile] | None = File(default=None),
     page_count: int | None = Form(default=1),
+    expert_mode: str | None = Form(default="off"),
     client_request_id: str | None = Form(default=None),
     session_id: str | None = Form(default=None),
     session: Session = Depends(get_session),
@@ -446,11 +467,22 @@ async def query(
 ):
     prompt_variant = _resolve_prompt_variant()
     pipeline_mode = _resolve_pipeline_mode()
+    resolved_expert_mode = _normalize_expert_mode(expert_mode)
 
-    base_prompt = _load_prompt(mode, prompt_variant=prompt_variant)
+    base_prompt = _load_prompt(
+        mode,
+        prompt_variant=prompt_variant,
+        expert_mode=resolved_expert_mode,
+    )
     legibility_base_prompt = _load_legibility_prompt(prompt_variant=prompt_variant)
     attempt_id = uuid4()
-    mode_prompt_version = _text_or_none(f"{prompt_variant}/{mode}/prompt.txt", max_len=64)
+    if prompt_variant == "v2" and mode == "check_solution" and resolved_expert_mode != "off":
+        mode_prompt_version = _text_or_none(
+            f"{prompt_variant}_expert/{resolved_expert_mode}/{mode}/prompt.txt",
+            max_len=64,
+        )
+    else:
+        mode_prompt_version = _text_or_none(f"{prompt_variant}/{mode}/prompt.txt", max_len=64)
     legibility_prompt_version = _text_or_none("v2/legibility/prompt.txt", max_len=64)
     reasoning_request_id = str(uuid4())
     legibility_request_id = str(uuid4())
@@ -511,6 +543,7 @@ async def query(
         "pageCount": resolved_page_count,
         "promptVariant": prompt_variant,
         "pipelineMode": pipeline_mode,
+        "expertMode": resolved_expert_mode,
         "environment": environment,
         "retryCount": None,
         "success": None,
@@ -716,6 +749,7 @@ async def query(
         "drawing_page_count": len(drawing_uploads),
         "prompt_variant": prompt_variant,
         "pipeline_mode": pipeline_mode,
+        "expert_mode": resolved_expert_mode,
         "solution_page_keys": [artifact[0] for artifact in solution_page_artifacts],
         "drawing_page_keys": [artifact[0] for artifact in drawing_page_artifacts],
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -795,6 +829,7 @@ async def query(
                 "page_count": resolved_page_count,
                 "prompt_variant": prompt_variant,
                 "pipeline_mode": pipeline_mode,
+                "expert_mode": resolved_expert_mode,
             }
         ),
     )
@@ -811,12 +846,14 @@ async def query(
                 "page_count": resolved_page_count,
                 "prompt_variant": prompt_variant,
                 "pipeline_mode": pipeline_mode,
+                "expert_mode": resolved_expert_mode,
             }
         ),
     )
     session.commit()
 
     response_payload = dict(payload)
+    response_payload["expert_mode"] = resolved_expert_mode
     response_payload["observability"] = {
         "traceId": trace_id,
         "observationId": observation_id,
