@@ -167,3 +167,50 @@ class AnalyticsEventResponse(BaseModel):
     verdict: str | None
     created_at: datetime
     metadata_json: str | None
+
+
+class UserStatsSummaryResponse(BaseModel):
+    solved_problems_count: int
+    success_rate: float
+    active_streak_days: int
+    attempts_last_7_days: int
+    total_attempts: int
+
+
+class ErrorBankEntryResponse(BaseModel):
+    error_type: str
+    concept_tag: str | None = None
+    count: int
+    fixed_count: int
+    unclear_count: int
+    unresolved_count: int
+    resolution_ratio: float
+    unclear_ratio: float
+    last_seen_at: datetime
+
+
+class ErrorBankSummaryResponse(BaseModel):
+    total_occurrences: int
+    total_distinct_errors: int
+    entries: list[ErrorBankEntryResponse]
+
+
+class AttemptLabelCreateRequest(BaseModel):
+    label_source: str = Field(min_length=1, max_length=32)
+    label_name: str = Field(min_length=1, max_length=64)
+    label_value: str = Field(min_length=1, max_length=256)
+    confidence: float | None = None
+    notes: str | None = None
+
+
+class AttemptLabelResponse(BaseModel):
+    id: UUID
+    attempt_id: UUID
+    user_id: UUID
+    anon_user_id: str
+    label_source: str
+    label_name: str
+    label_value: str
+    confidence: float | None = None
+    notes: str | None = None
+    created_at: datetime

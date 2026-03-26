@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import logging
 from uuid import UUID
 from uuid import uuid4
@@ -12,12 +12,25 @@ from sqlmodel import Session, select
 from backend.auth.deps import get_current_user
 from backend.db import get_session
 from backend.llm import submit_langfuse_score
-from backend.models.auth_models import AnalyticsEvent, Attempt, AttemptFeedback, Folder, Problem, User
+from backend.models.auth_models import (
+    AnalyticsEvent,
+    Attempt,
+    ErrorBankEntry,
+    AttemptFeedback,
+    AttemptLabel,
+    Folder,
+    Problem,
+    User,
+)
 from backend.schemas.problem import (
     AnalyticsEventResponse,
     AttemptFeedbackCreateRequest,
     AttemptFeedbackResponse,
+    AttemptLabelCreateRequest,
+    AttemptLabelResponse,
     AttemptResponse,
+    ErrorBankEntryResponse,
+    ErrorBankSummaryResponse,
     FolderCreateRequest,
     FolderResponse,
     FolderUpdateRequest,
@@ -26,6 +39,7 @@ from backend.schemas.problem import (
     ProblemCreateRequest,
     ProblemCreateResponse,
     ProblemMoveRequest,
+    UserStatsSummaryResponse,
 )
 from backend.storage.r2 import R2ConfigurationError, presigned_get_url
 
@@ -33,6 +47,8 @@ router = APIRouter(tags=["problem"])
 logger = logging.getLogger(__name__)
 DEFAULT_FOLDER_NAME = "Unsorted"
 DEFAULT_FOLDER_COLOR = "#6B7280"
+SUCCESS_VERDICTS = {"correct_so_far", "fully_correct", "fully_solved"}
+SOLVED_VERDICTS = {"fully_solved"}
 
 
 def _record_event(
@@ -518,6 +534,99 @@ def list_problem_attempts(
     ]
 
 
+@router.post("/attempts/{attempt_id}/labels", response_model=AttemptLabelResponse)
+def create_attempt_label(
+    attempt_id: UUID,
+    payload: AttemptLabelCreateRequest,
+    session: Session = Depends(get_session),
+    user: User = Depends(get_current_user),
+):
+    attempt = session.exec(
+        select(Attempt).where(Attempt.id == attempt_id, Attempt.user_id == user.id)
+    ).first()
+    if not attempt:
+        raise HTTPException(status_code=404, detail="Attempt not found")
+
+    now = datetime.now(timezone.utc)
+    label = AttemptLabel(
+        id=uuid4(),
+        attempt_id=attempt.id,
+        user_id=user.id,
+        anon_user_id=user.anon_user_id,
+        label_source=payload.label_source.strip(),
+        label_name=payload.label_name.strip(),
+        label_value=payload.label_value.strip(),
+        confidence=payload.confidence,
+        notes=payload.notes,
+        created_at=now,
+    )
+    session.add(label)
+    _record_event(
+        session=session,
+        user_id=user.id,
+        problem_id=attempt.problem_id,
+        attempt_id=attempt.id,
+        event_type="attempt_labeled",
+        mode=attempt.mode,
+        verdict=attempt.verdict,
+        metadata_json=json.dumps(
+            {
+                "label_source": label.label_source,
+                "label_name": label.label_name,
+            }
+        ),
+    )
+    session.commit()
+    session.refresh(label)
+
+    return AttemptLabelResponse(
+        id=label.id,
+        attempt_id=label.attempt_id,
+        user_id=label.user_id,
+        anon_user_id=label.anon_user_id,
+        label_source=label.label_source,
+        label_name=label.label_name,
+        label_value=label.label_value,
+        confidence=label.confidence,
+        notes=label.notes,
+        created_at=label.created_at,
+    )
+
+
+@router.get("/attempts/{attempt_id}/labels", response_model=list[AttemptLabelResponse])
+def list_attempt_labels(
+    attempt_id: UUID,
+    session: Session = Depends(get_session),
+    user: User = Depends(get_current_user),
+):
+    attempt = session.exec(
+        select(Attempt).where(Attempt.id == attempt_id, Attempt.user_id == user.id)
+    ).first()
+    if not attempt:
+        raise HTTPException(status_code=404, detail="Attempt not found")
+
+    labels = session.exec(
+        select(AttemptLabel)
+        .where(AttemptLabel.attempt_id == attempt.id, AttemptLabel.user_id == user.id)
+        .order_by(AttemptLabel.created_at.desc())
+    ).all()
+    return [
+        AttemptLabelResponse(
+            id=label.id,
+            attempt_id=label.attempt_id,
+            user_id=label.user_id,
+            anon_user_id=label.anon_user_id,
+            label_source=label.label_source,
+            label_name=label.label_name,
+            label_value=label.label_value,
+            confidence=label.confidence,
+            notes=label.notes,
+            created_at=label.created_at,
+        )
+        for label in labels
+    ]
+
+
 def _attempt_asset_url(asset_key: str | None) -> str | None:
     if not asset_key:
         return None
@@ -687,3 +796,117 @@ def list_analytics_events(
         )
         for event in events
     ]
+
+
+@router.get("/analytics/summary", response_model=UserStatsSummaryResponse)
+def get_user_stats_summary(
+    session: Session = Depends(get_session),
+    user: User = Depends(get_current_user),
+):
+    now = datetime.now(timezone.utc)
+    today = now.date()
+    seven_days_ago = now - timedelta(days=7)
+
+    total_attempts = session.exec(
+        select(func.count(Attempt.id)).where(Attempt.user_id == user.id)
+    ).one()
+    success_attempts = session.exec(
+        select(func.count(Attempt.id)).where(
+            Attempt.user_id == user.id,
+            Attempt.verdict.in_(SUCCESS_VERDICTS),
+        )
+    ).one()
+    attempts_last_7_days = session.exec(
+        select(func.count(Attempt.id)).where(
+            Attempt.user_id == user.id,
+            Attempt.created_at >= seven_days_ago,
+        )
+    ).one()
+    solved_problems_count = session.exec(
+        select(func.count(func.distinct(Attempt.problem_id))).where(
+            Attempt.user_id == user.id,
+            Attempt.verdict.in_(SOLVED_VERDICTS),
+        )
+    ).one()
+
+    days_with_activity_rows = session.exec(
+        select(func.date(Attempt.created_at))
+        .where(Attempt.user_id == user.id)
+        .distinct()
+        .order_by(func.date(Attempt.created_at).desc())
+    ).all()
+    normalized_days_with_activity = {
+        d.date() if isinstance(d, datetime) else d for d in days_with_activity_rows
+    }
+
+    active_streak_days = 0
+    cursor_day = today
+    while cursor_day in normalized_days_with_activity:
+        active_streak_days += 1
+        cursor_day -= timedelta(days=1)
+
+    success_rate = (float(success_attempts) / float(total_attempts)) if total_attempts else 0.0
+    return UserStatsSummaryResponse(
+        solved_problems_count=int(solved_problems_count or 0),
+        success_rate=success_rate,
+        active_streak_days=active_streak_days,
+        attempts_last_7_days=int(attempts_last_7_days or 0),
+        total_attempts=int(total_attempts or 0),
+    )
+
+
+@router.get("/analytics/error-bank", response_model=ErrorBankSummaryResponse)
+def get_error_bank_summary(
+    limit: int = 50,
+    session: Session = Depends(get_session),
+    user: User = Depends(get_current_user),
+):
+    safe_limit = max(1, min(limit, 200))
+    entries = session.exec(
+        select(ErrorBankEntry)
+        .where(ErrorBankEntry.anon_user_id == user.anon_user_id)
+        .order_by(ErrorBankEntry.count.desc(), ErrorBankEntry.last_seen_at.desc())
+        .limit(safe_limit)
+    ).all()
+
+    total_occurrences = int(
+        session.exec(
+            select(func.coalesce(func.sum(ErrorBankEntry.count), 0)).where(
+                ErrorBankEntry.anon_user_id == user.anon_user_id
+            )
+        ).one()
+        or 0
+    )
+    total_distinct_errors = int(
+        session.exec(
+            select(func.count(ErrorBankEntry.id)).where(
+                ErrorBankEntry.anon_user_id == user.anon_user_id
+            )
+        ).one()
+        or 0
+    )
+
+    response_entries = []
+    for entry in entries:
+        unresolved_count = max(0, entry.count - entry.fixed_count)
+        resolution_ratio = (entry.fixed_count / entry.count) if entry.count else 0.0
+        unclear_ratio = (entry.unclear_count / entry.count) if entry.count else 0.0
+        response_entries.append(
+            ErrorBankEntryResponse(
+                error_type=entry.error_type,
+                concept_tag=entry.concept_tag or None,
+                count=entry.count,
+                fixed_count=entry.fixed_count,
+                unclear_count=entry.unclear_count,
+                unresolved_count=unresolved_count,
+                resolution_ratio=resolution_ratio,
+                unclear_ratio=unclear_ratio,
+                last_seen_at=entry.last_seen_at,
+            )
+        )
+
+    return ErrorBankSummaryResponse(
+        total_occurrences=total_occurrences,
+        total_distinct_errors=total_distinct_errors,
+        entries=response_entries,
+    )

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from datetime import datetime, timezone
 from io import BytesIO
 from pathlib import Path
@@ -17,7 +18,14 @@ from backend.auth.deps import get_current_user
 from backend.config import QUERY_MAX_PAGE_COUNT, QUERY_MAX_SINGLE_FILE_BYTES, QUERY_MAX_TOTAL_BYTES
 from backend.db import get_session
 from backend.llm import call_legibility_with_retry, call_model_with_retry
-from backend.models.auth_models import AnalyticsEvent, Attempt, Problem, User
+from backend.models.auth_models import (
+    AnalyticsEvent,
+    Attempt,
+    AttemptStageMetric,
+    ErrorBankEntry,
+    Problem,
+    User,
+)
 from backend.storage.r2 import R2ConfigurationError, upload_bytes
 
 router = APIRouter(tags=["query"])
@@ -30,6 +38,7 @@ LEGIBILITY_PROMPT_PATH_V2 = PROMPTS_BASE / "legibility_v2" / "prompt.txt"
 DEFAULT_PROMPT_VARIANT = (os.getenv("QUERY_PROMPT_VARIANT") or "v2").strip().lower()
 DEFAULT_PIPELINE_MODE = (os.getenv("QUERY_PIPELINE_MODE") or "two_pass").strip().lower()
 ExpertMode = Literal["off", "clarity", "strict"]
+SUCCESS_VERDICTS = {"correct_so_far", "fully_correct", "fully_solved"}
 
 
 def _resolve_prompt_variant() -> Literal["v1", "v2"]:
@@ -338,6 +347,108 @@ def _extract_llm_result(
     )
 
 
+def _record_stage_metric(
+    *,
+    session: Session,
+    attempt_id: UUID,
+    user: User,
+    stage: str,
+    latency_ms: int | None,
+    tokens_in: int | None = None,
+    tokens_out: int | None = None,
+    tokens_total: int | None = None,
+    retry_count: int | None = None,
+) -> None:
+    session.add(
+        AttemptStageMetric(
+            id=uuid4(),
+            attempt_id=attempt_id,
+            user_id=user.id,
+            anon_user_id=user.anon_user_id,
+            stage=stage,
+            latency_ms=latency_ms,
+            tokens_in=tokens_in,
+            tokens_out=tokens_out,
+            tokens_total=tokens_total,
+            retry_count=retry_count,
+            created_at=datetime.now(timezone.utc),
+        )
+    )
+
+
+def _upsert_error_bank_entry(
+    *,
+    session: Session,
+    user: User,
+    error_type: str | None,
+    concept_tag: str | None,
+    verdict: str | None,
+) -> None:
+    normalized_error_type = _text_or_none(error_type, max_len=64)
+    normalized_concept_tag = _text_or_none(concept_tag, max_len=128) or ""
+    if not normalized_error_type:
+        return
+
+    now = datetime.now(timezone.utc)
+    entry = session.exec(
+        select(ErrorBankEntry).where(
+            ErrorBankEntry.anon_user_id == user.anon_user_id,
+            ErrorBankEntry.error_type == normalized_error_type,
+            ErrorBankEntry.concept_tag == normalized_concept_tag,
+        )
+    ).first()
+
+    if entry:
+        entry.count += 1
+        entry.updated_at = now
+        entry.last_seen_at = now
+        if verdict == "unclear":
+            entry.unclear_count += 1
+        session.add(entry)
+    else:
+        session.add(
+            ErrorBankEntry(
+                id=uuid4(),
+                anon_user_id=user.anon_user_id,
+                error_type=normalized_error_type,
+                concept_tag=normalized_concept_tag,
+                count=1,
+                fixed_count=0,
+                unclear_count=1 if verdict == "unclear" else 0,
+                created_at=now,
+                updated_at=now,
+                last_seen_at=now,
+            )
+        )
+
+
+def _record_error_bank_resolution(
+    *,
+    session: Session,
+    user: User,
+    concept_tag: str | None,
+) -> None:
+    normalized_concept_tag = _text_or_none(concept_tag, max_len=128)
+    if not normalized_concept_tag:
+        return
+
+    entries = session.exec(
+        select(ErrorBankEntry).where(
+            ErrorBankEntry.anon_user_id == user.anon_user_id,
+            ErrorBankEntry.concept_tag == normalized_concept_tag,
+            ErrorBankEntry.count > ErrorBankEntry.fixed_count,
+        )
+    ).all()
+    if not entries:
+        return
+
+    now = datetime.now(timezone.utc)
+    for entry in entries:
+        entry.fixed_count += 1
+        entry.updated_at = now
+        session.add(entry)
+
+
 def _normalize_upload_lists(
     *,
     sol_image: UploadFile | None,
@@ -465,6 +576,8 @@ async def query(
     session: Session = Depends(get_session),
     user: User = Depends(get_current_user),
 ):
+    request_started_perf = time.perf_counter()
+    preprocess_started_perf = request_started_perf
     prompt_variant = _resolve_prompt_variant()
     pipeline_mode = _resolve_pipeline_mode()
     resolved_expert_mode = _normalize_expert_mode(expert_mode)
@@ -514,6 +627,7 @@ async def query(
         _to_pil_image(upload, page_bytes)
         for upload, page_bytes in zip(solution_uploads, solution_pages_bytes)
     ]
+    preprocess_latency_ms = int((time.perf_counter() - preprocess_started_perf) * 1000)
     problem = session.exec(
         select(Problem).where(Problem.id == problem_id, Problem.user_id == user.id)
     ).first()
@@ -582,6 +696,16 @@ async def query(
     message_id: str | None = None
     request_id: str = reasoning_request_id
     retry_count: int | None = None
+    legibility_stage_latency_ms: int | None = None
+    legibility_stage_tokens_in: int | None = None
+    legibility_stage_tokens_out: int | None = None
+    legibility_stage_tokens_total: int | None = None
+    legibility_stage_retry_count: int | None = None
+    reasoning_stage_latency_ms: int | None = None
+    reasoning_stage_tokens_in: int | None = None
+    reasoning_stage_tokens_out: int | None = None
+    reasoning_stage_tokens_total: int | None = None
+    reasoning_stage_retry_count: int | None = None
 
     if pipeline_mode == "two_pass":
         try:
@@ -640,6 +764,13 @@ async def query(
         message_id = legibility_message_id
         request_id = legibility_request_id
         retry_count = legibility_retry_count
+        legibility_stage_latency_ms = (
+            int(legibility_latency_seconds * 1000) if legibility_latency_seconds is not None else None
+        )
+        legibility_stage_tokens_in = legibility_tokens_in
+        legibility_stage_tokens_out = legibility_tokens_out
+        legibility_stage_tokens_total = legibility_tokens_total
+        legibility_stage_retry_count = legibility_retry_count
 
         if legibility_failed:
             payload = _build_unclear_payload(
@@ -717,6 +848,13 @@ async def query(
         message_id = reasoning_message_id
         request_id = reasoning_request_id
         retry_count = reasoning_retry_count
+        reasoning_stage_latency_ms = (
+            int(reasoning_latency_seconds * 1000) if reasoning_latency_seconds is not None else None
+        )
+        reasoning_stage_tokens_in = reasoning_tokens_in
+        reasoning_stage_tokens_out = reasoning_tokens_out
+        reasoning_stage_tokens_total = reasoning_tokens_total
+        reasoning_stage_retry_count = reasoning_retry_count
 
     latency_ms = int(latency_seconds * 1000) if latency_seconds is not None else None
     error_type = _text_or_none(payload.get("error_type"), max_len=64)
@@ -755,6 +893,7 @@ async def query(
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
 
+    storage_started_perf = time.perf_counter()
     try:
         upload_bytes(
             key=problem_image_key,
@@ -783,6 +922,7 @@ async def query(
                 data=page_bytes,
                 content_type=upload.content_type or "application/octet-stream",
             )
+        storage_latency_ms = int((time.perf_counter() - storage_started_perf) * 1000)
     except R2ConfigurationError as exc:
         raise HTTPException(status_code=500, detail=f"R2 not configured: {exc}") from exc
     except Exception as exc:
@@ -792,11 +932,20 @@ async def query(
         id=attempt_id,
         problem_id=problem.id,
         user_id=user.id,
+        anon_user_id=user.anon_user_id,
         mode=mode,
         page_count=resolved_page_count,
+        client_request_id=resolved_client_request_id,
+        session_id=resolved_session_id,
+        prompt_variant=prompt_variant,
+        pipeline_mode=pipeline_mode,
+        expert_mode=resolved_expert_mode,
         problem_image_key=problem_image_key,
         solution_image_key=solution_image_key,
         drawing_data_key=drawing_data_key,
+        solution_page_keys=[artifact[0] for artifact in solution_page_artifacts],
+        drawing_page_keys=[artifact[0] for artifact in drawing_page_artifacts],
+        raw_response_json=payload,
         verdict=_text_or_none(payload.get("verdict"), max_len=64),
         response_type=_text_or_none(payload.get("response_type"), max_len=64),
         error_type=error_type,
@@ -816,40 +965,100 @@ async def query(
     session.add(attempt)
     # Ensure the parent attempt row is inserted before analytics FK inserts.
     session.flush()
-    _record_event(
-        session=session,
-        user_id=user.id,
-        problem_id=problem.id,
-        attempt_id=attempt_id,
-        event_type="attempt_submitted",
-        mode=mode,
-        verdict=attempt.verdict,
-        metadata_json=json.dumps(
-            {
-                "page_count": resolved_page_count,
-                "prompt_variant": prompt_variant,
-                "pipeline_mode": pipeline_mode,
-                "expert_mode": resolved_expert_mode,
-            }
-        ),
-    )
-    _record_event(
-        session=session,
-        user_id=user.id,
-        problem_id=problem.id,
-        attempt_id=attempt_id,
-        event_type="attempt_failed" if attempt.verdict in {"incorrect", "unclear"} else "attempt_succeeded",
-        mode=mode,
-        verdict=attempt.verdict,
-        metadata_json=json.dumps(
-            {
-                "page_count": resolved_page_count,
-                "prompt_variant": prompt_variant,
-                "pipeline_mode": pipeline_mode,
-                "expert_mode": resolved_expert_mode,
-            }
-        ),
-    )
+    total_latency_ms = int((time.perf_counter() - request_started_perf) * 1000)
+    if user.consent_analytics:
+        _record_stage_metric(
+            session=session,
+            attempt_id=attempt_id,
+            user=user,
+            stage="preprocess",
+            latency_ms=preprocess_latency_ms,
+        )
+        if legibility_stage_latency_ms is not None:
+            _record_stage_metric(
+                session=session,
+                attempt_id=attempt_id,
+                user=user,
+                stage="legibility",
+                latency_ms=legibility_stage_latency_ms,
+                tokens_in=legibility_stage_tokens_in,
+                tokens_out=legibility_stage_tokens_out,
+                tokens_total=legibility_stage_tokens_total,
+                retry_count=legibility_stage_retry_count,
+            )
+        if reasoning_stage_latency_ms is not None:
+            _record_stage_metric(
+                session=session,
+                attempt_id=attempt_id,
+                user=user,
+                stage="reasoning",
+                latency_ms=reasoning_stage_latency_ms,
+                tokens_in=reasoning_stage_tokens_in,
+                tokens_out=reasoning_stage_tokens_out,
+                tokens_total=reasoning_stage_tokens_total,
+                retry_count=reasoning_stage_retry_count,
+            )
+        _record_stage_metric(
+            session=session,
+            attempt_id=attempt_id,
+            user=user,
+            stage="storage",
+            latency_ms=storage_latency_ms,
+        )
+        _record_stage_metric(
+            session=session,
+            attempt_id=attempt_id,
+            user=user,
+            stage="total",
+            latency_ms=total_latency_ms,
+        )
+        _upsert_error_bank_entry(
+            session=session,
+            user=user,
+            error_type=error_type,
+            concept_tag=_text_or_none(payload.get("concept_tag"), max_len=128),
+            verdict=attempt.verdict,
+        )
+        if attempt.verdict in SUCCESS_VERDICTS:
+            _record_error_bank_resolution(
+                session=session,
+                user=user,
+                concept_tag=_text_or_none(payload.get("concept_tag"), max_len=128),
+            )
+        _record_event(
+            session=session,
+            user_id=user.id,
+            problem_id=problem.id,
+            attempt_id=attempt_id,
+            event_type="attempt_submitted",
+            mode=mode,
+            verdict=attempt.verdict,
+            metadata_json=json.dumps(
+                {
+                    "page_count": resolved_page_count,
+                    "prompt_variant": prompt_variant,
+                    "pipeline_mode": pipeline_mode,
+                    "expert_mode": resolved_expert_mode,
+                }
+            ),
+        )
+        _record_event(
+            session=session,
+            user_id=user.id,
+            problem_id=problem.id,
+            attempt_id=attempt_id,
+            event_type="attempt_failed" if attempt.verdict in {"incorrect", "unclear"} else "attempt_succeeded",
+            mode=mode,
+            verdict=attempt.verdict,
+            metadata_json=json.dumps(
+                {
+                    "page_count": resolved_page_count,
+                    "prompt_variant": prompt_variant,
+                    "pipeline_mode": pipeline_mode,
+                    "expert_mode": resolved_expert_mode,
+                }
+            ),
+        )
     session.commit()
 
     response_payload = dict(payload)

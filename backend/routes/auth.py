@@ -1,4 +1,6 @@
 # app/routes/auth.py
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Depends, HTTPException, Response, Request
 from sqlmodel import Session
 
@@ -14,6 +16,7 @@ from backend.schemas.auth import (
     RegisterRequest,
     LoginRequest,
     UpdateMeRequest,
+    UpdateConsentRequest,
     TokenResponse,
     MeResponse,
 )
@@ -145,7 +148,15 @@ def logout(resp: Response, request: Request, session: Session = Depends(get_sess
 
 @router.get("/me", response_model=MeResponse)
 def me(user: User = Depends(get_current_user)):
-    return MeResponse(id=str(user.id), email=user.email, full_name=user.full_name)
+    return MeResponse(
+        id=str(user.id),
+        email=user.email,
+        full_name=user.full_name,
+        anon_user_id=user.anon_user_id,
+        consent_analytics=user.consent_analytics,
+        consent_dataset_internal=user.consent_dataset_internal,
+        consent_dataset_publish=user.consent_dataset_publish,
+    )
 
 
 @router.patch("/me", response_model=MeResponse)
@@ -163,4 +174,46 @@ def update_me(
     session.commit()
     session.refresh(user)
 
-    return MeResponse(id=str(user.id), email=user.email, full_name=user.full_name)
+    return MeResponse(
+        id=str(user.id),
+        email=user.email,
+        full_name=user.full_name,
+        anon_user_id=user.anon_user_id,
+        consent_analytics=user.consent_analytics,
+        consent_dataset_internal=user.consent_dataset_internal,
+        consent_dataset_publish=user.consent_dataset_publish,
+    )
+
+
+@router.patch("/consent", response_model=MeResponse)
+def update_consent(
+    payload: UpdateConsentRequest,
+    session: Session = Depends(get_session),
+    user: User = Depends(get_current_user),
+):
+    changed = False
+    if payload.consent_analytics is not None:
+        user.consent_analytics = payload.consent_analytics
+        changed = True
+    if payload.consent_dataset_internal is not None:
+        user.consent_dataset_internal = payload.consent_dataset_internal
+        changed = True
+    if payload.consent_dataset_publish is not None:
+        user.consent_dataset_publish = payload.consent_dataset_publish
+        changed = True
+
+    if changed:
+        user.consent_updated_at = datetime.now(timezone.utc)
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+
+    return MeResponse(
+        id=str(user.id),
+        email=user.email,
+        full_name=user.full_name,
+        anon_user_id=user.anon_user_id,
+        consent_analytics=user.consent_analytics,
+        consent_dataset_internal=user.consent_dataset_internal,
+        consent_dataset_publish=user.consent_dataset_publish,
+    )
