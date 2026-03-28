@@ -37,6 +37,9 @@ class LLMResponse(BaseModel):
     response_type: str
     message_is: str
     error_type: str
+    error_step: str | None = None
+    correct_approach: str | None = None
+    error_confidence: float | None = None
     all_readable: bool
     ambiguous_regions: list["LegibilityRegion"] = Field(default_factory=list)
     missing_parts: list[str] = Field(default_factory=list)

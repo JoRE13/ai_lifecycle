@@ -17,6 +17,9 @@ CHECK-SOLUTION TASK:
 1) Evaluate correctness step-by-step.
 2) For each non-trivial step, check whether a justification is stated.
 3) If missing, emit strict clarity warning metadata.
+4) When verdict is "incorrect", return structured error fields:
+   - error_step
+   - correct_approach
 
 VERDICT RULES:
 - fully_solved / correct_so_far / incorrect / unclear
@@ -28,6 +31,9 @@ OUTPUT JSON ONLY:
   "response_type": "explanation | ask_clarification",
   "message_is": "Icelandic feedback text",
   "error_type": "conceptual | calculation | logic | ",
+  "error_step": "",
+  "correct_approach": "",
+  "error_confidence": 0.0,
   "all_readable": true,
   "ambiguous_regions": [],
   "missing_parts": [],
@@ -45,3 +51,4 @@ EXPERT-STRICT RULES:
 - Include step_reference (for example "bls. 1, skref 3").
 - Provide one concise Icelandic suggested_justification sentence.
 - Set can_skip=false for high-severity formalism gaps; true only for very common low-impact omissions.
+- If verdict is "incorrect", error_type/error_step/correct_approach must be non-empty.

@@ -23,6 +23,7 @@ from backend.models.auth_models import (
     Attempt,
     AttemptStageMetric,
     ErrorBankEntry,
+    ErrorEvent,
     Problem,
     User,
 )
@@ -212,6 +213,9 @@ def _build_unclear_payload(
         "response_type": "ask_clarification",
         "message_is": message,
         "error_type": "",
+        "error_step": "",
+        "correct_approach": "",
+        "error_confidence": None,
         "all_readable": False,
         "ambiguous_regions": regions,
         "missing_parts": missing_parts,
@@ -281,6 +285,20 @@ def _as_int_or_none(value: object) -> int | None:
         return int(value)
     except (TypeError, ValueError):
         return None
+
+
+def _as_float_or_none(value: object) -> float | None:
+    if value is None:
+        return None
+    try:
+        parsed = float(value)
+    except (TypeError, ValueError):
+        return None
+    if parsed < 0.0:
+        return 0.0
+    if parsed > 1.0:
+        return 1.0
+    return parsed
 
 
 def _extract_llm_result(
@@ -447,6 +465,50 @@ def _record_error_bank_resolution(
         entry.fixed_count += 1
         entry.updated_at = now
         session.add(entry)
+
+
+def _record_structured_error_event(
+    *,
+    session: Session,
+    attempt_id: UUID,
+    user: User,
+    mode: str,
+    verdict: str | None,
+    error_type: str | None,
+    concept_tag: str | None,
+    step_reference: str | None,
+    error_step: str | None,
+    correct_approach: str | None,
+    error_confidence: float | None,
+) -> None:
+    if mode != "check_solution":
+        return
+    if verdict not in {"incorrect", "unclear"}:
+        return
+
+    normalized_error_type = _text_or_none(error_type, max_len=64)
+    normalized_concept_tag = _text_or_none(concept_tag, max_len=128)
+    normalized_step_reference = _text_or_none(step_reference, max_len=128)
+    normalized_error_step = _text_or_none(error_step, max_len=1000)
+    normalized_correct_approach = _text_or_none(correct_approach, max_len=1000)
+
+    if not any([normalized_error_type, normalized_error_step, normalized_correct_approach]):
+        return
+
+    session.add(
+        ErrorEvent(
+            id=uuid4(),
+            attempt_id=attempt_id,
+            user_id=user.id,
+            topic=normalized_concept_tag,
+            subtopic=normalized_step_reference,
+            wrong_step=normalized_error_step,
+            correct_step=normalized_correct_approach,
+            error_type=normalized_error_type,
+            confidence=error_confidence,
+            created_at=datetime.now(timezone.utc),
+        )
+    )
 
 
 def _normalize_upload_lists(
@@ -857,7 +919,27 @@ async def query(
         reasoning_stage_retry_count = reasoning_retry_count
 
     latency_ms = int(latency_seconds * 1000) if latency_seconds is not None else None
+    verdict = _text_or_none(payload.get("verdict"), max_len=64)
+    response_type = _text_or_none(payload.get("response_type"), max_len=64)
+    concept_tag = _text_or_none(payload.get("concept_tag"), max_len=128)
+    step_reference = _text_or_none(payload.get("step_reference"), max_len=128)
     error_type = _text_or_none(payload.get("error_type"), max_len=64)
+    error_step = _text_or_none(payload.get("error_step"), max_len=1000)
+    correct_approach = _text_or_none(payload.get("correct_approach"), max_len=1000)
+    error_confidence = _as_float_or_none(payload.get("error_confidence"))
+
+    if verdict != "incorrect":
+        error_step = None
+        correct_approach = None
+        error_confidence = None
+
+    payload["error_type"] = error_type or ""
+    payload["error_step"] = error_step or ""
+    payload["correct_approach"] = correct_approach or ""
+    if error_confidence is not None:
+        payload["error_confidence"] = error_confidence
+    else:
+        payload.pop("error_confidence", None)
 
     merged_solution_bytes = _merge_solution_pages_for_artifact(solution_pil_pages)
     base_key = f"users/{user.id}/problems/{problem.id}/attempts/{attempt_id}"
@@ -946,8 +1028,8 @@ async def query(
         solution_page_keys=[artifact[0] for artifact in solution_page_artifacts],
         drawing_page_keys=[artifact[0] for artifact in drawing_page_artifacts],
         raw_response_json=payload,
-        verdict=_text_or_none(payload.get("verdict"), max_len=64),
-        response_type=_text_or_none(payload.get("response_type"), max_len=64),
+        verdict=verdict,
+        response_type=response_type,
         error_type=error_type,
         model_name=model_name,
         prompt_version=selected_prompt_version,
@@ -1012,18 +1094,31 @@ async def query(
             stage="total",
             latency_ms=total_latency_ms,
         )
+        _record_structured_error_event(
+            session=session,
+            attempt_id=attempt_id,
+            user=user,
+            mode=mode,
+            verdict=verdict,
+            error_type=error_type,
+            concept_tag=concept_tag,
+            step_reference=step_reference,
+            error_step=error_step,
+            correct_approach=correct_approach,
+            error_confidence=error_confidence,
+        )
         _upsert_error_bank_entry(
             session=session,
             user=user,
             error_type=error_type,
-            concept_tag=_text_or_none(payload.get("concept_tag"), max_len=128),
+            concept_tag=concept_tag,
             verdict=attempt.verdict,
         )
         if attempt.verdict in SUCCESS_VERDICTS:
             _record_error_bank_resolution(
                 session=session,
                 user=user,
-                concept_tag=_text_or_none(payload.get("concept_tag"), max_len=128),
+                concept_tag=concept_tag,
             )
         _record_event(
             session=session,
