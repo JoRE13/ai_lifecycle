@@ -11,6 +11,7 @@ from sqlmodel import Session, select
 
 from backend.auth.deps import get_current_user
 from backend.db import get_session
+from backend.error_taxonomy import normalize_error_type
 from backend.llm import submit_langfuse_score
 from backend.models.auth_models import (
     AnalyticsEvent,
@@ -962,46 +963,61 @@ def get_error_bank_summary(
     user: User = Depends(get_current_user),
 ):
     safe_limit = max(1, min(limit, 200))
-    entries = session.exec(
+    raw_entries = session.exec(
         select(ErrorBankEntry)
         .where(ErrorBankEntry.anon_user_id == user.anon_user_id)
-        .order_by(ErrorBankEntry.count.desc(), ErrorBankEntry.last_seen_at.desc())
-        .limit(safe_limit)
     ).all()
 
-    total_occurrences = int(
-        session.exec(
-            select(func.coalesce(func.sum(ErrorBankEntry.count), 0)).where(
-                ErrorBankEntry.anon_user_id == user.anon_user_id
-            )
-        ).one()
-        or 0
-    )
-    total_distinct_errors = int(
-        session.exec(
-            select(func.count(ErrorBankEntry.id)).where(
-                ErrorBankEntry.anon_user_id == user.anon_user_id
-            )
-        ).one()
-        or 0
+    aggregated: dict[tuple[str, str], dict[str, int | str | datetime]] = {}
+    for entry in raw_entries:
+        concept_tag = entry.concept_tag or ""
+        normalized_error_type = normalize_error_type(entry.error_type, concept_tag=concept_tag) or entry.error_type
+        key = (normalized_error_type, concept_tag)
+        existing = aggregated.get(key)
+        if existing is None:
+            aggregated[key] = {
+                "error_type": normalized_error_type,
+                "concept_tag": concept_tag,
+                "count": int(entry.count),
+                "fixed_count": int(entry.fixed_count),
+                "unclear_count": int(entry.unclear_count),
+                "last_seen_at": entry.last_seen_at,
+            }
+            continue
+        existing["count"] = int(existing["count"]) + int(entry.count)
+        existing["fixed_count"] = int(existing["fixed_count"]) + int(entry.fixed_count)
+        existing["unclear_count"] = int(existing["unclear_count"]) + int(entry.unclear_count)
+        if entry.last_seen_at > existing["last_seen_at"]:
+            existing["last_seen_at"] = entry.last_seen_at
+
+    merged_entries = sorted(
+        aggregated.values(),
+        key=lambda item: (int(item["count"]), item["last_seen_at"]),
+        reverse=True,
     )
 
+    total_occurrences = sum(int(item["count"]) for item in merged_entries)
+    total_distinct_errors = len(merged_entries)
+
     response_entries = []
-    for entry in entries:
-        unresolved_count = max(0, entry.count - entry.fixed_count)
-        resolution_ratio = (entry.fixed_count / entry.count) if entry.count else 0.0
-        unclear_ratio = (entry.unclear_count / entry.count) if entry.count else 0.0
+    for entry in merged_entries[:safe_limit]:
+        count = int(entry["count"])
+        fixed_count = int(entry["fixed_count"])
+        unclear_count = int(entry["unclear_count"])
+        unresolved_count = max(0, count - fixed_count)
+        resolution_ratio = (fixed_count / count) if count else 0.0
+        unclear_ratio = (unclear_count / count) if count else 0.0
         response_entries.append(
             ErrorBankEntryResponse(
-                error_type=entry.error_type,
-                concept_tag=entry.concept_tag or None,
-                count=entry.count,
-                fixed_count=entry.fixed_count,
-                unclear_count=entry.unclear_count,
+                error_type=str(entry["error_type"]),
+                concept_tag=str(entry["concept_tag"]) or None,
+                count=count,
+                fixed_count=fixed_count,
+                unclear_count=unclear_count,
                 unresolved_count=unresolved_count,
                 resolution_ratio=resolution_ratio,
                 unclear_ratio=unclear_ratio,
-                last_seen_at=entry.last_seen_at,
+                last_seen_at=entry["last_seen_at"],
             )
         )
 

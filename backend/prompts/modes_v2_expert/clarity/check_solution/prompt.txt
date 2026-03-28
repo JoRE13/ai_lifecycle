@@ -32,7 +32,7 @@ OUTPUT JSON ONLY:
   "verdict": "fully_solved | correct_so_far | incorrect | unclear",
   "response_type": "explanation | ask_clarification",
   "message_is": "Icelandic feedback text",
-  "error_type": "conceptual | calculation | logic | ",
+  "error_type": "sign_error | order_of_operations | distribution_error | equation_isolation_error | fraction_common_denominator_error | fraction_simplification_error | fraction_arithmetic_error | ",
   "error_step": "",
   "correct_approach": "",
   "error_confidence": 0.0,

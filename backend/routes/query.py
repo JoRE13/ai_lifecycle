@@ -17,6 +17,7 @@ from sqlmodel import Session, select
 from backend.auth.deps import get_current_user
 from backend.config import QUERY_MAX_PAGE_COUNT, QUERY_MAX_SINGLE_FILE_BYTES, QUERY_MAX_TOTAL_BYTES
 from backend.db import get_session
+from backend.error_taxonomy import normalize_error_type
 from backend.llm import call_legibility_with_retry, call_model_with_retry
 from backend.models.auth_models import (
     AnalyticsEvent,
@@ -554,8 +555,8 @@ def _upsert_error_bank_entry(
     concept_tag: str | None,
     verdict: str | None,
 ) -> None:
-    normalized_error_type = _text_or_none(error_type, max_len=64)
     normalized_concept_tag = _text_or_none(concept_tag, max_len=128) or ""
+    normalized_error_type = normalize_error_type(error_type, concept_tag=normalized_concept_tag)
     if not normalized_error_type:
         return
 
@@ -638,8 +639,8 @@ def _record_structured_error_event(
     if verdict not in {"incorrect", "unclear"}:
         return
 
-    normalized_error_type = _text_or_none(error_type, max_len=64)
     normalized_concept_tag = _text_or_none(concept_tag, max_len=128)
+    normalized_error_type = normalize_error_type(error_type, concept_tag=normalized_concept_tag)
     normalized_step_reference = _text_or_none(step_reference, max_len=128)
     normalized_error_step = _text_or_none(error_step, max_len=1000)
     normalized_correct_approach = _text_or_none(correct_approach, max_len=1000)
@@ -1126,7 +1127,8 @@ async def query(
     response_type = _text_or_none(payload.get("response_type"), max_len=64)
     concept_tag = _text_or_none(payload.get("concept_tag"), max_len=128)
     step_reference = _text_or_none(payload.get("step_reference"), max_len=128)
-    error_type = _text_or_none(payload.get("error_type"), max_len=64)
+    raw_error_type = _text_or_none(payload.get("error_type"), max_len=64)
+    error_type = normalize_error_type(raw_error_type, concept_tag=concept_tag)
     error_step = _text_or_none(payload.get("error_step"), max_len=1000)
     correct_approach = _text_or_none(payload.get("correct_approach"), max_len=1000)
     error_confidence = _as_float_or_none(payload.get("error_confidence"))

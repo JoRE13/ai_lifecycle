@@ -14,6 +14,17 @@ After each completed feature:
 
 ## Recent Work
 
+### 2026-03-28 (error taxonomy normalizer)
+- Backend (working tree): Added canonical error taxonomy normalization across query, analytics, and exam targeting.
+  - New module: `backend/error_taxonomy.py` with canonical error codes and legacy alias mapping.
+  - `/query` now normalizes `error_type` before persisting attempts, error events, and error-bank entries.
+  - `/exam-packs` now normalizes auto/manual targets and validates unsupported manual targets.
+  - Error-bank summary now merges legacy + canonical labels into a single canonical view per concept.
+  - Updated v2 prompt contracts to request canonical error codes directly.
+  - Impact:
+    - More stable training/eval dataset labels.
+    - Better exam target quality from historical user errors.
+
 ### 2026-03-28
 - Backend `5f35f0b`: Added one-level folder nesting and safe folder archiving behavior.
   - Added `parent_folder_id` support (model/schema/routes + migration `e8b1d4c3f6a2`).

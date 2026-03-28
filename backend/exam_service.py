@@ -5,30 +5,16 @@ import random
 from dataclasses import dataclass
 from fractions import Fraction
 
+from backend.error_taxonomy import (
+    CANONICAL_ERROR_TO_TOPIC,
+    CANONICAL_ERROR_TYPES,
+    DEFAULT_ERROR_TARGETS_BY_TOPIC,
+    normalize_error_type,
+    topic_for_error_type,
+)
 
-ERROR_TO_TOPIC = {
-    "sign_error": "algebra",
-    "order_of_operations": "algebra",
-    "distribution_error": "algebra",
-    "equation_isolation_error": "algebra",
-    "fraction_common_denominator_error": "fractions",
-    "fraction_simplification_error": "fractions",
-    "fraction_arithmetic_error": "fractions",
-}
-
-DEFAULT_ERROR_TARGETS = {
-    "algebra": [
-        "sign_error",
-        "order_of_operations",
-        "distribution_error",
-        "equation_isolation_error",
-    ],
-    "fractions": [
-        "fraction_common_denominator_error",
-        "fraction_simplification_error",
-        "fraction_arithmetic_error",
-    ],
-}
+ERROR_TO_TOPIC = CANONICAL_ERROR_TO_TOPIC
+DEFAULT_ERROR_TARGETS = DEFAULT_ERROR_TARGETS_BY_TOPIC
 
 
 @dataclass
@@ -46,7 +32,7 @@ class GeneratedExamItem:
 
 
 def topic_for_error(error_type: str) -> str | None:
-    return ERROR_TO_TOPIC.get(error_type)
+    return topic_for_error_type(error_type)
 
 
 def choose_auto_targets(
@@ -54,10 +40,17 @@ def choose_auto_targets(
     candidate_errors: list[str],
     topics: list[str],
 ) -> list[str]:
-    filtered = [
-        error for error in candidate_errors
-        if topic_for_error(error) in set(topics)
-    ]
+    topic_set = set(topics)
+    filtered: list[str] = []
+    seen: set[str] = set()
+    for error in candidate_errors:
+        canonical = normalize_error_type(error)
+        if not canonical or canonical in seen:
+            continue
+        if topic_for_error(canonical) not in topic_set:
+            continue
+        filtered.append(canonical)
+        seen.add(canonical)
     if filtered:
         return filtered
 
@@ -76,7 +69,13 @@ def generate_exam_items(
 ) -> list[GeneratedExamItem]:
     rng = random.Random(seed)
     normalized_topics = topics or ["algebra", "fractions"]
-    normalized_targets = target_errors or choose_auto_targets(candidate_errors=[], topics=normalized_topics)
+    normalized_targets: list[str] = []
+    for target in target_errors:
+        canonical = normalize_error_type(target)
+        if canonical and canonical not in normalized_targets:
+            normalized_targets.append(canonical)
+    if not normalized_targets:
+        normalized_targets = choose_auto_targets(candidate_errors=[], topics=normalized_topics)
     targeted_count = int(round(pack_size * 0.7))
     targeted_count = min(pack_size, max(1, targeted_count))
 
@@ -92,6 +91,9 @@ def generate_exam_items(
             topic = normalized_topics[(position - 1) % len(normalized_topics)]
             topic_errors = DEFAULT_ERROR_TARGETS.get(topic, DEFAULT_ERROR_TARGETS["algebra"])
             error_type = topic_errors[(position - 1) % len(topic_errors)]
+
+        if error_type not in CANONICAL_ERROR_TYPES:
+            error_type = DEFAULT_ERROR_TARGETS.get(topic, DEFAULT_ERROR_TARGETS["algebra"])[0]
 
         generated = _generate_question(
             rng=rng,

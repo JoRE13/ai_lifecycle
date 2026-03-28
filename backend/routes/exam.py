@@ -8,6 +8,7 @@ from sqlmodel import Session, select
 
 from backend.auth.deps import get_current_user
 from backend.db import get_session
+from backend.error_taxonomy import CANONICAL_ERROR_TYPES, normalize_error_type
 from backend.exam_service import choose_auto_targets, generate_exam_items, grade_answer
 from backend.models.auth_models import (
     ErrorBankEntry,
@@ -52,9 +53,13 @@ def _normalize_pack_input(payload: ExamPackCreateRequest) -> tuple[list[str], li
         if topic not in TOPICS:
             raise HTTPException(status_code=422, detail=f"unsupported topic: {topic}")
 
-    manual_targets = list(
-        dict.fromkeys(target.strip().lower() for target in (payload.manual_error_targets or []) if target.strip())
-    )
+    manual_targets: list[str] = []
+    for raw_target in payload.manual_error_targets or []:
+        canonical = normalize_error_type(raw_target)
+        if canonical and canonical not in manual_targets:
+            manual_targets.append(canonical)
+        elif raw_target.strip():
+            raise HTTPException(status_code=422, detail=f"unsupported manual error target: {raw_target}")
     return normalized_topics, manual_targets
 
 
@@ -126,8 +131,15 @@ def create_exam_pack(
             .where(ErrorBankEntry.anon_user_id == user.anon_user_id)
             .order_by((ErrorBankEntry.count - ErrorBankEntry.fixed_count).desc(), ErrorBankEntry.count.desc())
         ).all()
-        candidate_errors = [row.error_type for row in error_rows]
+        candidate_errors: list[str] = []
+        for row in error_rows:
+            canonical = normalize_error_type(row.error_type, concept_tag=row.concept_tag)
+            if canonical:
+                candidate_errors.append(canonical)
         selected_targets = choose_auto_targets(candidate_errors=candidate_errors, topics=normalized_topics)
+    selected_targets = [target for target in selected_targets if target in CANONICAL_ERROR_TYPES]
+    if not selected_targets:
+        selected_targets = choose_auto_targets(candidate_errors=[], topics=normalized_topics)
 
     now = datetime.now(timezone.utc)
     pack = ExamPack(
