@@ -14,6 +14,33 @@ After each completed feature:
 
 ## Recent Work
 
+### 2026-03-28 (avatar onboarding + labeled selector)
+- Frontend `c4dd038`: completed Norse avatar rollout and selection flow polish.
+  - Added six themed SVG avatar assets under `MathCoach/Resources/profile_avatars/`.
+  - Replaced dashboard/profile avatar rendering with SVG resource-based avatars.
+  - Added labeled avatar selector grid (name under each icon) in Profile.
+  - Added avatar selection in Registration so users pick a starting avatar at account creation.
+  - Standardized selected avatar storage to `profile.avatar.id` and shared option resolution.
+  - Impact:
+    - Clearer profile customization UX.
+    - Better first-run onboarding personalization.
+    - Consistent avatar identity between signup, profile, and dashboard.
+
+### 2026-03-28 (norse avatar assets in profile UI)
+- Frontend (working tree): Replaced placeholder profile icons with six Norse SVG avatars.
+  - Added assets under `MathCoach/Resources/profile_avatars/`:
+    - `avatar_odin.svg`
+    - `avatar_thor.svg`
+    - `avatar_loki.svg`
+    - `avatar_freya.svg`
+    - `avatar_garmur.svg`
+    - `avatar_idun.svg`
+  - Updated avatar border color in all six files from blue tones to theme-matching brown (`rgb(90,48,24)`).
+  - Profile selection UI now uses the SVG avatars directly.
+  - Dashboard profile button now shows the currently selected avatar.
+  - `SVGLogoView` now supports resource paths with subdirectories.
+  - Updated Xcode project file to include the six new SVG resources.
+
 ### 2026-03-28 (error taxonomy normalizer)
 - Backend (working tree): Added canonical error taxonomy normalization across query, analytics, and exam targeting.
   - New module: `backend/error_taxonomy.py` with canonical error codes and legacy alias mapping.
