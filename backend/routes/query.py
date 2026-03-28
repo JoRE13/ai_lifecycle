@@ -40,6 +40,7 @@ DEFAULT_PROMPT_VARIANT = (os.getenv("QUERY_PROMPT_VARIANT") or "v2").strip().low
 DEFAULT_PIPELINE_MODE = (os.getenv("QUERY_PIPELINE_MODE") or "two_pass").strip().lower()
 ExpertMode = Literal["off", "clarity", "strict"]
 SUCCESS_VERDICTS = {"correct_so_far", "fully_correct", "fully_solved"}
+READING_CONFIRM_CONFIDENCE_MIN = 0.30
 
 
 def _resolve_prompt_variant() -> Literal["v1", "v2"]:
@@ -299,6 +300,157 @@ def _as_float_or_none(value: object) -> float | None:
     if parsed > 1.0:
         return 1.0
     return parsed
+
+
+def _coerce_confirmed_reading_entries(
+    value: object,
+    *,
+    page_count: int,
+) -> list[dict[str, object]]:
+    if not isinstance(value, list):
+        return []
+
+    entries: list[dict[str, object]] = []
+    for index, item in enumerate(value[:16], start=1):
+        if not isinstance(item, dict):
+            continue
+        text = _text_or_none(item.get("text"), max_len=400)
+        if not text:
+            continue
+        page = _as_int_or_none(item.get("page"))
+        if page is not None:
+            page = max(1, min(page, page_count))
+        label = _text_or_none(item.get("label"), max_len=80) or (
+            f"Bls. {page}" if page is not None else f"Skref {index}"
+        )
+        entries.append(
+            {
+                "id": _text_or_none(item.get("id"), max_len=64) or f"reading_{index}",
+                "page": page,
+                "label": label,
+                "text": text,
+            }
+        )
+    return entries
+
+
+def _parse_confirmed_reading_json(
+    raw_value: str | None,
+    *,
+    page_count: int,
+) -> list[dict[str, object]]:
+    text = _text_or_none(raw_value, max_len=20_000)
+    if not text:
+        return []
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=422, detail=f"confirmed_reading_json is invalid JSON: {exc}") from exc
+    entries = _coerce_confirmed_reading_entries(payload, page_count=page_count)
+    if not entries:
+        raise HTTPException(status_code=422, detail="confirmed_reading_json must contain at least one entry with text")
+    return entries
+
+
+def _augment_prompt_with_confirmed_reading(
+    *,
+    base_prompt: str,
+    confirmed_entries: list[dict[str, object]],
+) -> str:
+    if not confirmed_entries:
+        return base_prompt
+
+    lines = [
+        "",
+        "USER-CONFIRMED READING:",
+        "- The student has reviewed and corrected uncertain handwriting.",
+        "- Treat these entries as authoritative transcription for ambiguous regions.",
+    ]
+    for entry in confirmed_entries:
+        page = entry.get("page")
+        label = _text_or_none(entry.get("label"), max_len=80) or "Skref"
+        text = _text_or_none(entry.get("text"), max_len=400) or ""
+        if page is not None:
+            lines.append(f"- bls. {page} ({label}): {text}")
+        else:
+            lines.append(f"- {label}: {text}")
+    return base_prompt + "\n".join(lines)
+
+
+def _coerce_interpreted_reading_entries(
+    *,
+    payload: dict[str, object],
+    page_count: int,
+    fallback_regions: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    interpreted_steps = _coerce_confirmed_reading_entries(
+        payload.get("interpreted_steps"),
+        page_count=page_count,
+    )
+    if interpreted_steps:
+        return interpreted_steps
+
+    interpreted_text = _text_or_none(payload.get("interpreted_text"), max_len=1_000)
+    if interpreted_text:
+        return [
+            {
+                "id": "reading_1",
+                "page": 1 if page_count >= 1 else None,
+                "label": "Heildarlestur",
+                "text": interpreted_text,
+            }
+        ]
+
+    fallback_entries: list[dict[str, object]] = []
+    for index, region in enumerate(fallback_regions[:8], start=1):
+        if not isinstance(region, dict):
+            continue
+        snippet = _text_or_none(region.get("snippet"), max_len=160)
+        reason = _text_or_none(region.get("reason"), max_len=160)
+        if not snippet and not reason:
+            continue
+        page = _as_int_or_none(region.get("page"))
+        if page is not None:
+            page = max(1, min(page, page_count))
+        text = snippet or reason or ""
+        fallback_entries.append(
+            {
+                "id": f"reading_{index}",
+                "page": page,
+                "label": f"Bls. {page}" if page is not None else f"Skref {index}",
+                "text": text,
+            }
+        )
+    return fallback_entries
+
+
+def _build_confirm_reading_payload(
+    *,
+    regions: list[dict[str, object]],
+    missing_parts: list[str],
+    interpreted_reading: list[dict[str, object]],
+    reading_confidence: float | None,
+    fallback_message: str | None = None,
+) -> dict[str, object]:
+    confidence_value = reading_confidence if reading_confidence is not None else 0.5
+    message = (
+        fallback_message
+        or "Ég er ekki alveg viss um lesturinn á lausninni. Vinsamlegast staðfestu eða leiðréttu textann áður en ég met skrefin."
+    )
+    return {
+        "verdict": "unclear",
+        "response_type": "confirm_reading",
+        "message_is": message,
+        "error_type": "",
+        "error_step": "",
+        "correct_approach": "",
+        "error_confidence": None,
+        "all_readable": False,
+        "reading_confidence": confidence_value,
+        "interpreted_reading": interpreted_reading,
+        "ambiguous_regions": regions,
+        "missing_parts": missing_parts,
+    }
 
 
 def _extract_llm_result(
@@ -633,6 +785,7 @@ async def query(
     drawing_data_pages: list[UploadFile] | None = File(default=None),
     page_count: int | None = Form(default=1),
     expert_mode: str | None = Form(default="off"),
+    confirmed_reading_json: str | None = Form(default=None),
     client_request_id: str | None = Form(default=None),
     session_id: str | None = Form(default=None),
     session: Session = Depends(get_session),
@@ -701,7 +854,15 @@ async def query(
     resolved_client_request_id = _text_or_none(client_request_id or header_client_request_id, max_len=128)
     resolved_session_id = _text_or_none(session_id or header_session_id, max_len=128)
     resolved_page_count = _normalize_page_count(page_count, uploaded_pages=len(solution_uploads))
+    confirmed_reading_entries = _parse_confirmed_reading_json(
+        confirmed_reading_json,
+        page_count=resolved_page_count,
+    )
     reasoning_prompt = _augment_prompt_for_pages(base_prompt=base_prompt, page_count=resolved_page_count)
+    reasoning_prompt = _augment_prompt_with_confirmed_reading(
+        base_prompt=reasoning_prompt,
+        confirmed_entries=confirmed_reading_entries,
+    )
     legibility_prompt = _augment_prompt_for_pages(
         base_prompt=legibility_base_prompt,
         page_count=resolved_page_count,
@@ -720,6 +881,7 @@ async def query(
         "promptVariant": prompt_variant,
         "pipelineMode": pipeline_mode,
         "expertMode": resolved_expert_mode,
+        "confirmedReadingProvided": bool(confirmed_reading_entries),
         "environment": environment,
         "retryCount": None,
         "success": None,
@@ -835,11 +997,36 @@ async def query(
         legibility_stage_retry_count = legibility_retry_count
 
         if legibility_failed:
-            payload = _build_unclear_payload(
-                regions=legibility_regions,
-                missing_parts=legibility_missing_parts,
-                fallback_message=_text_or_none(legibility_payload_raw.get("message_is")),
-            )
+            if mode == "check_solution":
+                if not confirmed_reading_entries:
+                    reading_confidence = _as_float_or_none(legibility_payload_raw.get("reading_confidence"))
+                    interpreted_reading = _coerce_interpreted_reading_entries(
+                        payload=legibility_payload_raw,
+                        page_count=resolved_page_count,
+                        fallback_regions=legibility_regions,
+                    )
+                    if interpreted_reading and (
+                        reading_confidence is None or reading_confidence >= READING_CONFIRM_CONFIDENCE_MIN
+                    ):
+                        payload = _build_confirm_reading_payload(
+                            regions=legibility_regions,
+                            missing_parts=legibility_missing_parts,
+                            interpreted_reading=interpreted_reading,
+                            reading_confidence=reading_confidence,
+                            fallback_message=_text_or_none(legibility_payload_raw.get("message_is")),
+                        )
+                    else:
+                        payload = _build_unclear_payload(
+                            regions=legibility_regions,
+                            missing_parts=legibility_missing_parts,
+                            fallback_message=_text_or_none(legibility_payload_raw.get("message_is")),
+                        )
+            else:
+                payload = _build_unclear_payload(
+                    regions=legibility_regions,
+                    missing_parts=legibility_missing_parts,
+                    fallback_message=_text_or_none(legibility_payload_raw.get("message_is")),
+                )
 
     if payload is None:
         try:
@@ -917,6 +1104,22 @@ async def query(
         reasoning_stage_tokens_out = reasoning_tokens_out
         reasoning_stage_tokens_total = reasoning_tokens_total
         reasoning_stage_retry_count = reasoning_retry_count
+
+    if _text_or_none(payload.get("response_type"), max_len=64) == "confirm_reading":
+        response_payload = dict(payload)
+        response_payload["expert_mode"] = resolved_expert_mode
+        response_payload["observability"] = {
+            "traceId": trace_id,
+            "observationId": observation_id,
+            "messageId": message_id,
+            "requestId": request_id,
+            "modelName": model_name,
+            "promptVersion": selected_prompt_version,
+            "retryCount": retry_count,
+            "clientRequestId": resolved_client_request_id,
+            "sessionId": resolved_session_id,
+        }
+        return JSONResponse(content=response_payload)
 
     latency_ms = int(latency_seconds * 1000) if latency_seconds is not None else None
     verdict = _text_or_none(payload.get("verdict"), max_len=64)

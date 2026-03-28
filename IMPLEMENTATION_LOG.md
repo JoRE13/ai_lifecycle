@@ -37,6 +37,20 @@ After each completed feature:
     - consistency for error-based exam generation
     - analytics for frequent mistake patterns.
 
+### 2026-03-28 (reading confirmation flow)
+- Backend + Frontend (working tree): Added confirm-before-grading flow for uncertain handwriting in `check_solution`.
+  - Backend:
+    - Legibility output extended with `reading_confidence`, `interpreted_text`, `interpreted_steps`.
+    - `/query` accepts optional `confirmed_reading_json`.
+    - When legibility is uncertain, backend can return `response_type = confirm_reading` with editable interpreted fields.
+    - Confirmed reading is injected into reasoning prompt on follow-up call.
+  - Frontend (iOS):
+    - Added editable "Staðfesta lestur" sheet.
+    - User can edit interpreted steps and submit "Samþykkja og meta" to re-run grading with confirmed reading.
+  - Impact:
+    - Reduces wrong feedback from handwriting misreads.
+    - Creates cleaner corrected-reading traces for future dataset work.
+
 ### Earlier phase (already implemented before this update)
 - Backend `470834d`: dataset collection schema + exam-pack API flow.
 - Backend `a88c75d`: folders and problem move APIs + migration.
@@ -55,4 +69,3 @@ After each completed feature:
 - Error bank and analytics summaries.
 - Exam pack generation and online exam flow (10/20/30, auto/manual, per-question/end feedback).
 - Folder organization with one-level subfolders and safe deletion.
-

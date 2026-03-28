@@ -13,6 +13,11 @@ STRICT POLICY:
 OUTPUT JSON ONLY:
 {
   "all_readable": true,
+  "reading_confidence": 1.0,
+  "interpreted_text": "Best-effort short transcription of the student's key math content",
+  "interpreted_steps": [
+    {"page": 1, "text": "x + 3 = 7"}
+  ],
   "ambiguous_regions": [
     {"page": 1, "snippet": "optional short quote", "reason": "what is unreadable"}
   ],
@@ -28,3 +33,6 @@ RULES:
   - set all_readable = true
   - ambiguous_regions = []
   - missing_parts = []
+- reading_confidence must be between 0.0 and 1.0
+- interpreted_text should be concise and may be empty only if nothing readable
+- interpreted_steps should list readable step snippets in page order (can be empty if unreadable)
