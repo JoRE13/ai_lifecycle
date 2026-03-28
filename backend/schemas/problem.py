@@ -22,16 +22,19 @@ class ProblemCreateResponse(BaseModel):
 class FolderCreateRequest(BaseModel):
     name: str = Field(min_length=1, max_length=128)
     color: str | None = Field(default=None, max_length=32)
+    parent_folder_id: UUID | None = None
 
 
 class FolderUpdateRequest(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=128)
     color: str | None = Field(default=None, max_length=32)
+    parent_folder_id: UUID | None = None
 
 
 class FolderResponse(BaseModel):
     id: UUID
     user_id: UUID
+    parent_folder_id: UUID | None = None
     name: str
     color: str | None = None
     created_at: datetime

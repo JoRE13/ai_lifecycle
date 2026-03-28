@@ -81,12 +81,17 @@ def _ensure_default_folder(*, session: Session, user_id: UUID) -> Folder:
     existing = session.exec(
         select(Folder).where(Folder.user_id == user_id, Folder.name == DEFAULT_FOLDER_NAME)
     ).first()
+    if existing and existing.parent_folder_id is not None:
+        existing.parent_folder_id = None
+        existing.updated_at = datetime.now(timezone.utc)
+        session.add(existing)
     if existing:
         return existing
 
     now = datetime.now(timezone.utc)
     folder = Folder(
         user_id=user_id,
+        parent_folder_id=None,
         name=DEFAULT_FOLDER_NAME,
         color=DEFAULT_FOLDER_COLOR,
         created_at=now,
@@ -140,6 +145,30 @@ def _resolve_folder(
     return folder
 
 
+def _is_default_folder(folder: Folder) -> bool:
+    return folder.name == DEFAULT_FOLDER_NAME
+
+
+def _validate_parent_folder(
+    *,
+    session: Session,
+    user_id: UUID,
+    parent_folder_id: UUID,
+) -> Folder:
+    parent_folder = _resolve_folder(
+        session=session,
+        user_id=user_id,
+        folder_id=parent_folder_id,
+        allow_archived=False,
+    )
+    if parent_folder.parent_folder_id is not None:
+        raise HTTPException(
+            status_code=422,
+            detail="Only one level of subfolders is supported",
+        )
+    return parent_folder
+
+
 def _problem_response(problem: Problem, folder_name: str | None) -> ProblemCreateResponse:
     return ProblemCreateResponse(
         id=problem.id,
@@ -160,6 +189,7 @@ def create_folder(
 ):
     name = _normalize_folder_name(payload.name)
     color = _normalize_folder_color(payload.color)
+    parent_folder_id = payload.parent_folder_id
     existing = session.exec(
         select(Folder).where(
             Folder.user_id == user.id,
@@ -169,9 +199,17 @@ def create_folder(
     if existing:
         raise HTTPException(status_code=409, detail="Folder name already exists")
 
+    if parent_folder_id is not None:
+        _validate_parent_folder(
+            session=session,
+            user_id=user.id,
+            parent_folder_id=parent_folder_id,
+        )
+
     now = datetime.now(timezone.utc)
     folder = Folder(
         user_id=user.id,
+        parent_folder_id=parent_folder_id,
         name=name,
         color=color,
         created_at=now,
@@ -186,13 +224,20 @@ def create_folder(
         problem_id=None,
         attempt_id=None,
         event_type="folder_created",
-        metadata_json=json.dumps({"folder_id": str(folder.id), "folder_name": folder.name}),
+        metadata_json=json.dumps(
+            {
+                "folder_id": str(folder.id),
+                "folder_name": folder.name,
+                "parent_folder_id": str(parent_folder_id) if parent_folder_id else None,
+            }
+        ),
     )
     session.commit()
     session.refresh(folder)
     return FolderResponse(
         id=folder.id,
         user_id=folder.user_id,
+        parent_folder_id=folder.parent_folder_id,
         name=folder.name,
         color=folder.color,
         created_at=folder.created_at,
@@ -231,6 +276,7 @@ def list_folders(
         FolderResponse(
             id=folder.id,
             user_id=folder.user_id,
+            parent_folder_id=folder.parent_folder_id,
             name=folder.name,
             color=folder.color,
             created_at=folder.created_at,
@@ -251,13 +297,14 @@ def update_folder(
 ):
     folder = _resolve_folder(session=session, user_id=user.id, folder_id=folder_id, allow_archived=True)
     now = datetime.now(timezone.utc)
+    updated_fields = getattr(payload, "model_fields_set", getattr(payload, "__fields_set__", set()))
 
-    if payload.name is None and payload.color is None:
+    if not updated_fields.intersection({"name", "color", "parent_folder_id"}):
         raise HTTPException(status_code=422, detail="No folder fields provided for update")
 
     if payload.name is not None:
         new_name = _normalize_folder_name(payload.name)
-        if folder.name == DEFAULT_FOLDER_NAME and new_name != DEFAULT_FOLDER_NAME:
+        if _is_default_folder(folder) and new_name != DEFAULT_FOLDER_NAME:
             raise HTTPException(status_code=400, detail="Cannot rename default folder")
         duplicate = session.exec(
             select(Folder).where(
@@ -273,6 +320,35 @@ def update_folder(
     if payload.color is not None:
         folder.color = _normalize_folder_color(payload.color)
 
+    if "parent_folder_id" in updated_fields:
+        new_parent_folder_id = payload.parent_folder_id
+        if _is_default_folder(folder) and new_parent_folder_id is not None:
+            raise HTTPException(status_code=400, detail="Cannot move default folder")
+        if new_parent_folder_id == folder.id:
+            raise HTTPException(status_code=422, detail="Folder cannot be its own parent")
+
+        if new_parent_folder_id is not None:
+            parent_folder = _validate_parent_folder(
+                session=session,
+                user_id=user.id,
+                parent_folder_id=new_parent_folder_id,
+            )
+            has_children = session.exec(
+                select(Folder.id).where(
+                    Folder.user_id == user.id,
+                    Folder.parent_folder_id == folder.id,
+                    Folder.archived_at.is_(None),
+                )
+            ).first()
+            if has_children:
+                raise HTTPException(
+                    status_code=422,
+                    detail="Folder with subfolders cannot be moved under another folder",
+                )
+            folder.parent_folder_id = parent_folder.id
+        else:
+            folder.parent_folder_id = None
+
     folder.updated_at = now
     _record_event(
         session=session,
@@ -280,7 +356,15 @@ def update_folder(
         problem_id=None,
         attempt_id=None,
         event_type="folder_updated",
-        metadata_json=json.dumps({"folder_id": str(folder.id), "folder_name": folder.name}),
+        metadata_json=json.dumps(
+            {
+                "folder_id": str(folder.id),
+                "folder_name": folder.name,
+                "parent_folder_id": (
+                    str(folder.parent_folder_id) if folder.parent_folder_id is not None else None
+                ),
+            }
+        ),
     )
     session.add(folder)
     session.commit()
@@ -293,6 +377,7 @@ def update_folder(
     return FolderResponse(
         id=folder.id,
         user_id=folder.user_id,
+        parent_folder_id=folder.parent_folder_id,
         name=folder.name,
         color=folder.color,
         created_at=folder.created_at,
@@ -309,7 +394,7 @@ def archive_folder(
     user: User = Depends(get_current_user),
 ):
     folder = _resolve_folder(session=session, user_id=user.id, folder_id=folder_id, allow_archived=True)
-    if folder.name == DEFAULT_FOLDER_NAME:
+    if _is_default_folder(folder):
         raise HTTPException(status_code=400, detail="Cannot archive default folder")
 
     default_folder = _ensure_default_folder(session=session, user_id=user.id)
@@ -319,6 +404,16 @@ def archive_folder(
 
     now = datetime.now(timezone.utc)
     moved_count = 0
+    detached_child_folder_count = 0
+    child_folders = session.exec(
+        select(Folder).where(Folder.user_id == user.id, Folder.parent_folder_id == folder.id)
+    ).all()
+    for child_folder in child_folders:
+        child_folder.parent_folder_id = None
+        child_folder.updated_at = now
+        session.add(child_folder)
+        detached_child_folder_count += 1
+
     problems_to_move = session.exec(
         select(Problem).where(Problem.user_id == user.id, Problem.folder_id == folder.id)
     ).all()
@@ -338,7 +433,11 @@ def archive_folder(
         attempt_id=None,
         event_type="folder_archived",
         metadata_json=json.dumps(
-            {"folder_id": str(folder.id), "moved_problem_count": moved_count}
+            {
+                "folder_id": str(folder.id),
+                "moved_problem_count": moved_count,
+                "detached_child_folder_count": detached_child_folder_count,
+            }
         ),
     )
     session.commit()
@@ -347,6 +446,7 @@ def archive_folder(
     return FolderResponse(
         id=folder.id,
         user_id=folder.user_id,
+        parent_folder_id=folder.parent_folder_id,
         name=folder.name,
         color=folder.color,
         created_at=folder.created_at,

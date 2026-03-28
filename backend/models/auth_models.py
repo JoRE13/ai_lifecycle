@@ -134,6 +134,11 @@ class Folder(SQLModel, table=True):
 
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True)
     user_id: UUID = Field(foreign_key="users.id", index=True)
+    parent_folder_id: Optional[UUID] = Field(
+        default=None,
+        foreign_key="folders.id",
+        index=True,
+    )
     name: str = Field(sa_column=Column(String(128), nullable=False))
     color: Optional[str] = Field(default=None, sa_column=Column(String(32)))
     created_at: datetime = Field(
@@ -151,6 +156,16 @@ class Folder(SQLModel, table=True):
 
     user: User = Relationship(
         sa_relationship=relationship("User", back_populates="folders")
+    )
+    parent: Optional["Folder"] = Relationship(
+        sa_relationship=relationship(
+            "Folder",
+            remote_side="Folder.id",
+            back_populates="children",
+        )
+    )
+    children: list["Folder"] = Relationship(
+        sa_relationship=relationship("Folder", back_populates="parent")
     )
     problems: list[Problem] = Relationship(
         sa_relationship=relationship("Problem", back_populates="folder")
