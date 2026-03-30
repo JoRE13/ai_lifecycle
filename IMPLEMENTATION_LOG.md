@@ -1,6 +1,6 @@
 # Ratatoskur Implementation Log
 
-Last updated: 2026-03-28
+Last updated: 2026-03-30
 
 This is a living log of major implemented work across:
 - Backend repo: `ailifecycle/ai_lifecycle`
@@ -13,6 +13,23 @@ After each completed feature:
 3. Add a short impact note (why this matters).
 
 ## Recent Work
+
+### 2026-03-30 (avatar rendering performance + folder layout)
+- Frontend `c8c9383`: fixed avatar SVG bundle lookup fallback so profile/dashboard icons resolve reliably.
+- Frontend `96371bc`: adjusted avatar UX sizing and styling.
+  - Larger dashboard/profile/picker avatars.
+  - Removed extra wrapper circles so only the avatar artwork border is shown.
+- Frontend `159ab20`: hotfix for clipped/blank avatar rendering by restoring stable HTML-based SVG scaling path.
+- Frontend `f2ed2f4`: migrated avatar rendering to native PNG images for speed.
+  - Generated and added six PNG avatars under `MathCoach/Resources/profile_avatars/`.
+  - Added `Shared/AvatarImageView.swift` with in-memory image caching.
+  - Avatar usage now prefers PNG (fast path) with SVG fallback.
+- Frontend `afc7f3f`: updated dashboard folders list to two columns per row.
+  - Subfolder behavior unchanged (same data model/actions), only visual layout changed.
+  - Added truncation handling to keep folder cards stable in narrower cells.
+  - Impact:
+    - Faster and more stable avatar rendering on iOS.
+    - Better dashboard density and quicker folder scanning.
 
 ### 2026-03-28 (avatar onboarding + labeled selector)
 - Frontend `c4dd038`: completed Norse avatar rollout and selection flow polish.
