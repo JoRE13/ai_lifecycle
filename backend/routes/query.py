@@ -666,26 +666,16 @@ def _record_structured_error_event(
 
 def _normalize_upload_lists(
     *,
-    sol_image: UploadFile | None,
-    sol_images: list[UploadFile] | None,
-    drawing_data: UploadFile | None,
-    drawing_data_pages: list[UploadFile] | None,
+    sol_images: list[UploadFile],
+    drawing_data_pages: list[UploadFile],
 ) -> tuple[list[UploadFile], list[UploadFile]]:
-    solution_uploads = [upload for upload in (sol_images or []) if upload is not None]
-    drawing_uploads = [upload for upload in (drawing_data_pages or []) if upload is not None]
-
-    if not solution_uploads and sol_image is not None:
-        solution_uploads = [sol_image]
-    if not drawing_uploads and drawing_data is not None:
-        drawing_uploads = [drawing_data]
+    solution_uploads = [upload for upload in sol_images if upload is not None]
+    drawing_uploads = [upload for upload in drawing_data_pages if upload is not None]
 
     if not solution_uploads or not drawing_uploads:
         raise HTTPException(
             status_code=422,
-            detail=(
-                "prob_image and either (sol_image + drawing_data) or "
-                "(sol_images[] + drawing_data_pages[]) are required"
-            ),
+            detail="prob_image, sol_images, and drawing_data_pages are required",
         )
     if len(solution_uploads) != len(drawing_uploads):
         raise HTTPException(
@@ -780,10 +770,8 @@ async def query(
     problem_id: UUID = Form(...),
     mode: Literal["hint", "check_solution", "reveal"] = Form(...),
     prob_image: UploadFile = File(...),
-    sol_image: UploadFile | None = File(default=None),
-    drawing_data: UploadFile | None = File(default=None),
-    sol_images: list[UploadFile] | None = File(default=None),
-    drawing_data_pages: list[UploadFile] | None = File(default=None),
+    sol_images: list[UploadFile] = File(...),
+    drawing_data_pages: list[UploadFile] = File(...),
     page_count: int | None = Form(default=1),
     expert_mode: str | None = Form(default="off"),
     confirmed_reading_json: str | None = Form(default=None),
@@ -817,9 +805,7 @@ async def query(
     legibility_request_id = str(uuid4())
 
     solution_uploads, drawing_uploads = _normalize_upload_lists(
-        sol_image=sol_image,
         sol_images=sol_images,
-        drawing_data=drawing_data,
         drawing_data_pages=drawing_data_pages,
     )
 
