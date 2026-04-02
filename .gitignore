@@ -1,6 +1,6 @@
 
 slides/
-xtra/
+documentation/
 test_samples/
 */.env
 my_app/
