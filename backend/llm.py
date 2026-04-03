@@ -51,6 +51,12 @@ class LLMResponse(BaseModel):
     can_skip: bool | None = None
 
 
+class ModeV3Response(BaseModel):
+    verdict: str
+    response_type: str
+    message_is: str
+
+
 class LegibilityRegion(BaseModel):
     page: int | None = None
     snippet: str | None = None
@@ -70,6 +76,15 @@ class LegibilityResponse(BaseModel):
     reading_confidence: float | None = None
     interpreted_text: str | None = None
     interpreted_steps: list[LegibilityInterpretedStep] = Field(default_factory=list)
+
+
+class DeferredErrorResponse(BaseModel):
+    topic: str | None = None
+    subtopic: str | None = None
+    wrong_step: str | None = None
+    correct_step: str | None = None
+    error_type: str
+    confidence: float | None = None
 
 
 def is_langfuse_enabled() -> bool:
@@ -446,6 +461,7 @@ def _call_model_with_retry_internal(
                 config={
                     "response_mime_type": "application/json",
                     "response_json_schema": response_schema.model_json_schema(),
+                    "thinking_config": {"thinking_level": "low"},
                 },
             )
 
@@ -555,6 +571,64 @@ def call_legibility_with_retry(
         sol_images=sol_images,
         mode=mode,
         response_schema=LegibilityResponse,
+        max_retries=max_retries,
+        regenerate=regenerate,
+        trace_name=trace_name,
+        trace_metadata=trace_metadata,
+        trace_user_id=trace_user_id,
+        trace_session_id=trace_session_id,
+        request_id=request_id,
+    )
+
+
+def call_mode_v3_with_retry(
+    prompt: str,
+    prob_image: Any,
+    sol_images: Sequence[Any],
+    mode: str,
+    max_retries: int = 5,
+    regenerate: bool = False,
+    trace_name: str = "gemini-mode-v3",
+    trace_metadata: dict[str, Any] | None = None,
+    trace_user_id: str | None = None,
+    trace_session_id: str | None = None,
+    request_id: str | None = None,
+):
+    return _call_model_with_retry_internal(
+        prompt=prompt,
+        prob_image=prob_image,
+        sol_images=sol_images,
+        mode=mode,
+        response_schema=ModeV3Response,
+        max_retries=max_retries,
+        regenerate=regenerate,
+        trace_name=trace_name,
+        trace_metadata=trace_metadata,
+        trace_user_id=trace_user_id,
+        trace_session_id=trace_session_id,
+        request_id=request_id,
+    )
+
+
+def call_deferred_error_with_retry(
+    prompt: str,
+    prob_image: Any,
+    sol_images: Sequence[Any],
+    mode: str,
+    max_retries: int = 5,
+    regenerate: bool = False,
+    trace_name: str = "gemini-deferred-error",
+    trace_metadata: dict[str, Any] | None = None,
+    trace_user_id: str | None = None,
+    trace_session_id: str | None = None,
+    request_id: str | None = None,
+):
+    return _call_model_with_retry_internal(
+        prompt=prompt,
+        prob_image=prob_image,
+        sol_images=sol_images,
+        mode=mode,
+        response_schema=DeferredErrorResponse,
         max_retries=max_retries,
         regenerate=regenerate,
         trace_name=trace_name,

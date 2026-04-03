@@ -200,7 +200,6 @@ class Attempt(SQLModel, table=True):
 
     verdict: Optional[str] = Field(default=None, sa_column=Column(String(64)))
     response_type: Optional[str] = Field(default=None, sa_column=Column(String(64)))
-    error_type: Optional[str] = Field(default=None, sa_column=Column(String(64)))
     model_name: Optional[str] = Field(default=None, sa_column=Column(String(128)))
     prompt_version: Optional[str] = Field(default=None, sa_column=Column(String(64)))
     latency_ms: Optional[int] = Field(default=None, sa_column=Column(Integer))

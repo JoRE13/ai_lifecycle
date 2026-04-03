@@ -621,7 +621,6 @@ def list_problem_attempts(
             verdict=attempt.verdict,
             response_type=attempt.response_type,
             message_is=attempt.message_is,
-            error_type=attempt.error_type,
             model_name=attempt.model_name,
             prompt_version=attempt.prompt_version,
             latency_ms=attempt.latency_ms,
