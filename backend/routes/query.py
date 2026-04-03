@@ -243,6 +243,15 @@ def _to_pil_image(upload: UploadFile, data: bytes) -> Image.Image:
         ) from exc
 
 
+def _bytes_to_pil_image(data: bytes, *, filename: str) -> Image.Image:
+    try:
+        image = Image.open(BytesIO(data))
+        image.load()
+        return image
+    except UnidentifiedImageError as exc:
+        raise ValueError(f"Invalid image bytes for '{filename}'") from exc
+
+
 def _safe_suffix(upload: UploadFile, default: str) -> str:
     suffix = Path(upload.filename or "").suffix.lower()
     if suffix and len(suffix) <= 10:
@@ -742,10 +751,9 @@ def _run_deferred_error_analysis(
         page_count=len(solution_pages_bytes),
     )
 
-    problem_upload = UploadFile(filename=prob_filename or "problem.png")
-    prob_image = _to_pil_image(problem_upload, prob_bytes)
+    prob_image = _bytes_to_pil_image(prob_bytes, filename=prob_filename or "problem.png")
     solution_images = [
-        _to_pil_image(UploadFile(filename=f"solution_{index}.png"), page_bytes)
+        _bytes_to_pil_image(page_bytes, filename=f"solution_{index}.png")
         for index, page_bytes in enumerate(solution_pages_bytes, start=1)
     ]
 
