@@ -9,16 +9,16 @@ from pathlib import Path
 from typing import Literal
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import JSONResponse
 from PIL import Image, UnidentifiedImageError
 from sqlmodel import Session, select
 
 from backend.auth.deps import get_current_user
 from backend.config import QUERY_MAX_PAGE_COUNT, QUERY_MAX_SINGLE_FILE_BYTES, QUERY_MAX_TOTAL_BYTES
-from backend.db import get_session
+from backend.db import engine, get_session
 from backend.error_taxonomy import normalize_error_type
-from backend.llm import call_legibility_with_retry, call_model_with_retry
+from backend.llm import call_deferred_error_with_retry, call_legibility_with_retry, call_mode_v3_with_retry
 from backend.models.auth_models import (
     AnalyticsEvent,
     Attempt,
@@ -33,26 +33,27 @@ from backend.storage.r2 import R2ConfigurationError, upload_bytes
 router = APIRouter(tags=["query"])
 
 PROMPTS_BASE = Path(__file__).resolve().parents[1] / "prompts"
-PROMPTS_ROOT_V1 = PROMPTS_BASE / "modes"
-PROMPTS_ROOT_V2 = PROMPTS_BASE / "modes_v2"
-PROMPTS_ROOT_V2_EXPERT = PROMPTS_BASE / "modes_v2_expert"
-LEGIBILITY_PROMPT_PATH_V2 = PROMPTS_BASE / "legibility_v2" / "prompt.txt"
-DEFAULT_PROMPT_VARIANT = (os.getenv("QUERY_PROMPT_VARIANT") or "v2").strip().lower()
-DEFAULT_PIPELINE_MODE = (os.getenv("QUERY_PIPELINE_MODE") or "two_pass").strip().lower()
+PROMPTS_ROOT = PROMPTS_BASE / "modes"
+PROMPTS_EXPERT_ROOT = PROMPTS_BASE / "modes_expert"
+LEGIBILITY_PROMPT_ROOT = PROMPTS_BASE / "legibility"
+ERROR_PROMPT_PATH_V1 = PROMPTS_BASE / "errors" / "v1" / "prompt.txt"
+DEFAULT_PROMPT_VARIANT = (os.getenv("QUERY_PROMPT_VARIANT") or "v3").strip().lower()
 ExpertMode = Literal["off", "clarity", "strict"]
 SUCCESS_VERDICTS = {"correct_so_far", "fully_correct", "fully_solved"}
 READING_CONFIRM_CONFIDENCE_MIN = 0.30
 
 
-def _resolve_prompt_variant() -> Literal["v1", "v2"]:
+def _resolve_prompt_variant() -> Literal["v1", "v2", "v3"]:
     configured = (os.getenv("QUERY_PROMPT_VARIANT") or DEFAULT_PROMPT_VARIANT).strip().lower()
     if configured == "v1":
         return "v1"
-    return "v2"
+    if configured == "v2":
+        return "v2"
+    return "v3"
 
 
-def _resolve_pipeline_mode() -> Literal["single_pass", "two_pass"]:
-    configured = (os.getenv("QUERY_PIPELINE_MODE") or DEFAULT_PIPELINE_MODE).strip().lower()
+def _resolve_pipeline_mode(value: str | None) -> Literal["single_pass", "two_pass"]:
+    configured = (value or "two_pass").strip().lower()
     if configured == "single_pass":
         return "single_pass"
     return "two_pass"
@@ -70,19 +71,18 @@ def _normalize_expert_mode(value: str | None) -> ExpertMode:
 def _load_prompt(
     mode: Literal["hint", "check_solution", "reveal"],
     *,
-    prompt_variant: Literal["v1", "v2"],
+    prompt_variant: Literal["v1", "v2", "v3"],
     expert_mode: ExpertMode,
 ) -> str:
-    if prompt_variant == "v2" and mode == "check_solution" and expert_mode != "off":
-        expert_prompt_path = PROMPTS_ROOT_V2_EXPERT / expert_mode / mode / "prompt.txt"
+    if mode == "check_solution" and expert_mode != "off":
+        expert_prompt_path = PROMPTS_EXPERT_ROOT / prompt_variant / expert_mode / mode / "prompt.txt"
         if expert_prompt_path.exists():
             try:
                 return expert_prompt_path.read_text(encoding="utf-8")
             except FileNotFoundError:
                 pass
 
-    prompt_root = PROMPTS_ROOT_V1 if prompt_variant == "v1" else PROMPTS_ROOT_V2
-    prompt_path = prompt_root / mode / "prompt.txt"
+    prompt_path = PROMPTS_ROOT / prompt_variant / mode / "prompt.txt"
     try:
         return prompt_path.read_text(encoding="utf-8")
     except FileNotFoundError as exc:
@@ -92,12 +92,19 @@ def _load_prompt(
         ) from exc
 
 
-def _load_legibility_prompt(*, prompt_variant: Literal["v1", "v2"]) -> str:
-    _ = prompt_variant
+def _load_legibility_prompt(*, prompt_variant: Literal["v1", "v2", "v3"]) -> str:
+    prompt_path = LEGIBILITY_PROMPT_ROOT / prompt_variant / "prompt.txt"
     try:
-        return LEGIBILITY_PROMPT_PATH_V2.read_text(encoding="utf-8")
+        return prompt_path.read_text(encoding="utf-8")
     except FileNotFoundError as exc:
         raise HTTPException(status_code=500, detail="Legibility prompt file not found") from exc
+
+
+def _load_deferred_error_prompt() -> str:
+    try:
+        return ERROR_PROMPT_PATH_V1.read_text(encoding="utf-8")
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=500, detail="Deferred error prompt file not found") from exc
 
 
 def _augment_prompt_for_pages(*, base_prompt: str, page_count: int) -> str:
@@ -378,6 +385,15 @@ def _augment_prompt_with_confirmed_reading(
     return base_prompt + "\n".join(lines)
 
 
+def _augment_deferred_error_prompt(*, base_prompt: str, message_is: str) -> str:
+    safe_message = _text_or_none(message_is, max_len=2_000) or ""
+    return (
+        f"{base_prompt}\n\n"
+        "FAST USER-FACING FEEDBACK:\n"
+        f"- message_is: {safe_message}\n"
+    )
+
+
 def _coerce_interpreted_reading_entries(
     *,
     payload: dict[str, object],
@@ -556,7 +572,10 @@ def _upsert_error_bank_entry(
     verdict: str | None,
 ) -> None:
     normalized_concept_tag = _text_or_none(concept_tag, max_len=128) or ""
-    normalized_error_type = normalize_error_type(error_type, concept_tag=normalized_concept_tag)
+    normalized_error_type = (
+        normalize_error_type(error_type, concept_tag=normalized_concept_tag)
+        or _text_or_none(error_type, max_len=64)
+    )
     if not normalized_error_type:
         return
 
@@ -664,6 +683,160 @@ def _record_structured_error_event(
     )
 
 
+def _record_error_event_from_deferred_payload(
+    *,
+    session: Session,
+    attempt_id: UUID,
+    user: User,
+    payload: dict[str, object],
+) -> str | None:
+    raw_error_type = _text_or_none(payload.get("error_type"), max_len=64)
+    normalized_error_type = normalize_error_type(raw_error_type) or raw_error_type
+    topic = _text_or_none(payload.get("topic"), max_len=128)
+    subtopic = _text_or_none(payload.get("subtopic"), max_len=128)
+    wrong_step = _text_or_none(payload.get("wrong_step"), max_len=1000)
+    correct_step = _text_or_none(payload.get("correct_step"), max_len=1000)
+    confidence = _as_float_or_none(payload.get("confidence"))
+
+    if not normalized_error_type:
+        return None
+
+    session.add(
+        ErrorEvent(
+            id=uuid4(),
+            attempt_id=attempt_id,
+            user_id=user.id,
+            topic=topic,
+            subtopic=subtopic,
+            wrong_step=wrong_step,
+            correct_step=correct_step,
+            error_type=normalized_error_type,
+            confidence=confidence,
+            created_at=datetime.now(timezone.utc),
+        )
+    )
+    return topic
+
+
+def _run_deferred_error_analysis(
+    *,
+    attempt_id: UUID,
+    problem_id: UUID,
+    user_id: UUID,
+    anon_user_id: str,
+    mode: str,
+    prompt_variant: str,
+    pipeline_mode: str,
+    expert_mode: str,
+    resolved_session_id: str | None,
+    message_is: str,
+    prob_bytes: bytes,
+    prob_filename: str | None,
+    solution_pages_bytes: list[bytes],
+) -> None:
+    classification_prompt = _augment_prompt_for_pages(
+        base_prompt=_augment_deferred_error_prompt(
+            base_prompt=_load_deferred_error_prompt(),
+            message_is=message_is,
+        ),
+        page_count=len(solution_pages_bytes),
+    )
+
+    problem_upload = UploadFile(filename=prob_filename or "problem.png")
+    prob_image = _to_pil_image(problem_upload, prob_bytes)
+    solution_images = [
+        _to_pil_image(UploadFile(filename=f"solution_{index}.png"), page_bytes)
+        for index, page_bytes in enumerate(solution_pages_bytes, start=1)
+    ]
+
+    deferred_request_id = str(uuid4())
+    environment = _text_or_none(os.getenv("ENVIRONMENT"), max_len=64)
+    trace_metadata = {
+        "feature": "notebook",
+        "flow": "solve_problem",
+        "phase": "deferred_error_analysis",
+        "requestType": "deferred_error_analysis",
+        "route": "POST /query (deferred error analysis)",
+        "problemId": str(problem_id),
+        "attemptId": str(attempt_id),
+        "userId": str(user_id),
+        "sessionId": resolved_session_id,
+        "promptVariant": prompt_variant,
+        "pipelineMode": pipeline_mode,
+        "expertMode": expert_mode,
+        "requestId": deferred_request_id,
+        "promptVersion": "errors/v1/prompt.txt",
+        "environment": environment,
+    }
+
+    payload: dict[str, object] | None = None
+    for _attempt in range(2):
+        try:
+            deferred_result = call_deferred_error_with_retry(
+                prompt=classification_prompt,
+                prob_image=prob_image,
+                sol_images=solution_images,
+                mode=f"{mode}_deferred_error",
+                max_retries=1,
+                trace_name=f"{mode}-deferred-error",
+                trace_metadata=trace_metadata,
+                trace_user_id=str(user_id),
+                trace_session_id=resolved_session_id,
+                request_id=deferred_request_id,
+            )
+            deferred_resp_text, *_rest = _extract_llm_result(
+                deferred_result,
+                default_request_id=deferred_request_id,
+            )
+            parsed = json.loads(deferred_resp_text)
+            if not isinstance(parsed, dict):
+                raise ValueError("Deferred error payload must be an object")
+            payload = parsed
+            break
+        except Exception:
+            payload = None
+
+    if payload is None:
+        payload = {
+            "topic": "",
+            "subtopic": "",
+            "wrong_step": "",
+            "correct_step": message_is,
+            "error_type": "uncategorized",
+            "confidence": 0.0,
+        }
+
+    with Session(engine) as session:
+        user = session.get(User, user_id)
+        if not user or not user.consent_analytics:
+            return
+
+        topic = _record_error_event_from_deferred_payload(
+            session=session,
+            attempt_id=attempt_id,
+            user=user,
+            payload=payload,
+        )
+        _upsert_error_bank_entry(
+            session=session,
+            user=user,
+            error_type=_text_or_none(payload.get("error_type"), max_len=64),
+            concept_tag=topic,
+            verdict="incorrect",
+        )
+        _record_event(
+            session=session,
+            user_id=user.id,
+            problem_id=problem_id,
+            attempt_id=attempt_id,
+            event_type="error_classified",
+            mode=mode,
+            verdict="incorrect",
+            metadata_json=json.dumps({"prompt_version": "errors/v1/prompt.txt"}),
+        )
+        session.commit()
+
+
 def _normalize_upload_lists(
     *,
     sol_images: list[UploadFile],
@@ -766,6 +939,7 @@ def _merge_solution_pages_for_artifact(solution_pages: list[Image.Image]) -> byt
 
 @router.post("/query")
 async def query(
+    background_tasks: BackgroundTasks,
     request: Request,
     problem_id: UUID = Form(...),
     mode: Literal["hint", "check_solution", "reveal"] = Form(...),
@@ -773,6 +947,7 @@ async def query(
     sol_images: list[UploadFile] = File(...),
     drawing_data_pages: list[UploadFile] = File(...),
     page_count: int | None = Form(default=1),
+    pipeline_mode: str | None = Form(default="two_pass"),
     expert_mode: str | None = Form(default="off"),
     confirmed_reading_json: str | None = Form(default=None),
     client_request_id: str | None = Form(default=None),
@@ -783,7 +958,7 @@ async def query(
     request_started_perf = time.perf_counter()
     preprocess_started_perf = request_started_perf
     prompt_variant = _resolve_prompt_variant()
-    pipeline_mode = _resolve_pipeline_mode()
+    pipeline_mode = _resolve_pipeline_mode(pipeline_mode)
     resolved_expert_mode = _normalize_expert_mode(expert_mode)
 
     base_prompt = _load_prompt(
@@ -793,14 +968,14 @@ async def query(
     )
     legibility_base_prompt = _load_legibility_prompt(prompt_variant=prompt_variant)
     attempt_id = uuid4()
-    if prompt_variant == "v2" and mode == "check_solution" and resolved_expert_mode != "off":
+    if mode == "check_solution" and resolved_expert_mode != "off":
         mode_prompt_version = _text_or_none(
             f"{prompt_variant}_expert/{resolved_expert_mode}/{mode}/prompt.txt",
             max_len=64,
         )
     else:
         mode_prompt_version = _text_or_none(f"{prompt_variant}/{mode}/prompt.txt", max_len=64)
-    legibility_prompt_version = _text_or_none("v2/legibility/prompt.txt", max_len=64)
+    legibility_prompt_version = _text_or_none(f"legibility/{prompt_variant}/prompt.txt", max_len=64)
     reasoning_request_id = str(uuid4())
     legibility_request_id = str(uuid4())
 
@@ -918,7 +1093,9 @@ async def query(
     reasoning_stage_tokens_total: int | None = None
     reasoning_stage_retry_count: int | None = None
 
-    if pipeline_mode == "two_pass":
+    should_run_legibility = pipeline_mode == "two_pass" and not confirmed_reading_entries
+
+    if should_run_legibility:
         try:
             legibility_result = call_legibility_with_retry(
                 prompt=legibility_prompt,
@@ -1017,7 +1194,7 @@ async def query(
 
     if payload is None:
         try:
-            reasoning_result = call_model_with_retry(
+            reasoning_result = call_mode_v3_with_retry(
                 prompt=reasoning_prompt,
                 prob_image=prob_pil,
                 sol_images=solution_pil_pages,
@@ -1052,25 +1229,7 @@ async def query(
 
         if not isinstance(reasoning_payload_raw, dict):
             raise HTTPException(status_code=502, detail="Model returned invalid payload")
-
-        (
-            reasoning_legibility_failed,
-            _reasoning_all_readable,
-            reasoning_regions,
-            reasoning_missing_parts,
-        ) = _evaluate_legibility_payload(reasoning_payload_raw, fail_closed=False)
-
-        if reasoning_legibility_failed:
-            payload = _build_unclear_payload(
-                regions=reasoning_regions,
-                missing_parts=reasoning_missing_parts,
-                fallback_message=_text_or_none(reasoning_payload_raw.get("message_is")),
-            )
-        else:
-            payload = dict(reasoning_payload_raw)
-            payload["all_readable"] = True
-            payload["ambiguous_regions"] = []
-            payload["missing_parts"] = []
+        payload = dict(reasoning_payload_raw)
 
         selected_prompt_version = mode_prompt_version
         model_name = reasoning_model_name
@@ -1111,26 +1270,11 @@ async def query(
     latency_ms = int(latency_seconds * 1000) if latency_seconds is not None else None
     verdict = _text_or_none(payload.get("verdict"), max_len=64)
     response_type = _text_or_none(payload.get("response_type"), max_len=64)
-    concept_tag = _text_or_none(payload.get("concept_tag"), max_len=128)
-    step_reference = _text_or_none(payload.get("step_reference"), max_len=128)
-    raw_error_type = _text_or_none(payload.get("error_type"), max_len=64)
-    error_type = normalize_error_type(raw_error_type, concept_tag=concept_tag)
-    error_step = _text_or_none(payload.get("error_step"), max_len=1000)
-    correct_approach = _text_or_none(payload.get("correct_approach"), max_len=1000)
-    error_confidence = _as_float_or_none(payload.get("error_confidence"))
-
-    if verdict != "incorrect":
-        error_step = None
-        correct_approach = None
-        error_confidence = None
-
-    payload["error_type"] = error_type or ""
-    payload["error_step"] = error_step or ""
-    payload["correct_approach"] = correct_approach or ""
-    if error_confidence is not None:
-        payload["error_confidence"] = error_confidence
-    else:
-        payload.pop("error_confidence", None)
+    payload = {
+        "verdict": verdict or "",
+        "response_type": response_type or "",
+        "message_is": _text_or_none(payload.get("message_is")) or "",
+    }
 
     merged_solution_bytes = _merge_solution_pages_for_artifact(solution_pil_pages)
     base_key = f"users/{user.id}/problems/{problem.id}/attempts/{attempt_id}"
@@ -1221,7 +1365,6 @@ async def query(
         raw_response_json=payload,
         verdict=verdict,
         response_type=response_type,
-        error_type=error_type,
         model_name=model_name,
         prompt_version=selected_prompt_version,
         latency_ms=latency_ms,
@@ -1285,32 +1428,6 @@ async def query(
             stage="total",
             latency_ms=total_latency_ms,
         )
-        _record_structured_error_event(
-            session=session,
-            attempt_id=attempt_id,
-            user=user,
-            mode=mode,
-            verdict=verdict,
-            error_type=error_type,
-            concept_tag=concept_tag,
-            step_reference=step_reference,
-            error_step=error_step,
-            correct_approach=correct_approach,
-            error_confidence=error_confidence,
-        )
-        _upsert_error_bank_entry(
-            session=session,
-            user=user,
-            error_type=error_type,
-            concept_tag=concept_tag,
-            verdict=attempt.verdict,
-        )
-        if attempt.verdict in SUCCESS_VERDICTS:
-            _record_error_bank_resolution(
-                session=session,
-                user=user,
-                concept_tag=concept_tag,
-            )
         _record_event(
             session=session,
             user_id=user.id,
@@ -1346,6 +1463,24 @@ async def query(
             ),
         )
     session.commit()
+
+    if user.consent_analytics and verdict == "incorrect":
+        background_tasks.add_task(
+            _run_deferred_error_analysis,
+            attempt_id=attempt_id,
+            problem_id=problem.id,
+            user_id=user.id,
+            anon_user_id=user.anon_user_id,
+            mode=mode,
+            prompt_variant=prompt_variant,
+            pipeline_mode=pipeline_mode,
+            expert_mode=resolved_expert_mode,
+            resolved_session_id=resolved_session_id,
+            message_is=_text_or_none(payload.get("message_is")) or "",
+            prob_bytes=prob_bytes,
+            prob_filename=prob_image.filename,
+            solution_pages_bytes=solution_pages_bytes,
+        )
 
     response_payload = dict(payload)
     response_payload["expert_mode"] = resolved_expert_mode

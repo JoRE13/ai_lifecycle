@@ -67,7 +67,6 @@ class AttemptResponse(BaseModel):
     verdict: str | None
     response_type: str | None
     message_is: str | None
-    error_type: str | None = None
     model_name: str | None = None
     prompt_version: str | None = None
     latency_ms: int | None = None
