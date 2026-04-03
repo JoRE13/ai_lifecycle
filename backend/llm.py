@@ -162,8 +162,11 @@ def _extract_entity_id(entity: Any) -> str | None:
 
 
 def _estimate_call_cost_usd(*, tokens_in: int, tokens_out: int, tokens_thoughts: int) -> float:
-    billed_output_tokens = max(0, tokens_out) + max(0, tokens_thoughts)
-    return (max(0, tokens_in) / 1_000_000.0) * INPUT_COST_PER_1M_TOKENS_USD + (
+    safe_tokens_in = 0 if tokens_in is None else tokens_in
+    safe_tokens_out = 0 if tokens_out is None else tokens_out
+    safe_tokens_thoughts = 0 if tokens_thoughts is None else tokens_thoughts
+    billed_output_tokens = max(0, safe_tokens_out) + max(0, safe_tokens_thoughts)
+    return (max(0, safe_tokens_in) / 1_000_000.0) * INPUT_COST_PER_1M_TOKENS_USD + (
         billed_output_tokens / 1_000_000.0
     ) * OUTPUT_COST_PER_1M_TOKENS_USD
 
