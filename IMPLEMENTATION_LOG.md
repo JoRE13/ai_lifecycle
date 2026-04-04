@@ -15,13 +15,13 @@ After each completed feature:
 ## Recent Work
 
 ### 2026-04-04 (fínpússun á persónulegum prófum)
-- Backend `b8d4bcb`: polished exam backend behavior and localization.
+- Backend `1853357`: polished exam backend behavior and localization.
   - `/exam-packs/{pack_id}/start` now resumes an existing `in_progress` session for the same user/pack instead of always creating a new one.
   - Localized generated exam prompts and grading feedback to Icelandic in `exam_service.py` (question text + result messages).
   - Impact:
     - Users can safely continue unfinished personal exams.
     - Exam experience is language-consistent with the rest of the app.
-- Frontend `a5873ac`: polished personal exam UX in `ExamPrepSheet`.
+- Frontend `4cc402d`: polished personal exam UX in `ExamPrepSheet`.
   - Added in-session question navigator (quick jump between questions).
   - Added unanswered counter and submit confirmation when unanswered questions remain.
   - Added session hydration/resume logic by loading existing session answers/feedback on open.
