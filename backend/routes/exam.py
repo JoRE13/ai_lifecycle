@@ -229,6 +229,28 @@ def start_exam_pack(
     if pack.status != "ready":
         raise HTTPException(status_code=409, detail="Exam pack is not ready")
 
+    items = session.exec(
+        select(ExamPackItem).where(ExamPackItem.pack_id == pack.id).order_by(ExamPackItem.position.asc())
+    ).all()
+
+    existing_session = session.exec(
+        select(ExamSession)
+        .where(
+            ExamSession.pack_id == pack.id,
+            ExamSession.user_id == user.id,
+            ExamSession.status == "in_progress",
+        )
+        .order_by(ExamSession.started_at.desc())
+    ).first()
+    if existing_session:
+        return ExamSessionStartResponse(
+            session_id=existing_session.id,
+            pack=ExamPackDetailResponse(
+                **_to_pack_response(pack).model_dump(),
+                items=[_to_pack_item_response(item) for item in items],
+            ),
+        )
+
     now = datetime.now(timezone.utc)
     exam_session = ExamSession(
         id=uuid4(),
@@ -241,9 +263,6 @@ def start_exam_pack(
     session.add(exam_session)
     session.flush()
 
-    items = session.exec(
-        select(ExamPackItem).where(ExamPackItem.pack_id == pack.id).order_by(ExamPackItem.position.asc())
-    ).all()
     for item in items:
         session.add(
             ExamSessionAnswer(

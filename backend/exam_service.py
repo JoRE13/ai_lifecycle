@@ -115,7 +115,7 @@ def grade_answer(
 ) -> tuple[bool, float, str]:
     normalized_answer = _normalize_answer(answer_text)
     if not normalized_answer:
-        return False, 0.0, "No answer provided."
+        return False, 0.0, "Ekkert svar skráð."
 
     acceptable = [_normalize_answer(str(value)) for value in correct_answer_json.get("acceptable_answers", [])]
     acceptable = [value for value in acceptable if value]
@@ -127,12 +127,12 @@ def grade_answer(
     if answer_format in {"numeric", "fraction"}:
         for value in acceptable:
             if _matches_numeric_or_fraction(normalized_answer, value):
-                return True, 1.0, "Correct."
-        return False, 0.0, "Incorrect. Re-check arithmetic and signs."
+                return True, 1.0, "Rétt."
+        return False, 0.0, "Rangt. Farðu yfir formerki og reikniaðgerðir."
 
     if normalized_answer in acceptable:
-        return True, 1.0, "Correct."
-    return False, 0.0, "Incorrect. Review the target concept and try again."
+        return True, 1.0, "Rétt."
+    return False, 0.0, "Rangt. Farðu yfir hugtakið og reyndu aftur."
 
 
 def _difficulty_schedule(pack_size: int) -> list[str]:
@@ -195,7 +195,7 @@ def _generate_algebra_question(
         a = rng.randint(2, 9) if difficulty != "hard" else rng.randint(5, 12)
         b = rng.randint(-12, 12)
         c = a * x_value + b
-        question = f"Solve for x: {a}x + ({b}) = {c}"
+        question = f"Leystu fyrir x: {a}x + ({b}) = {c}"
         acceptable = [str(x_value)]
         concept_tag = "linear_equations"
         answer_format = "numeric"
@@ -206,7 +206,7 @@ def _generate_algebra_question(
         c = rng.randint(2, 7)
         d = rng.randint(1, 6)
         value = a * (b + c) - d
-        question = f"Evaluate: {a}({b} + {c}) - {d}"
+        question = f"Reiknaðu: {a}({b} + {c}) - {d}"
         acceptable = [str(value)]
         concept_tag = "order_of_operations"
         answer_format = "numeric"
@@ -236,7 +236,7 @@ def _generate_fraction_question(
         denominator = rng.randint(6, 18)
         numerator = denominator * rng.randint(2, 5)
         base = Fraction(numerator, denominator)
-        question = f"Simplify the fraction: {numerator}/{denominator}"
+        question = f"Einfaldaðu brotið: {numerator}/{denominator}"
         answer = str(base)
         acceptable = [answer, f"{float(base):.6f}".rstrip("0").rstrip(".")]
         concept_tag = "fraction_simplification"
@@ -245,7 +245,7 @@ def _generate_fraction_question(
         b = Fraction(rng.randint(1, 9), rng.randint(2, 9))
         op = rng.choice(["+", "-", "*"])
         value = a + b if op == "+" else (a - b if op == "-" else a * b)
-        question = f"Compute: {a} {op} {b}"
+        question = f"Reiknaðu: {a} {op} {b}"
         answer = str(value)
         acceptable = [answer, f"{float(value):.6f}".rstrip("0").rstrip(".")]
         concept_tag = "fraction_arithmetic"
@@ -258,7 +258,7 @@ def _generate_fraction_question(
         a = Fraction(rng.randint(1, d1 - 1), d1)
         b = Fraction(rng.randint(1, d2 - 1), d2)
         value = a + b
-        question = f"Add the fractions: {a} + {b}"
+        question = f"Leggðu saman brotin: {a} + {b}"
         answer = str(value)
         acceptable = [answer, f"{float(value):.6f}".rstrip("0").rstrip(".")]
         concept_tag = "common_denominator"
