@@ -131,6 +131,14 @@ After each completed feature:
     - Reduces wrong feedback from handwriting misreads.
     - Creates cleaner corrected-reading traces for future dataset work.
 
+### 2026-04-04 (reading confirmation expansion + UX stability)
+- Backend (working tree): Expanded unclear-handwriting handling so `confirm_reading` can be returned for all query modes (`check_solution`, `hint`, `reveal`) when interpreted reading is available.
+  - `/query` now uses `confirm_reading` as the primary unclear-path outcome independent of mode.
+  - `ask_clarification` remains as fallback when interpreted reading cannot be built with enough confidence.
+- Frontend (working tree): Fixed reading confirmation sheet interaction issues.
+  - Prevented draw-canvas fields from stealing focus from text fields.
+  - Removed unnecessary async/detached OCR wrapper that triggered async-without-await warnings.
+
 ### Earlier phase (already implemented before this update)
 - Backend `470834d`: dataset collection schema + exam-pack API flow.
 - Backend `a88c75d`: folders and problem move APIs + migration.

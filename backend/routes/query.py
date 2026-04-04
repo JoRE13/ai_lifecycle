@@ -1169,30 +1169,22 @@ async def query(
         legibility_stage_retry_count = legibility_retry_count
 
         if legibility_failed:
-            if mode == "check_solution":
-                if not confirmed_reading_entries:
-                    reading_confidence = _as_float_or_none(legibility_payload_raw.get("reading_confidence"))
-                    interpreted_reading = _coerce_interpreted_reading_entries(
-                        payload=legibility_payload_raw,
-                        page_count=resolved_page_count,
-                        fallback_regions=legibility_regions,
-                    )
-                    if interpreted_reading and (
-                        reading_confidence is None or reading_confidence >= READING_CONFIRM_CONFIDENCE_MIN
-                    ):
-                        payload = _build_confirm_reading_payload(
-                            regions=legibility_regions,
-                            missing_parts=legibility_missing_parts,
-                            interpreted_reading=interpreted_reading,
-                            reading_confidence=reading_confidence,
-                            fallback_message=_text_or_none(legibility_payload_raw.get("message_is")),
-                        )
-                    else:
-                        payload = _build_unclear_payload(
-                            regions=legibility_regions,
-                            missing_parts=legibility_missing_parts,
-                            fallback_message=_text_or_none(legibility_payload_raw.get("message_is")),
-                        )
+            reading_confidence = _as_float_or_none(legibility_payload_raw.get("reading_confidence"))
+            interpreted_reading = _coerce_interpreted_reading_entries(
+                payload=legibility_payload_raw,
+                page_count=resolved_page_count,
+                fallback_regions=legibility_regions,
+            )
+            if interpreted_reading and (
+                reading_confidence is None or reading_confidence >= READING_CONFIRM_CONFIDENCE_MIN
+            ):
+                payload = _build_confirm_reading_payload(
+                    regions=legibility_regions,
+                    missing_parts=legibility_missing_parts,
+                    interpreted_reading=interpreted_reading,
+                    reading_confidence=reading_confidence,
+                    fallback_message=_text_or_none(legibility_payload_raw.get("message_is")),
+                )
             else:
                 payload = _build_unclear_payload(
                     regions=legibility_regions,
