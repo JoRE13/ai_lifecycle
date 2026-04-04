@@ -1,9 +1,16 @@
 from __future__ import annotations
 
+import base64
+import json
 import math
 import random
+import re
 from dataclasses import dataclass
 from fractions import Fraction
+from io import BytesIO
+
+from PIL import Image, UnidentifiedImageError
+from pydantic import BaseModel
 
 from backend.error_taxonomy import (
     CANONICAL_ERROR_TO_TOPIC,
@@ -15,6 +22,13 @@ from backend.error_taxonomy import (
 
 ERROR_TO_TOPIC = CANONICAL_ERROR_TO_TOPIC
 DEFAULT_ERROR_TARGETS = DEFAULT_ERROR_TARGETS_BY_TOPIC
+
+MAX_EXAM_ANSWER_IMAGE_BYTES = 4 * 1024 * 1024
+MAX_EXAM_ANSWER_IMAGE_DIMENSION = 2048
+
+
+class ExtractedExamAnswer(BaseModel):
+    answer_text: str | None = None
 
 
 @dataclass
@@ -135,6 +149,32 @@ def grade_answer(
     return False, 0.0, "Rangt. Farðu yfir hugtakið og reyndu aftur."
 
 
+def extract_answer_text_from_image(
+    *,
+    answer_image_base64: str,
+    question_text: str,
+    answer_format: str,
+) -> str | None:
+    # Import lazily to avoid requiring GEMINI_API_KEY during app startup for non-exam routes.
+    from backend.llm import client as gemini_client
+
+    image_bytes = _decode_base64_image(answer_image_base64)
+    image = _load_exam_answer_image(image_bytes)
+    prompt = _build_answer_extraction_prompt(question_text=question_text, answer_format=answer_format)
+    resp = gemini_client.models.generate_content(
+        model="models/gemini-3-flash-preview",
+        contents=[prompt, image],
+        config={
+            "response_mime_type": "application/json",
+            "response_json_schema": ExtractedExamAnswer.model_json_schema(),
+            "thinking_config": {"thinking_level": "low"},
+        },
+    )
+    payload = json.loads(resp.text)
+    parsed = ExtractedExamAnswer.model_validate(payload)
+    return _normalize_extracted_answer(parsed.answer_text, answer_format=answer_format)
+
+
 def _difficulty_schedule(pack_size: int) -> list[str]:
     easy_count = int(math.floor(pack_size * 0.4))
     hard_count = int(math.ceil(pack_size * 0.2))
@@ -158,6 +198,76 @@ def _matches_numeric_or_fraction(left: str, right: str) -> bool:
             return abs(float(left) - float(right)) < 1e-9
         except Exception:
             return False
+
+
+def _decode_base64_image(encoded: str) -> bytes:
+    raw = encoded.strip()
+    if not raw:
+        raise ValueError("Answer image is empty")
+
+    if raw.startswith("data:"):
+        comma_index = raw.find(",")
+        if comma_index < 0:
+            raise ValueError("Answer image data URL is invalid")
+        raw = raw[comma_index + 1 :]
+
+    try:
+        decoded = base64.b64decode(raw, validate=True)
+    except Exception as exc:
+        raise ValueError("Answer image base64 is invalid") from exc
+
+    if not decoded:
+        raise ValueError("Answer image is empty")
+    if len(decoded) > MAX_EXAM_ANSWER_IMAGE_BYTES:
+        raise ValueError("Answer image is too large")
+    return decoded
+
+
+def _load_exam_answer_image(data: bytes) -> Image.Image:
+    try:
+        image = Image.open(BytesIO(data))
+        image.load()
+    except UnidentifiedImageError as exc:
+        raise ValueError("Answer image format is invalid") from exc
+
+    if image.width <= 0 or image.height <= 0:
+        raise ValueError("Answer image has invalid dimensions")
+    if image.width > MAX_EXAM_ANSWER_IMAGE_DIMENSION or image.height > MAX_EXAM_ANSWER_IMAGE_DIMENSION:
+        raise ValueError("Answer image dimensions are too large")
+    return image.convert("RGB")
+
+
+def _build_answer_extraction_prompt(*, question_text: str, answer_format: str) -> str:
+    return (
+        "You read one handwritten student answer from an image.\n"
+        "Task: extract only the final answer the student wrote.\n"
+        "If the final answer is unreadable or missing, return null.\n\n"
+        f"Question: {question_text}\n"
+        f"Expected answer_format: {answer_format}\n\n"
+        "Rules:\n"
+        "- Return JSON only with key answer_text.\n"
+        "- Do not explain steps.\n"
+        "- For numeric/fraction, return only the value (examples: 4, -3/5, 2.5).\n"
+        "- If student wrote x = 4, return 4.\n"
+        "- Keep sign and fraction symbols exact.\n"
+    )
+
+
+def _normalize_extracted_answer(value: str | None, *, answer_format: str) -> str | None:
+    if value is None:
+        return None
+    cleaned = value.strip()
+    if not cleaned:
+        return None
+
+    first_line = cleaned.splitlines()[0].strip()
+    if answer_format in {"numeric", "fraction"}:
+        first_line = first_line.replace("\u2212", "-").replace(",", ".")
+        first_line = re.sub(r"^[a-zA-Z]\w*\s*=\s*", "", first_line)
+        first_line = first_line.replace(" ", "")
+        if not first_line:
+            return None
+    return first_line
 
 
 def _generate_question(

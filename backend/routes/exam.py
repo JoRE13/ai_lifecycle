@@ -9,7 +9,7 @@ from sqlmodel import Session, select
 from backend.auth.deps import get_current_user
 from backend.db import get_session
 from backend.error_taxonomy import CANONICAL_ERROR_TYPES, normalize_error_type
-from backend.exam_service import choose_auto_targets, generate_exam_items, grade_answer
+from backend.exam_service import choose_auto_targets, extract_answer_text_from_image, generate_exam_items, grade_answer
 from backend.models.auth_models import (
     ErrorBankEntry,
     ExamPack,
@@ -111,6 +111,38 @@ def _load_session_or_404(*, session: Session, session_id: UUID, user: User) -> t
     if not pack:
         raise HTTPException(status_code=404, detail="Exam pack not found")
     return exam_session, pack
+
+
+def _resolve_answer_text(
+    *,
+    payload: ExamAnswerUpdateRequest,
+    item: ExamPackItem,
+) -> str | None:
+    if payload.answer_text is not None:
+        normalized = payload.answer_text.strip()
+        if normalized:
+            return normalized
+
+    if payload.answer_image_base64 is None:
+        return None
+
+    try:
+        extracted = extract_answer_text_from_image(
+            answer_image_base64=payload.answer_image_base64,
+            question_text=item.question_text,
+            answer_format=item.answer_format,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Failed to read handwritten answer: {exc}") from exc
+
+    if extracted is None:
+        raise HTTPException(
+            status_code=422,
+            detail="Could not read a final answer from handwriting. Please write the final answer clearly and retry.",
+        )
+    return extracted
 
 
 @router.post("/exam-packs", response_model=ExamPackDetailResponse)
@@ -315,12 +347,13 @@ def save_exam_answer(
     if not item:
         raise HTTPException(status_code=404, detail="Exam item not found")
 
-    answer_row.answer_text = payload.answer_text
+    resolved_answer_text = _resolve_answer_text(payload=payload, item=item)
+    answer_row.answer_text = resolved_answer_text
     answer_row.updated_at = datetime.now(timezone.utc)
     graded = False
     if pack.feedback_mode == "per_question":
         is_correct, score, feedback = grade_answer(
-            answer_text=payload.answer_text,
+            answer_text=resolved_answer_text,
             answer_format=item.answer_format,
             correct_answer_json=item.correct_answer_json or {},
         )

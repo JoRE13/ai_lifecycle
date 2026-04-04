@@ -58,6 +58,7 @@ class ExamSessionStartResponse(BaseModel):
 
 class ExamAnswerUpdateRequest(BaseModel):
     answer_text: str | None = None
+    answer_image_base64: str | None = None
 
 
 class ExamAnswerUpdateResponse(BaseModel):
