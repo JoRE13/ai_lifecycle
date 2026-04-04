@@ -1,6 +1,6 @@
 # Ratatoskur Implementation Log
 
-Last updated: 2026-03-30
+Last updated: 2026-04-04
 
 This is a living log of major implemented work across:
 - Backend repo: `ailifecycle/ai_lifecycle`
@@ -13,6 +13,31 @@ After each completed feature:
 3. Add a short impact note (why this matters).
 
 ## Recent Work
+
+### 2026-04-04 (fínpússun á persónulegum prófum)
+- Backend `b8d4bcb`: polished exam backend behavior and localization.
+  - `/exam-packs/{pack_id}/start` now resumes an existing `in_progress` session for the same user/pack instead of always creating a new one.
+  - Localized generated exam prompts and grading feedback to Icelandic in `exam_service.py` (question text + result messages).
+  - Impact:
+    - Users can safely continue unfinished personal exams.
+    - Exam experience is language-consistent with the rest of the app.
+- Frontend `a5873ac`: polished personal exam UX in `ExamPrepSheet`.
+  - Added in-session question navigator (quick jump between questions).
+  - Added unanswered counter and submit confirmation when unanswered questions remain.
+  - Added session hydration/resume logic by loading existing session answers/feedback on open.
+  - Added automatic save-before-navigation when current answer changed.
+  - Updated recent pack timestamp display to Icelandic date-only format (lowercase month names).
+  - Impact:
+    - Stronger exam flow reliability with less accidental data loss.
+    - Faster navigation and better completion clarity for users.
+
+### 2026-03-30 (problem timestamp readability)
+- Frontend `40d037c`: changed problem date display from raw ISO timestamp to Icelandic date-only format.
+  - Applied across dashboard recent problems, all-problems list, and submission export selection.
+  - Uses lowercase Icelandic month names (for example: `30. mars 2026`) with no time shown.
+  - Impact:
+    - Removes noisy fractional-second timestamps from UI.
+    - Improves readability and aligns with Icelandic language expectations.
 
 ### 2026-03-30 (avatar rendering performance + folder layout)
 - Frontend `c8c9383`: fixed avatar SVG bundle lookup fallback so profile/dashboard icons resolve reliably.
