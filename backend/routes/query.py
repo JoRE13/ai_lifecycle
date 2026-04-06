@@ -36,7 +36,7 @@ PROMPTS_BASE = Path(__file__).resolve().parents[1] / "prompts"
 PROMPTS_ROOT = PROMPTS_BASE / "modes"
 PROMPTS_EXPERT_ROOT = PROMPTS_BASE / "modes_expert"
 LEGIBILITY_PROMPT_ROOT = PROMPTS_BASE / "legibility"
-ERROR_PROMPT_PATH_V1 = PROMPTS_BASE / "errors" / "v1" / "prompt.txt"
+ERROR_PROMPT_PATH_V2 = PROMPTS_BASE / "errors" / "v2" / "prompt.txt"
 DEFAULT_PROMPT_VARIANT = (os.getenv("QUERY_PROMPT_VARIANT") or "v3").strip().lower()
 ExpertMode = Literal["off", "clarity", "strict"]
 SUCCESS_VERDICTS = {"correct_so_far", "fully_correct", "fully_solved"}
@@ -102,7 +102,7 @@ def _load_legibility_prompt(*, prompt_variant: Literal["v1", "v2", "v3"]) -> str
 
 def _load_deferred_error_prompt() -> str:
     try:
-        return ERROR_PROMPT_PATH_V1.read_text(encoding="utf-8")
+        return ERROR_PROMPT_PATH_V2.read_text(encoding="utf-8")
     except FileNotFoundError as exc:
         raise HTTPException(status_code=500, detail="Deferred error prompt file not found") from exc
 
@@ -773,7 +773,7 @@ def _run_deferred_error_analysis(
         "pipelineMode": pipeline_mode,
         "expertMode": expert_mode,
         "requestId": deferred_request_id,
-        "promptVersion": "errors/v1/prompt.txt",
+        "promptVersion": "errors/v2/prompt.txt",
         "environment": environment,
     }
 
@@ -840,7 +840,7 @@ def _run_deferred_error_analysis(
             event_type="error_classified",
             mode=mode,
             verdict="incorrect",
-            metadata_json=json.dumps({"prompt_version": "errors/v1/prompt.txt"}),
+            metadata_json=json.dumps({"prompt_version": "errors/v2/prompt.txt"}),
         )
         session.commit()
 
