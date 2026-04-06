@@ -200,6 +200,38 @@ class ErrorBankSummaryResponse(BaseModel):
     entries: list[ErrorBankEntryResponse]
 
 
+class ErrorEventTypeCountEntryResponse(BaseModel):
+    error_type: str
+    count: int
+
+
+class ErrorEventTypeCountSummaryResponse(BaseModel):
+    total_occurrences: int
+    total_distinct_error_types: int
+    entries: list[ErrorEventTypeCountEntryResponse]
+
+
+class ErrorEventListItemResponse(BaseModel):
+    id: UUID
+    attempt_id: UUID
+    problem_id: UUID
+    problem_title: str
+    folder_id: UUID | None = None
+    folder_name: str | None = None
+    topic: str | None = None
+    subtopic: str | None = None
+    wrong_step: str | None = None
+    correct_step: str | None = None
+    error_type: str
+    confidence: float | None = None
+    created_at: datetime
+
+
+class ErrorEventListResponse(BaseModel):
+    items: list[ErrorEventListItemResponse]
+    next_cursor: str | None = None
+
+
 class AttemptLabelCreateRequest(BaseModel):
     label_source: str = Field(min_length=1, max_length=32)
     label_name: str = Field(min_length=1, max_length=64)

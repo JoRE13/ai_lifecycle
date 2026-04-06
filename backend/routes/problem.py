@@ -1,3 +1,4 @@
+import base64
 import json
 from datetime import datetime, timedelta, timezone
 import logging
@@ -33,6 +34,10 @@ from backend.schemas.problem import (
     AttemptResponse,
     ErrorBankEntryResponse,
     ErrorBankSummaryResponse,
+    ErrorEventListItemResponse,
+    ErrorEventListResponse,
+    ErrorEventTypeCountEntryResponse,
+    ErrorEventTypeCountSummaryResponse,
     FolderCreateRequest,
     FolderResponse,
     FolderUpdateRequest,
@@ -181,6 +186,20 @@ def _problem_response(problem: Problem, folder_name: str | None) -> ProblemCreat
         created_at=problem.created_at,
         updated_at=problem.updated_at,
     )
+
+
+def _encode_error_event_cursor(*, created_at: datetime, event_id: UUID) -> str:
+    payload = f"{created_at.isoformat()}|{event_id}"
+    return base64.urlsafe_b64encode(payload.encode("utf-8")).decode("ascii")
+
+
+def _decode_error_event_cursor(cursor: str) -> tuple[datetime, UUID]:
+    try:
+        decoded = base64.urlsafe_b64decode(cursor.encode("ascii")).decode("utf-8")
+        created_at_raw, event_id_raw = decoded.split("|", 1)
+        return datetime.fromisoformat(created_at_raw), UUID(event_id_raw)
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail="Invalid cursor") from exc
 
 
 @router.post("/folders", response_model=FolderResponse)
@@ -1077,3 +1096,147 @@ def get_error_bank_summary(
         total_distinct_errors=total_distinct_errors,
         entries=response_entries,
     )
+
+
+@router.get("/analytics/error-events/types", response_model=ErrorEventTypeCountSummaryResponse)
+def get_error_event_type_summary(
+    folder_id: UUID | None = None,
+    session: Session = Depends(get_session),
+    user: User = Depends(get_current_user),
+):
+    if folder_id is not None:
+        _resolve_folder(
+            session=session,
+            user_id=user.id,
+            folder_id=folder_id,
+            allow_archived=True,
+        )
+
+    base_statement = (
+        select(ErrorEvent.error_type, func.count(ErrorEvent.id))
+        .join(Attempt, Attempt.id == ErrorEvent.attempt_id)
+        .join(Problem, Problem.id == Attempt.problem_id)
+        .where(
+            ErrorEvent.user_id == user.id,
+            Problem.user_id == user.id,
+            ErrorEvent.error_type.is_not(None),
+            func.trim(ErrorEvent.error_type) != "",
+        )
+    )
+    if folder_id is not None:
+        base_statement = base_statement.where(Problem.folder_id == folder_id)
+
+    rows = session.exec(
+        base_statement
+        .group_by(ErrorEvent.error_type)
+        .order_by(func.count(ErrorEvent.id).desc(), ErrorEvent.error_type.asc())
+    ).all()
+
+    total_occurrences = sum(int(count or 0) for _, count in rows)
+    entries = [
+        ErrorEventTypeCountEntryResponse(
+            error_type=str(error_type).strip(),
+            count=int(count or 0),
+        )
+        for error_type, count in rows
+    ]
+
+    return ErrorEventTypeCountSummaryResponse(
+        total_occurrences=total_occurrences,
+        total_distinct_error_types=len(entries),
+        entries=entries,
+    )
+
+
+@router.get("/analytics/error-events", response_model=ErrorEventListResponse)
+def get_error_events(
+    error_type: str,
+    folder_id: UUID | None = None,
+    limit: int = 20,
+    cursor: str | None = None,
+    session: Session = Depends(get_session),
+    user: User = Depends(get_current_user),
+):
+    normalized_error_type = error_type.strip()
+    if not normalized_error_type:
+        raise HTTPException(status_code=422, detail="error_type is required")
+
+    if folder_id is not None:
+        _resolve_folder(
+            session=session,
+            user_id=user.id,
+            folder_id=folder_id,
+            allow_archived=True,
+        )
+
+    safe_limit = max(1, min(limit, 100))
+    cursor_created_at: datetime | None = None
+    cursor_event_id: UUID | None = None
+    if cursor:
+        cursor_created_at, cursor_event_id = _decode_error_event_cursor(cursor)
+
+    statement = (
+        select(
+            ErrorEvent,
+            Attempt.problem_id,
+            Problem.title,
+            Problem.folder_id,
+            Folder.name,
+        )
+        .join(Attempt, Attempt.id == ErrorEvent.attempt_id)
+        .join(Problem, Problem.id == Attempt.problem_id)
+        .join(Folder, Folder.id == Problem.folder_id, isouter=True)
+        .where(
+            ErrorEvent.user_id == user.id,
+            Problem.user_id == user.id,
+            ErrorEvent.error_type == normalized_error_type,
+        )
+    )
+    if folder_id is not None:
+        statement = statement.where(Problem.folder_id == folder_id)
+    if cursor_created_at is not None and cursor_event_id is not None:
+        statement = statement.where(
+            (ErrorEvent.created_at < cursor_created_at)
+            | (
+                (ErrorEvent.created_at == cursor_created_at)
+                & (ErrorEvent.id < cursor_event_id)
+            )
+        )
+
+    rows = session.exec(
+        statement
+        .order_by(ErrorEvent.created_at.desc(), ErrorEvent.id.desc())
+        .limit(safe_limit + 1)
+    ).all()
+
+    has_more = len(rows) > safe_limit
+    rows = rows[:safe_limit]
+
+    items = [
+        ErrorEventListItemResponse(
+            id=event.id,
+            attempt_id=event.attempt_id,
+            problem_id=problem_id,
+            problem_title=problem_title or "",
+            folder_id=problem_folder_id,
+            folder_name=folder_name,
+            topic=event.topic,
+            subtopic=event.subtopic,
+            wrong_step=event.wrong_step,
+            correct_step=event.correct_step,
+            error_type=event.error_type or "",
+            confidence=event.confidence,
+            created_at=event.created_at,
+        )
+        for event, problem_id, problem_title, problem_folder_id, folder_name in rows
+    ]
+
+    next_cursor = None
+    if has_more and rows:
+        last_event = rows[-1][0]
+        next_cursor = _encode_error_event_cursor(
+            created_at=last_event.created_at,
+            event_id=last_event.id,
+        )
+
+    return ErrorEventListResponse(items=items, next_cursor=next_cursor)
