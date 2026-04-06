@@ -917,7 +917,15 @@ def _merge_solution_pages_for_artifact(solution_pages: list[Image.Image]) -> byt
     if not solution_pages:
         raise HTTPException(status_code=422, detail="At least one solution page is required")
 
-    normalized_pages = [page.convert("RGB") for page in solution_pages]
+    normalized_pages: list[Image.Image] = []
+    for page in solution_pages:
+        # Flatten transparency onto white so pencil/pen strokes stay visible.
+        if "A" in page.getbands():
+            rgba_page = page.convert("RGBA")
+            white_background = Image.new("RGBA", rgba_page.size, (255, 255, 255, 255))
+            normalized_pages.append(Image.alpha_composite(white_background, rgba_page).convert("RGB"))
+        else:
+            normalized_pages.append(page.convert("RGB"))
     horizontal_padding = 24
     vertical_padding = 24
     separator_height = 20
