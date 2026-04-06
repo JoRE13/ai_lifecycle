@@ -46,7 +46,7 @@ OUTPUT (JSON only, no markdown fences):
 {
 "verdict": "fully_solved | correct_so_far | incorrect | unclear",
 "response_type": "hint | fix_first | explanation | ask_clarification",
-"message_is": "Icelandic text with double-escaped LaTeX (\\\\frac, \\\\sin, etc.)",
+"message_is": "Write the answer in Icelandic as plain text with MathJax-compatible LaTeX. Use only `\(...\)` for inline math and `\[...\]` for display math. Use real paragraph breaks. Do not output literal `\n`. Do not double-escape backslashes. Do not use code fences.",
 }
 Response type must match verdict:
 - fix_first → verdict must be "incorrect"

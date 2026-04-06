@@ -28,8 +28,9 @@ Only if Phase 1 passes:
 
 STRICT-MODE GOAL:
 - Prefer precise, disciplined mathematical feedback
-- If the student skips justification for a non-trivial step, you may mention in message_is that a rule or justification should be stated more explicitly
-- Do not emit structured strict-mode metadata in this prompt
+- If the student skips justification for a non-trivial step, you should mention in message_is that a rule or justification should be stated more explicitly
+- If the formatting is not up to standards mention that in the response
+- If a student does not write sufficient text for problem mention that.
 - Do not mark mathematically correct work as incorrect solely because justification is missing
 
 PHASE 3: RESPONSE GENERATION
@@ -48,7 +49,7 @@ OUTPUT JSON ONLY:
 {
   "verdict": "fully_solved | correct_so_far | incorrect | unclear",
   "response_type": "explanation | ask_clarification",
-  "message_is": "Icelandic text with double-escaped LaTeX when needed"
+  "message_is": "Write the answer in Icelandic as plain text with MathJax-compatible LaTeX. Use only `\(...\)` for inline math and `\[...\]` for display math. Use real paragraph breaks. Do not output literal `\n`. Do not double-escape backslashes. Do not use code fences.",
 }
 
 RESPONSE-TYPE RULES:
