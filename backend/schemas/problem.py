@@ -172,11 +172,14 @@ class AnalyticsEventResponse(BaseModel):
 
 
 class UserStatsSummaryResponse(BaseModel):
-    solved_problems_count: int
-    success_rate: float
-    active_streak_days: int
-    attempts_last_7_days: int
-    total_attempts: int
+    solved_problems_count_current: int
+    solved_problems_count_pre: int
+    average_error_current: float
+    average_error_pre: float
+    active_streak: int
+    average_attempts_current: float
+    average_attempts_pre: float
+    most_common_mode: str | None = None
 
 
 class ErrorBankEntryResponse(BaseModel):
