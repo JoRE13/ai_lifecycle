@@ -17,6 +17,7 @@ from backend.models.auth_models import (
     AnalyticsEvent,
     Attempt,
     ErrorBankEntry,
+    ErrorEvent,
     AttemptFeedback,
     AttemptLabel,
     Folder,
@@ -905,29 +906,78 @@ def get_user_stats_summary(
 ):
     now = datetime.now(timezone.utc)
     today = now.date()
-    seven_days_ago = now - timedelta(days=7)
+    current_window_start = now - timedelta(days=7)
+    previous_window_end = current_window_start
+    previous_window_start = now - timedelta(days=14)
 
-    total_attempts = session.exec(
-        select(func.count(Attempt.id)).where(Attempt.user_id == user.id)
-    ).one()
-    success_attempts = session.exec(
-        select(func.count(Attempt.id)).where(
-            Attempt.user_id == user.id,
-            Attempt.verdict.in_(SUCCESS_VERDICTS),
-        )
-    ).one()
-    attempts_last_7_days = session.exec(
-        select(func.count(Attempt.id)).where(
-            Attempt.user_id == user.id,
-            Attempt.created_at >= seven_days_ago,
-        )
-    ).one()
-    solved_problems_count = session.exec(
+    def _average_attempts_per_problem(start: datetime, end: datetime) -> float:
+        attempt_count = session.exec(
+            select(func.count(Attempt.id)).where(
+                Attempt.user_id == user.id,
+                Attempt.created_at >= start,
+                Attempt.created_at < end,
+            )
+        ).one()
+        problem_count = session.exec(
+            select(func.count(func.distinct(Attempt.problem_id))).where(
+                Attempt.user_id == user.id,
+                Attempt.created_at >= start,
+                Attempt.created_at < end,
+            )
+        ).one()
+        return (float(attempt_count) / float(problem_count)) if problem_count else 0.0
+
+    def _average_errors_per_problem(start: datetime, end: datetime) -> float:
+        error_count = session.exec(
+            select(func.count(ErrorEvent.id))
+            .join(Attempt, Attempt.id == ErrorEvent.attempt_id)
+            .where(
+                ErrorEvent.user_id == user.id,
+                Attempt.created_at >= start,
+                Attempt.created_at < end,
+            )
+        ).one()
+        problem_count = session.exec(
+            select(func.count(func.distinct(Attempt.problem_id))).where(
+                Attempt.user_id == user.id,
+                Attempt.created_at >= start,
+                Attempt.created_at < end,
+            )
+        ).one()
+        return (float(error_count) / float(problem_count)) if problem_count else 0.0
+
+    solved_problems_count_current = session.exec(
         select(func.count(func.distinct(Attempt.problem_id))).where(
             Attempt.user_id == user.id,
             Attempt.verdict.in_(SOLVED_VERDICTS),
+            Attempt.created_at >= current_window_start,
+            Attempt.created_at < now,
         )
     ).one()
+    solved_problems_count_pre = session.exec(
+        select(func.count(func.distinct(Attempt.problem_id))).where(
+            Attempt.user_id == user.id,
+            Attempt.verdict.in_(SOLVED_VERDICTS),
+            Attempt.created_at >= previous_window_start,
+            Attempt.created_at < previous_window_end,
+        )
+    ).one()
+    average_error_current = _average_errors_per_problem(current_window_start, now)
+    average_error_pre = _average_errors_per_problem(previous_window_start, previous_window_end)
+    average_attempts_current = _average_attempts_per_problem(current_window_start, now)
+    average_attempts_pre = _average_attempts_per_problem(previous_window_start, previous_window_end)
+
+    most_common_mode_row = session.exec(
+        select(Attempt.mode, func.count(Attempt.id).label("mode_count"))
+        .where(
+            Attempt.user_id == user.id,
+            Attempt.created_at >= current_window_start,
+            Attempt.created_at < now,
+        )
+        .group_by(Attempt.mode)
+        .order_by(func.count(Attempt.id).desc(), Attempt.mode.asc())
+    ).first()
+    most_common_mode = most_common_mode_row[0] if most_common_mode_row else None
 
     days_with_activity_rows = session.exec(
         select(func.date(Attempt.created_at))
@@ -945,13 +995,15 @@ def get_user_stats_summary(
         active_streak_days += 1
         cursor_day -= timedelta(days=1)
 
-    success_rate = (float(success_attempts) / float(total_attempts)) if total_attempts else 0.0
     return UserStatsSummaryResponse(
-        solved_problems_count=int(solved_problems_count or 0),
-        success_rate=success_rate,
-        active_streak_days=active_streak_days,
-        attempts_last_7_days=int(attempts_last_7_days or 0),
-        total_attempts=int(total_attempts or 0),
+        solved_problems_count_current=int(solved_problems_count_current or 0),
+        solved_problems_count_pre=int(solved_problems_count_pre or 0),
+        average_error_current=average_error_current,
+        average_error_pre=average_error_pre,
+        active_streak=active_streak_days,
+        average_attempts_current=average_attempts_current,
+        average_attempts_pre=average_attempts_pre,
+        most_common_mode=most_common_mode,
     )
 
 
