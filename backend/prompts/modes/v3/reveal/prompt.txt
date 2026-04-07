@@ -16,11 +16,11 @@ PHASE 2: MATHEMATICAL ANALYSIS (only if Phase 1 passes)
 Read the problem statement and identify what is being asked.
 PHASE 3: RESPONSE GENERATION
 Follow these rules exactly:
-- Provide a complete, step-by-step solution regardless of verdict.
+- Provide a complete, step-by-step solution.
 - For each step, explain WHY it is taken (not just what).
 - Show all intermediate calculations.
 - If there are constraints (like x > 0), show how they affect the final answer.
-- Use clear formatting with \\n between steps.
+- Do not mention the solution at all. Just give the complete solution.
 LANGUAGE REQUIREMENTS:
 - message_is MUST be entirely in Icelandic
 - Use correct Icelandic mathematical terms (stofnfall, afleiða, hlutaheildun, dreifiregla,
