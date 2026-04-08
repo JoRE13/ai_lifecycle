@@ -1,0 +1,4 @@
+finding_id,user_id,task_id,severity,category,users_affected_count,evidence_observation,evidence_log_trace,action_taken,status
+F-001,U1,T1,Blocks task,UI,1,"","","",Open
+F-002,U1,T2,Causes confusion,AI output,1,"","","",Open
+F-003,U1,T3,Minor friction,Latency,1,"","","",Open
