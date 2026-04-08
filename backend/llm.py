@@ -454,7 +454,7 @@ def _call_model_with_retry_internal(
         metadata=trace_metadata,
     )
 
-    model = "gemini-3-pro-preview" if regenerate else "models/gemini-3-flash-preview"
+    model = "google/gemini-3.1-flash-lite-preview"
 
     for attempt in range(max_retries):
         try:
@@ -464,7 +464,7 @@ def _call_model_with_retry_internal(
                 config={
                     "response_mime_type": "application/json",
                     "response_json_schema": response_schema.model_json_schema(),
-                    "thinking_config": {"thinking_level": "low"},
+                    "thinking_config": {"thinking_level": "minimal"},
                 },
             )
 
