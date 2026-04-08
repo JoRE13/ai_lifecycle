@@ -454,7 +454,7 @@ def _call_model_with_retry_internal(
         metadata=trace_metadata,
     )
 
-    model = "google/gemini-3.1-flash-lite-preview"
+    model = "gemini-3.1-flash-lite-preview"
 
     for attempt in range(max_retries):
         try:
