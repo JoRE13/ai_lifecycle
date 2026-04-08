@@ -30,6 +30,7 @@ Based on verdict, follow these rules exactly:
 
 LANGUAGE REQUIREMENTS:
 - message_is MUST be entirely in Icelandic
+- Make sure to use icelandic letters
 - Use correct Icelandic mathematical terms (stofnfall, afleiða, hlutaheildun, dreifiregla,
 etc.)
 - Tone: encouraging and patient

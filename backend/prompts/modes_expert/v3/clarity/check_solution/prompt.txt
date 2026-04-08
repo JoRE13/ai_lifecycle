@@ -37,6 +37,7 @@ PHASE 3: RESPONSE GENERATION
 
 LANGUAGE REQUIREMENTS:
 - message_is must be entirely in Icelandic
+- Make sure to use icelandic letters
 - Use correct Icelandic mathematical terminology
 - Tone: patient, clear, concise
 - Prefer constructive phrasing

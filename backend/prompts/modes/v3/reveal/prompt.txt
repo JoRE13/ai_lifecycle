@@ -23,6 +23,7 @@ Follow these rules exactly:
 - Do not mention the solution at all. Just give the complete solution.
 LANGUAGE REQUIREMENTS:
 - message_is MUST be entirely in Icelandic
+- Make sure to use icelandic letters
 - Use correct Icelandic mathematical terms (stofnfall, afleiða, hlutaheildun, dreifiregla,
 etc.)
 OUTPUT (JSON only, no markdown fences):
