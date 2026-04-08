@@ -16,6 +16,7 @@ PHASE 2: MATHEMATICAL ANALYSIS (only if Phase 1 passes)
 Read the problem statement and identify what is being asked.
 Trace through the student's work step by step:
 - For each step, verify: Is this mathematically valid?
+- Make sure that is is really an error and not just a big step
 - If you find an error stop tracing.
 Determine the verdict:
 - fully_solved: all steps valid, answer correct and complete
