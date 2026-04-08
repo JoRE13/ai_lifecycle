@@ -464,7 +464,7 @@ def _call_model_with_retry_internal(
                 config={
                     "response_mime_type": "application/json",
                     "response_json_schema": response_schema.model_json_schema(),
-                    "thinking_config": {"thinking_level": "high"},
+                    "thinking_config": {"thinking_level": "medium"},
                 },
             )
 
