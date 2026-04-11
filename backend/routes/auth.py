@@ -61,7 +61,12 @@ def register(payload: RegisterRequest, resp: Response, session: Session = Depend
     if existing:
         raise HTTPException(status_code=409, detail="Email already registered")
 
-    user = create_user(session, payload.email, payload.password)
+    user = create_user(
+        session,
+        payload.email,
+        payload.password,
+        payload.full_name,
+    )
 
     # Create refresh token + set cookie
     _, cookie_value = create_refresh_token(

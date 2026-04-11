@@ -68,10 +68,19 @@ def get_user_by_email(session: Session, email: str) -> Optional[User]:
 def get_user(session: Session, user_id: UUID) -> Optional[User]:
     return session.get(User, user_id)
 
-def create_user(session: Session, email: str, password: str) -> User:
+def create_user(
+    session: Session,
+    email: str,
+    password: str,
+    full_name: str | None = None,
+) -> User:
+    normalized_name = full_name.strip() if full_name is not None else None
+    if normalized_name == "":
+        normalized_name = None
     user = User(
         email=email.lower().strip(),
         password_hash=hash_password(password),
+        full_name=normalized_name,
     )
     session.add(user)
     session.commit()
