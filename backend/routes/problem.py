@@ -21,6 +21,9 @@ from backend.models.auth_models import (
     ErrorEvent,
     AttemptFeedback,
     AttemptLabel,
+    AttemptStageMetric,
+    EvalDatasetItem,
+    EvalRunResult,
     Folder,
     Problem,
     User,
@@ -535,6 +538,87 @@ def list_problems(
         _problem_response(problem, folder_name)
         for problem, folder_name in rows
     ]
+
+
+@router.delete("/problems/{problem_id}", response_model=ProblemCreateResponse)
+def delete_problem(
+    problem_id: UUID,
+    session: Session = Depends(get_session),
+    user: User = Depends(get_current_user),
+):
+    row = session.exec(
+        select(Problem, Folder.name)
+        .join(Folder, Folder.id == Problem.folder_id, isouter=True)
+        .where(Problem.id == problem_id, Problem.user_id == user.id)
+    ).first()
+    if not row:
+        raise HTTPException(status_code=404, detail="Problem not found")
+
+    problem, folder_name = row
+    deleted_problem_response = _problem_response(problem, folder_name)
+
+    attempt_ids = session.exec(
+        select(Attempt.id).where(
+            Attempt.user_id == user.id,
+            Attempt.problem_id == problem.id,
+        )
+    ).all()
+
+    if attempt_ids:
+        dependency_models = [
+            AttemptFeedback,
+            ErrorEvent,
+            AttemptLabel,
+            AttemptStageMetric,
+            EvalDatasetItem,
+            EvalRunResult,
+        ]
+        for dependency_model in dependency_models:
+            dependent_rows = session.exec(
+                select(dependency_model).where(dependency_model.attempt_id.in_(attempt_ids))
+            ).all()
+            for dependent_row in dependent_rows:
+                session.delete(dependent_row)
+
+        analytics_rows_by_attempt = session.exec(
+            select(AnalyticsEvent).where(AnalyticsEvent.attempt_id.in_(attempt_ids))
+        ).all()
+        for analytics_row in analytics_rows_by_attempt:
+            session.delete(analytics_row)
+
+        attempts = session.exec(
+            select(Attempt).where(
+                Attempt.user_id == user.id,
+                Attempt.id.in_(attempt_ids),
+            )
+        ).all()
+        for attempt in attempts:
+            session.delete(attempt)
+
+    analytics_rows_by_problem = session.exec(
+        select(AnalyticsEvent).where(AnalyticsEvent.problem_id == problem.id)
+    ).all()
+    for analytics_row in analytics_rows_by_problem:
+        session.delete(analytics_row)
+
+    session.delete(problem)
+
+    _record_event(
+        session=session,
+        user_id=user.id,
+        problem_id=None,
+        attempt_id=None,
+        event_type="problem_deleted",
+        metadata_json=json.dumps(
+            {
+                "problem_id": str(problem.id),
+                "problem_title": problem.title or "",
+                "attempt_count_deleted": len(attempt_ids),
+            }
+        ),
+    )
+    session.commit()
+    return deleted_problem_response
 
 
 @router.patch("/problems/{problem_id}/move", response_model=ProblemCreateResponse)
