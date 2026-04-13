@@ -36,17 +36,27 @@ PROMPTS_BASE = Path(__file__).resolve().parents[1] / "prompts"
 PROMPTS_ROOT = PROMPTS_BASE / "modes"
 PROMPTS_EXPERT_ROOT = PROMPTS_BASE / "modes_expert"
 LEGIBILITY_PROMPT_ROOT = PROMPTS_BASE / "legibility"
-ERROR_PROMPT_PATH_V2 = PROMPTS_BASE / "errors" / "v2" / "prompt.txt"
-DEFAULT_PROMPT_VARIANT = (os.getenv("QUERY_PROMPT_VARIANT") or "v3").strip().lower()
+ERROR_PROMPT_PATH_V3 = PROMPTS_BASE / "errors" / "v3" / "prompt.txt"
+DEFAULT_MODE_PROMPT_VARIANT = (os.getenv("QUERY_PROMPT_VARIANT") or "v4").strip().lower()
+DEFAULT_LEGIBILITY_PROMPT_VARIANT = (os.getenv("QUERY_LEGIBILITY_PROMPT_VARIANT") or "v3").strip().lower()
 ExpertMode = Literal["off", "clarity", "strict"]
 SUCCESS_VERDICTS = {"correct_so_far", "fully_correct", "fully_solved"}
 READING_CONFIRM_CONFIDENCE_MIN = 0.30
 
 
-def _resolve_prompt_variant() -> Literal["v1", "v2", "v3"]:
-    configured = (os.getenv("QUERY_PROMPT_VARIANT") or DEFAULT_PROMPT_VARIANT).strip().lower()
+def _resolve_mode_prompt_variant() -> Literal["v1", "v2", "v3", "v4"]:
+    configured = (os.getenv("QUERY_PROMPT_VARIANT") or DEFAULT_MODE_PROMPT_VARIANT).strip().lower()
     if configured == "v1":
         return "v1"
+    if configured == "v2":
+        return "v2"
+    if configured == "v3":
+        return "v3"
+    return "v4"
+
+
+def _resolve_legibility_prompt_variant() -> Literal["v2", "v3"]:
+    configured = (os.getenv("QUERY_LEGIBILITY_PROMPT_VARIANT") or DEFAULT_LEGIBILITY_PROMPT_VARIANT).strip().lower()
     if configured == "v2":
         return "v2"
     return "v3"
@@ -71,18 +81,10 @@ def _normalize_expert_mode(value: str | None) -> ExpertMode:
 def _load_prompt(
     mode: Literal["hint", "check_solution", "reveal"],
     *,
-    prompt_variant: Literal["v1", "v2", "v3"],
+    prompt_variant: Literal["v1", "v2", "v3", "v4"],
     expert_mode: ExpertMode,
 ) -> str:
-    if mode == "check_solution" and expert_mode != "off":
-        expert_prompt_path = PROMPTS_EXPERT_ROOT / prompt_variant / expert_mode / mode / "prompt.txt"
-        if expert_prompt_path.exists():
-            try:
-                return expert_prompt_path.read_text(encoding="utf-8")
-            except FileNotFoundError:
-                pass
-
-    prompt_path = PROMPTS_ROOT / prompt_variant / mode / "prompt.txt"
+    prompt_path = _resolve_mode_prompt_path(mode=mode, prompt_variant=prompt_variant, expert_mode=expert_mode)
     try:
         return prompt_path.read_text(encoding="utf-8")
     except FileNotFoundError as exc:
@@ -92,7 +94,21 @@ def _load_prompt(
         ) from exc
 
 
-def _load_legibility_prompt(*, prompt_variant: Literal["v1", "v2", "v3"]) -> str:
+def _resolve_mode_prompt_path(
+    *,
+    mode: Literal["hint", "check_solution", "reveal"],
+    prompt_variant: Literal["v1", "v2", "v3", "v4"],
+    expert_mode: ExpertMode,
+) -> Path:
+    if mode == "check_solution" and expert_mode != "off":
+        expert_prompt_path = PROMPTS_EXPERT_ROOT / prompt_variant / expert_mode / mode / "prompt.txt"
+        if expert_prompt_path.exists():
+            return expert_prompt_path
+
+    return PROMPTS_ROOT / prompt_variant / mode / "prompt.txt"
+
+
+def _load_legibility_prompt(*, prompt_variant: Literal["v2", "v3"]) -> str:
     prompt_path = LEGIBILITY_PROMPT_ROOT / prompt_variant / "prompt.txt"
     try:
         return prompt_path.read_text(encoding="utf-8")
@@ -102,7 +118,7 @@ def _load_legibility_prompt(*, prompt_variant: Literal["v1", "v2", "v3"]) -> str
 
 def _load_deferred_error_prompt() -> str:
     try:
-        return ERROR_PROMPT_PATH_V2.read_text(encoding="utf-8")
+        return ERROR_PROMPT_PATH_V3.read_text(encoding="utf-8")
     except FileNotFoundError as exc:
         raise HTTPException(status_code=500, detail="Deferred error prompt file not found") from exc
 
@@ -773,7 +789,7 @@ def _run_deferred_error_analysis(
         "pipelineMode": pipeline_mode,
         "expertMode": expert_mode,
         "requestId": deferred_request_id,
-        "promptVersion": "errors/v2/prompt.txt",
+        "promptVersion": "errors/v3/prompt.txt",
         "environment": environment,
     }
 
@@ -840,7 +856,7 @@ def _run_deferred_error_analysis(
             event_type="error_classified",
             mode=mode,
             verdict="incorrect",
-            metadata_json=json.dumps({"prompt_version": "errors/v2/prompt.txt"}),
+            metadata_json=json.dumps({"prompt_version": "errors/v3/prompt.txt"}),
         )
         session.commit()
 
@@ -973,25 +989,28 @@ async def query(
 ):
     request_started_perf = time.perf_counter()
     preprocess_started_perf = request_started_perf
-    prompt_variant = _resolve_prompt_variant()
+    prompt_variant = _resolve_mode_prompt_variant()
+    legibility_prompt_variant = _resolve_legibility_prompt_variant()
     pipeline_mode = _resolve_pipeline_mode(pipeline_mode)
     resolved_expert_mode = _normalize_expert_mode(expert_mode)
+    mode_prompt_path = _resolve_mode_prompt_path(
+        mode=mode,
+        prompt_variant=prompt_variant,
+        expert_mode=resolved_expert_mode,
+    )
 
     base_prompt = _load_prompt(
         mode,
         prompt_variant=prompt_variant,
         expert_mode=resolved_expert_mode,
     )
-    legibility_base_prompt = _load_legibility_prompt(prompt_variant=prompt_variant)
+    legibility_base_prompt = _load_legibility_prompt(prompt_variant=legibility_prompt_variant)
     attempt_id = uuid4()
-    if mode == "check_solution" and resolved_expert_mode != "off":
-        mode_prompt_version = _text_or_none(
-            f"{prompt_variant}_expert/{resolved_expert_mode}/{mode}/prompt.txt",
-            max_len=64,
-        )
-    else:
-        mode_prompt_version = _text_or_none(f"{prompt_variant}/{mode}/prompt.txt", max_len=64)
-    legibility_prompt_version = _text_or_none(f"legibility/{prompt_variant}/prompt.txt", max_len=64)
+    mode_prompt_version = _text_or_none(
+        str(mode_prompt_path.relative_to(PROMPTS_BASE)).replace("\\", "/"),
+        max_len=64,
+    )
+    legibility_prompt_version = _text_or_none(f"legibility/{legibility_prompt_variant}/prompt.txt", max_len=64)
     reasoning_request_id = str(uuid4())
     legibility_request_id = str(uuid4())
 
@@ -1071,6 +1090,7 @@ async def query(
             "requestType": "legibility",
             "route": "POST /query (legibility)",
             "requestId": legibility_request_id,
+            "promptVariant": legibility_prompt_variant,
             "promptVersion": legibility_prompt_version,
         }
     )

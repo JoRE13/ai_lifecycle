@@ -429,6 +429,7 @@ def _call_model_with_retry_internal(
     sol_images: Sequence[Any],
     mode: str,
     response_schema: type[BaseModel],
+    model_name: str = "gemini-3.1-flash-lite-preview",
     max_retries: int = 5,
     regenerate: bool = False,
     trace_name: str = "gemini-call",
@@ -454,12 +455,10 @@ def _call_model_with_retry_internal(
         metadata=trace_metadata,
     )
 
-    model = "gemini-3.1-flash-lite-preview"
-
     for attempt in range(max_retries):
         try:
             resp = client.models.generate_content(
-                model=model,
+                model=model_name,
                 contents=contents,
                 config={
                     "response_mime_type": "application/json",
@@ -484,7 +483,7 @@ def _call_model_with_retry_internal(
 
             observation_id = _trace_generation(
                 trace,
-                model=model,
+                model=model_name,
                 prompt=prompt,
                 output=resp.text,
                 mode=mode,
@@ -506,7 +505,7 @@ def _call_model_with_retry_internal(
                 "prob_image": prob_image,
                 "sol_images": sol_images_list,
                 "mode": mode,
-                "model_name": model,
+                "model_name": model_name,
                 "timestamp": datetime.now(),
                 "latency_seconds": latency,
                 "tokens_in": tokens_in,
@@ -574,6 +573,7 @@ def call_legibility_with_retry(
         sol_images=sol_images,
         mode=mode,
         response_schema=LegibilityResponse,
+        model_name="gemini-3.1-flash-lite-preview",
         max_retries=max_retries,
         regenerate=regenerate,
         trace_name=trace_name,
@@ -603,6 +603,7 @@ def call_mode_v3_with_retry(
         sol_images=sol_images,
         mode=mode,
         response_schema=ModeV3Response,
+        model_name="gemini-3.1-flash-lite-preview",
         max_retries=max_retries,
         regenerate=regenerate,
         trace_name=trace_name,
@@ -632,6 +633,7 @@ def call_deferred_error_with_retry(
         sol_images=sol_images,
         mode=mode,
         response_schema=DeferredErrorResponse,
+        model_name="gemini-3-flash-preview",
         max_retries=max_retries,
         regenerate=regenerate,
         trace_name=trace_name,
@@ -662,6 +664,7 @@ def call_model_with_retry(
         sol_images=sol_images,
         mode=mode,
         response_schema=LLMResponse,
+        model_name="gemini-3.1-flash-lite-preview",
         max_retries=max_retries,
         regenerate=regenerate,
         trace_name=trace_name,
