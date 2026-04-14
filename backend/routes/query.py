@@ -37,14 +37,14 @@ PROMPTS_ROOT = PROMPTS_BASE / "modes"
 PROMPTS_EXPERT_ROOT = PROMPTS_BASE / "modes_expert"
 LEGIBILITY_PROMPT_ROOT = PROMPTS_BASE / "legibility"
 ERROR_PROMPT_PATH_V4 = PROMPTS_BASE / "errors" / "v4" / "prompt.txt"
-DEFAULT_MODE_PROMPT_VARIANT = (os.getenv("QUERY_PROMPT_VARIANT") or "v4").strip().lower()
+DEFAULT_MODE_PROMPT_VARIANT = (os.getenv("QUERY_PROMPT_VARIANT") or "v6").strip().lower()
 DEFAULT_LEGIBILITY_PROMPT_VARIANT = (os.getenv("QUERY_LEGIBILITY_PROMPT_VARIANT") or "v3").strip().lower()
 ExpertMode = Literal["off", "clarity", "strict"]
 SUCCESS_VERDICTS = {"correct_so_far", "fully_correct", "fully_solved"}
 READING_CONFIRM_CONFIDENCE_MIN = 0.30
 
 
-def _resolve_mode_prompt_variant() -> Literal["v1", "v2", "v3", "v4"]:
+def _resolve_mode_prompt_variant() -> Literal["v1", "v2", "v3", "v4", "v5", "v6"]:
     configured = (os.getenv("QUERY_PROMPT_VARIANT") or DEFAULT_MODE_PROMPT_VARIANT).strip().lower()
     if configured == "v1":
         return "v1"
@@ -52,7 +52,11 @@ def _resolve_mode_prompt_variant() -> Literal["v1", "v2", "v3", "v4"]:
         return "v2"
     if configured == "v3":
         return "v3"
-    return "v4"
+    if configured == "v4":
+        return "v4"
+    if configured == "v5":
+        return "v5"
+    return "v6"
 
 
 def _resolve_legibility_prompt_variant() -> Literal["v2", "v3"]:
@@ -81,7 +85,7 @@ def _normalize_expert_mode(value: str | None) -> ExpertMode:
 def _load_prompt(
     mode: Literal["hint", "check_solution", "reveal"],
     *,
-    prompt_variant: Literal["v1", "v2", "v3", "v4"],
+    prompt_variant: Literal["v1", "v2", "v3", "v4", "v5", "v6"],
     expert_mode: ExpertMode,
 ) -> str:
     prompt_path = _resolve_mode_prompt_path(mode=mode, prompt_variant=prompt_variant, expert_mode=expert_mode)
@@ -97,7 +101,7 @@ def _load_prompt(
 def _resolve_mode_prompt_path(
     *,
     mode: Literal["hint", "check_solution", "reveal"],
-    prompt_variant: Literal["v1", "v2", "v3", "v4"],
+    prompt_variant: Literal["v1", "v2", "v3", "v4", "v5", "v6"],
     expert_mode: ExpertMode,
 ) -> Path:
     if mode == "check_solution" and expert_mode != "off":
