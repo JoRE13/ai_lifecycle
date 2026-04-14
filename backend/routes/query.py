@@ -42,6 +42,8 @@ DEFAULT_LEGIBILITY_PROMPT_VARIANT = (os.getenv("QUERY_LEGIBILITY_PROMPT_VARIANT"
 ExpertMode = Literal["off", "clarity", "strict"]
 SUCCESS_VERDICTS = {"correct_so_far", "fully_correct", "fully_solved"}
 READING_CONFIRM_CONFIDENCE_MIN = 0.30
+QUERY_MAX_IMAGE_PIXELS = int(os.getenv("QUERY_MAX_IMAGE_PIXELS", str(16_000_000)))
+LEGIBILITY_MAX_IMAGE_SIDE = int(os.getenv("LEGIBILITY_MAX_IMAGE_SIDE", "1600"))
 
 
 def _resolve_mode_prompt_variant() -> Literal["v1", "v2", "v3", "v4", "v5", "v6"]:
@@ -255,6 +257,7 @@ def _to_pil_image(upload: UploadFile, data: bytes) -> Image.Image:
     try:
         image = Image.open(BytesIO(data))
         image.load()
+        _validate_image_dimensions(image, filename=upload.filename or "upload")
         return image
     except UnidentifiedImageError as exc:
         raise HTTPException(
@@ -267,9 +270,32 @@ def _bytes_to_pil_image(data: bytes, *, filename: str) -> Image.Image:
     try:
         image = Image.open(BytesIO(data))
         image.load()
+        _validate_image_dimensions(image, filename=filename)
         return image
     except UnidentifiedImageError as exc:
         raise ValueError(f"Invalid image bytes for '{filename}'") from exc
+
+
+def _validate_image_dimensions(image: Image.Image, *, filename: str) -> None:
+    width, height = image.size
+    if width <= 0 or height <= 0:
+        raise HTTPException(status_code=422, detail=f"Invalid image dimensions for '{filename}'")
+    if width * height > QUERY_MAX_IMAGE_PIXELS:
+        raise HTTPException(
+            status_code=413,
+            detail=(
+                f"Image '{filename}' is too large in pixel dimensions. "
+                "Try a lower-resolution export or fewer pages."
+            ),
+        )
+
+
+def _downscale_for_legibility(image: Image.Image) -> Image.Image:
+    downscaled = image.copy()
+    downscaled.thumbnail((LEGIBILITY_MAX_IMAGE_SIDE, LEGIBILITY_MAX_IMAGE_SIDE), Image.Resampling.LANCZOS)
+    if downscaled.mode not in {"RGB", "RGBA"}:
+        downscaled = downscaled.convert("RGB")
+    return downscaled
 
 
 def _safe_suffix(upload: UploadFile, default: str) -> str:
@@ -1247,11 +1273,13 @@ async def query(
     should_run_legibility = pipeline_mode == "two_pass" and not confirmed_reading_entries
 
     if should_run_legibility:
+        legibility_prob_pil = _downscale_for_legibility(prob_pil)
+        legibility_solution_pages = [_downscale_for_legibility(page) for page in solution_pil_pages]
         try:
             legibility_result = call_legibility_with_retry(
                 prompt=legibility_prompt,
-                prob_image=prob_pil,
-                sol_images=solution_pil_pages,
+                prob_image=legibility_prob_pil,
+                sol_images=legibility_solution_pages,
                 mode=f"{mode}_legibility",
                 trace_name=f"{mode}-legibility",
                 trace_metadata=legibility_trace_metadata,
@@ -1334,6 +1362,9 @@ async def query(
                     missing_parts=legibility_missing_parts,
                     fallback_message=_text_or_none(legibility_payload_raw.get("message_is")),
                 )
+        legibility_prob_pil.close()
+        for page in legibility_solution_pages:
+            page.close()
 
     if payload is None:
         try:

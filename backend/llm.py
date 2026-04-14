@@ -514,8 +514,6 @@ def _call_model_with_retry_internal(
             return {
                 "response_text": resp.text,
                 "prompt": prompt,
-                "prob_image": prob_image,
-                "sol_images": sol_images_list,
                 "mode": mode,
                 "model_name": model_name,
                 "timestamp": datetime.now(),
