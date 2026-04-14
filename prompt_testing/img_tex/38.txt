@@ -1,0 +1,20 @@
+Leysið $\log(x-1) + \log(x+3) = 2$.
+
+Formengi: $x-1 > 0$ og $x+3 > 0 \Rightarrow x > 1$
+
+Tökum saman logra og fáum:
+$\log((x-1)(x+3)) = 2$
+
+Svo:
+$10^{\log((x-1)(x+3))} = 10^2$
+$\Rightarrow (x-1)(x+3) = 100$
+
+Litum:
+$x^2 + 2x - 3 = 100$
+$\Rightarrow x^2 + 2x - 103 = 0$
+
+Notum svo lausnarformúlu annars stigs margliðu og fáum:
+$x = \frac{-2 \pm \sqrt{4 + 412}}{2} = \frac{-2 \pm \sqrt{416}}{2}$
+
+En þar sem $x > 1$ er lausnin
+$x = \frac{-2 + \sqrt{416}}{2}$

@@ -1,0 +1,3 @@
+Leysið \(\int x\sin(x) dx\)
+
+Notum hlutheildun \\ Látum \quad \(u=x \Rightarrow du=dx\) \\ \quad \(dv=\sin(x) dx \Rightarrow v=-\cos(x)\) \\ Höfum þá: \\ \(\int u dv = uv - \int v du\) \\ \(\int x\sin(x) dx = -x\cos(x) - \int(-\cos(x))dx\) \\ \(\quad = -x\cos(x) + \int\cos(x)dx\) \\ \(\quad = -x\cos(x) + \sin(x) + C\)

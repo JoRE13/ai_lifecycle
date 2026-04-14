@@ -1,0 +1,3 @@
+28. Einfaldið $\frac{(a^3)^2 b^4 \cdot \sqrt{a}}{(ab)^2} .$
+
+$\frac{(a^3)^2 b^4 \cdot \sqrt{a}}{(ab)^2} = \frac{a^6 b^4 \cdot a^{1/2}}{a^2 b^2} = \frac{a^{13/2} b^4}{a^2 b^2} = a^{9/2} b^2$

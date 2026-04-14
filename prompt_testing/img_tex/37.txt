@@ -1,0 +1,3 @@
+Leysið \frac{x^2-9}{x-3}.
+
+Höfum: x^2-9=(x-3)(x+3) Svo: \frac{(x-3)(x+3)}{(x-3)} = x+3 \text{ og } x \neq 3

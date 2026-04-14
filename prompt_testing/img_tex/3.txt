@@ -1,0 +1,26 @@
+3. Leysi
+eighbors jaf
+eighbors 
+
+$|x-3| - |x+10| = 13$ fyrir x.
+
+H
+eighborsfum byr
+eighbors tilviki.
+
+(i) Ef $x \le -10$ 
+
+p
+eighbors er $-(x-3) - -(x+10) = 13 \Leftrightarrow -x+3+x+10 = 13 \Leftrightarrow 13=13$
+
+(ii) Ef $-10 < x \le 3$ 
+
+p
+eighbors er $-(x-3) - (x+10) = 13 \Leftrightarrow -x+3-x-10 = 13 \Leftrightarrow -2x = 20 \Leftrightarrow x = -10$
+
+(iii) Ef $x>3$
+
+p
+eighbors er $x-3 - (x+10) = 13 \Leftrightarrow x-3-x-10 = 13 \Leftrightarrow -13=13$
+
+Svo $x \in ]-\infty, -10]$.

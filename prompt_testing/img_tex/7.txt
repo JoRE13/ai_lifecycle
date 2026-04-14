@@ -1,0 +1,3 @@
+Finnið afleiðu fallsins $f(x) = -2	ext{log}_2(-	an(2x))$
+
+$f'(x) = -2 rac{1}{-	an(2x)	ext{ln}(2)} igg(-rac{1}{	ext{cos}^2(2x)} igg) 	ext{cdot} 2 = -4 rac{	ext{sec}^2(2x)}{	an(2x)	ext{ln}(2)} = -4 rac{1}{	ext{sin}(2x)	ext{cos}(2x)	ext{ln}(2)} = -4 rac{2}{	ext{sin}(4x)	ext{ln}(2)} = -8 	ext{csc}(4x) / 	ext{ln}(2)$

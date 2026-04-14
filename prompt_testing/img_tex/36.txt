@@ -1,0 +1,3 @@
+Leysið $\frac{x^2-4}{x-2} = 3$
+
+Einföldum fyrst: $\frac{x^2-4}{x-2} = \frac{(x-2)^2}{x-2} = x-2$ Svo við höfum: $x-2 = 3$

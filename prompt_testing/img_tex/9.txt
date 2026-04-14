@@ -1,0 +1,3 @@
+Í hvaða punktum er fallið $f(x) = \tan(x)$ ekki samfellt?
+
+$f(x) = \tan(x) = \frac{\sin(x)}{\cos(x)}$ fallið er ekki samfellt þegar \(\cos(x) = 0\), það gerist þegar \(x = \frac{\pi}{2} + n\pi\) fyrir öll heil lög \(n\).

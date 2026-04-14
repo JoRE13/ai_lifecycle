@@ -1,0 +1,3 @@
+Finndu afleiðu fallsins $f(x) = \frac{x^2 + 1}{\tan x}$
+
+Endurritum: $f(x) = \frac{x^2 + 1}{\tan x} = (x^2 + 1) \tan x$ Notum margfeldisreglu: $f'(x) = 2x \cdot \tan x + (x^2 + 1) \cdot \frac{d}{dx} (\tan x)$ Diffrum $\tan x$: $\frac{d}{dx} \tan x = 1 + \tan x$

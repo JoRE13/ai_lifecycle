@@ -1,0 +1,3 @@
+31. Reiknið heildið $\int x\sin(x)dx$.
+
+$\int x\sin(x)dx = x\cos(x) - \int \cos(x)dx = x\cos(x) - \sin(x) + k$.

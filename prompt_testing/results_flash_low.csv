@@ -1,0 +1,143 @@
+verdict,response_type,message_is,file_path,expected_verdict,prompt_version,latency
+fully_solved,explanation,"Vel gert! Þetta er alveg rétt hjá þér. Þú hefur lagt saman liðina með sama veldi á réttan hátt: \(-y^5 - 5y^5 - 2y^5 = -8y^5\) og haldið liðnum \(xy\) sér, þar sem hann er ekki samkynja hinum. Glæsilegt!",./prompt_testing/img/1.png,fully_solved,v4,1.9630860830657184
+fully_solved,explanation,"Vel gert! Þetta er alveg rétt hjá þér.
+
+Þú fannst fyrst sammengið \(B \cup C = \{2, 6, 8, 10\}\) á réttan hátt og síðan sniðmengi þess við \(A\). Niðurstaðan \(A \cap (B \cup C) = \{2, 6\}\) er rétt þar sem þetta eru einu stökin sem eru í báðum mengjunum. Glæsilegt!",./prompt_testing/img/2.png,fully_solved,v4,2.8211757503449917
+fully_solved,explanation,"Vel gert! Þetta er alveg hárrétt hjá þér. Þú skiptir dæminu rétt upp í þrjú tilvik miðað við núllstöðvar algildanna og skoðaðir hvert þeirra fyrir sig af mikilli nákvæmni. Niðurstaðan þín, að lausnin sé bilið \(x \in ]-\infty, -10]\), er rétt og rökstuðningurinn skýr.",./prompt_testing/img/3.png,fully_solved,v4,2.5596724157221615
+incorrect,explanation,"Vel gert að byrja á því að færa \(x\)-liðina yfir á sömu hlið. Það er góð fyrsta aðgerð.
+
+En skoðum aðeins skrefið þegar þú ferð úr \(-5x - 3 = -4x - 9\) yfir í \(-x - 3 = -9\). Þegar þú bætir \(4x\) við báðar hliðar til að eyða \(-4x\) hægra megin, hvað gerist þá vinstra megin við jöfnuna? Prófaðu að reikna aftur út úr \(-5x + 4x\).",./prompt_testing/img/4.png,fully_solved,v4,2.26867658412084
+fully_solved,explanation,"Vel gert! Þetta er alveg hárrétt hjá þér. Þú notar kósínusregluna á réttan hátt til þess að finna stærð hornsins \(C\). Útreikningarnir þínir á \(c^2 = (2\sqrt{19})^2 = 4 \cdot 19 = 76\) og einföldun brotsins í \(\frac{1}{2}\) eru nákvæmir. Að lokum finnur þú rétt hornmál, þar sem \(\arccos(\frac{1}{2}) = 60^{\circ}\). Glæsileg vinna!",./prompt_testing/img/5.png,fully_solved,v4,2.3846445004455745
+incorrect,explanation,"Vel gert að byrja á því að nota lograreglur til að einfalda stæðuna og safna veldisvísunum saman. Það er góð nálgun að skipta yfir í hornafallsformið.
+
+ Hins vegar virðist smá villa hafa laumað sér inn þegar þú sameinaðir lograliðina í veldisvísinum. Þegar þú leggur saman \(-2\ln(8)\) og \(-2\ln(2)\), hvaða gildi færðu þá fyrir heildarlograliðinn í veldisvísinum?",./prompt_testing/img/6.png,fully_solved,v4,3.359020374715328
+fully_solved,explanation,Vel gert! Þetta er alveg hárrétt hjá þér. Þú notar keðjuregluna rétt í hverju skrefi til að finna afleiðuna. Það er líka gott hjá þér að sýna hvernig þú dregur saman liðina í lokin í eitt einfalt brot. Glæsilegt!,./prompt_testing/img/7.png,fully_solved,v4,2.305367125198245
+correct_so_far,hint,"Vel gert! Þetta er rétt byrjun hjá þér. Þú ert búin(n) að nota regluna um logra af margfeldi á réttan hátt.
+
+Manstu eftir einhverri reglu sem gerir þér kleift að færa veldisvísana, eins og \(1/4\) og \(-3\), fram fyrir lograna?",./prompt_testing/img/8.png,correct_so_far,v4,2.086090875323862
+correct_so_far,hint,Þetta er frábær byrjun hjá þér! Þú hefur réttilega sýnt að \(f(x) = \tan(x)\) má skrifa sem brotið \(\frac{\sin(x)}{\cos(x)}\). Hvað gerist ef nefnarinn í broti verður núll?,./prompt_testing/img/9.png,correct_so_far,v4,1.9945770828053355
+correct_so_far,hint,"Þú ert á hárréttri leið! Þú hefur fundið lausnina á jöfnunni \(x^2 + 2x + 1 = 0\) með því að nota diskriminantinn og lausnarformúluna. Nú þarftu að klára þáttunina. Ef margliða hefur rótina \(x = r\), hvernig geturðu notað þá vitneskju til að skrifa niður samsvarandi þátt í margliðunni?",./prompt_testing/img/10.png,correct_so_far,v4,2.970108332578093
+correct_so_far,hint,"Vel gert að byrja á því að skilgreina grunnvengi jöfnunnar, það er mjög mikilvægt þegar unnið er með logra. Þú ert komin með jöfnuna á formið \(\ln(3x - 4) = 0\). Hvaða gildi þarf stærðin inni í sviganum, \(3x - 4\), að hafa til þess að náttúrulegi logrinn af henni verði núll?",./prompt_testing/img/11.png,correct_so_far,v4,2.431817665696144
+correct_so_far,hint,"Þetta er mjög vel byrjað hjá þér! Þú hefur fundið rétta hallatölu fyrir línuna sem fer í gegnum punktana \((3, -3)\) og \((-8, 8)\). Hallatalan \(h = -1\) er rétt fundin.
+
+Nú þegar þú veist hallatöluna og ert með tvo punkta á línunni, hvernig geturðu notað annað hvort punktinn eða regluna fyrir jöfnu línunnar, \(y - y_1 = h(x - x_1)\), til þess að finna lokajöfnuna?",./prompt_testing/img/12.png,correct_so_far,v4,2.6433656672015786
+correct_so_far,hint,"Vel gert að skilgreina verkefnið svona vel! Þú ert á réttri leið með að þátta markgildisregluna.
+
+Nú þarftu að finna samband á milli \(|x-1|\) og \(\epsilon\). Þar sem þátturinn \(|x+1|\) er enn til staðar, hvað gerist ef við takmörkum \(x\) við ákveðið nágrenni í kringum 1, til dæmis ef við segjum að \(\delta \le 1\)?",./prompt_testing/img/13.png,correct_so_far,v4,3.4358113328926265
+correct_so_far,hint,"Þetta er góð byrjun á hlutheildun hjá þér! Þú hefur réttilega valið að nota hlutheildun til að leysa heildið \(\int e^x \sin(x) dx\).
+
+Þú ert búin(n) að framkvæma fyrsta skrefið og ert komin(n) með nýtt heildi, \(\int e^x \cos(x) dx\). Hvaða aðferð gætirðu notað á þetta nýja heildi til að halda áfram og finna tengingu við upprunalega heildið?",./prompt_testing/img/14.png,correct_so_far,v4,2.4024947499856353
+correct_so_far,hint,"Þú ert búin(n) að skrifa upp heildið \(\int 2x^2 \log(x) dx\). Þetta er margfeldi tveggja ólíkra falla, þar sem annað er margliða og hitt er lografall. Mundu þú eftir einhverri reglu eða aðferð sem hentar vel þegar við þurfum að heilda margfeldi tveggja falla þar sem auðvelt er að deilda annað fallið?",./prompt_testing/img/15.png,correct_so_far,v4,3.130577208008617
+correct_so_far,hint,"Vel gert að byrja á því að þátta nefnarann í heildisstofninum. Það sýnir góðan skilning á algebru.
+
+Ef þú skoðar samband nefnarans, \(8x^2 - 5x\), og teljarans, \(16x - 5\), hvað tekurðu eftir ef þú deildar nefnarann?",./prompt_testing/img/16.png,correct_so_far,v4,2.1385149168781936
+unclear,ask_clarification,"Ég sé að þú ert byrjaður að diffra fallið \(f(x) = -4 \log_2(\cos(11x))\), en það vantar hluta af útreikningunum neðst í hægra horninu á myndinni. Textinn virðist vera skorinn af eftir \(\frac{1}{\log_2(\dots}\). Gætirðu tekið nýja mynd þar sem allir útreikningarnir sjást greinilega svo ég geti hjálpað þér áfram?",./prompt_testing/img/17.png,incorrect,v4,2.5560112078674138
+correct_so_far,hint,"Þetta er góð byrjun! Þú ert búin(n) að finna fyrstu og aðra afleiðuna rétt með því að nota keðjuregluna. 
+
+Ef þú heldur áfram og finnur þriðju og fjórðu afleiðuna, sérðu þá einhverja reglu eða mynstur sem fer að endurtaka sig í hornafallahlutanum?",./prompt_testing/img/18.png,correct_so_far,v4,2.121825333684683
+correct_so_far,hint,"Þú hefur beitt reglu L'Hôpital rétt til að byrja með og afleiðurnar eru réttar hjá þér. Ef þú reynir að setja \(x=0\) inn í nýja brotið þitt \(\frac{1-\cos(x)}{3x^2}\), hvaða óákvörðuðu stærð færðu þá, og hvaða reglu gætirðu beitt aftur til að halda áfram?",./prompt_testing/img/19.png,correct_so_far,v4,1.9549505421891809
+correct_so_far,hint,Þetta er góð byrjun hjá þér! Þú hefur réttilega sett saman föllin og fundið að \(h(x) = 2\sqrt{2e^{3x}}\). Nú þarftu að finna afleiðuna \(h'(x)\). Hvaða reglu notar þú þegar þú vilt diffra samsett fall eins og þetta þar sem eitt fall er inni í öðru?,./prompt_testing/img/20.png,correct_so_far,v4,2.693621666636318
+correct_so_far,hint,"Þetta er góð byrjun að skoða hægri hlið jöfnunnar. Til þess að sýna fram á þessa samhengi, getur þú munað eftir hornafræðireglunni sem tengir saman \(\cos^2(x)\) og \(\sin^2(x)\)?",./prompt_testing/img/21.png,correct_so_far,v4,2.0816588327288628
+incorrect,explanation,"Vel gert að byrja á því að margfalda í gegnum ójöfnuna með 2 til þess að eyða brotinu, það er mjög gott fyrsta skref. Við það færðu réttilega út \(2(x+3) < x\).
+
+Hins vegar virðist eitthvað hafa farið úrskeiðis þegar þú beittir dreifireglunni á vinstri hliðina. Þegar þú margfaldar tvo inn í svigann \(2(x+3)\), þarftu að muna að margfalda 2 við alla liði inni í sviganum. Hvað færðu þegar þú margfaldar \(2 \cdot 3\)?",./prompt_testing/img/22.png,incorrect,v4,2.503724125213921
+incorrect,explanation,"Vel gert að byrja á því að einangra fastatöluna og finna samnefnara fyrir brotin, það er góð leið til að einfalda dæmið. 
+
+Hins vegar er smá villa í næsta skrefi þegar þú sameinar brotin í eitt. Þegar þú dregur brotið \(\frac{-6x+3}{6}\) frá, þarftu að gæta þess að mínusinn fyrir framan brotið hafi áhrif á alla liðina í teljaranum. 
+
+Hvað gerist ef þú setur sviga utan um teljarann \((-6x+3)\) áður en þú dregur hann frá?",./prompt_testing/img/23.png,incorrect,v4,2.90687904227525
+incorrect,explanation,"Vel gert við að byrja á því að deila x upp í teljarann. 
+
+Þú deildir x rétt upp í fyrri liðinn \(x^2\) til að fá út \(x\), en það vantar eitthvað í seinni liðinn. Mundu að þegar við deilum með \(x\) þá þurfum við að deila með öllum liðunum í teljaranum. 
+
+Hvað gerist ef þú deilir \(3\) með \(x\)?",./prompt_testing/img/24.png,incorrect,v4,2.2297515841200948
+incorrect,explanation,"Vel gert að byrja á því að skilgreina grunnvengi jöfnunnar, það er mjög mikilvægt þegar unnið er með logra. Þú sýnir líka góð tök á því að nota samokuregluna til að einfalda margföldun sviga.
+
+Hins vegar virðist vera smá villa þegar þú tekur fyrsta skrefið í að sameina lograuna vinstra megin. Þú sameinar \(\log(x-1) + \log(x+1)\) rétt í \(\log(x^2-1)\), en hvað varð um þriðja liðinn, \(\log(4)\)?
+
+Getur þú rifjað upp regluna fyrir summu margra logra með sama stofn, til dæmis \(\log(a) + 
+\log(b) + \log(c)\)?",./prompt_testing/img/25.png,incorrect,v4,2.6874540830031037
+incorrect,explanation,"Vel gert við að deilda fallið rétt og finna afleiðuna \(f'(x) = x^2 + 5x + 6\). Það er frábært upphaf.
+
+Hins vegar er þáttunin á þríliðunni ekki alveg rétt. Þegar þú margfaldar saman \((x+1)(x+6)\), hvaða gildi færðu fyrir miðjuliðinn (x-liðinn)?
+
+Geturðu fundið tvær aðrar tölur sem hafa summuna 5 og margfeldið 6?",./prompt_testing/img/26.png,incorrect,v4,2.8203604170121253
+incorrect,explanation,"Vel gert við að byrja á því að einangra ræturnar! Þú sýnir góðan skilning á því að nota logreglur til að sameina liði. Hins vegar virðist vera smá ósamræmi í fyrsta skrefinu hjá þér. Í upphaflega dæminu stendur \(\log_2(3)\) en þegar þú byrjar að leysa dæmið skrifarðu \(\log_2(x)\). Auk þess eru þetta tveir mismunandi lograr, annar er náttúrulegur logri \(\ln\) en hinn hefur grunntöluna 2. Hvaða reglur gilda um að sameina logra sem hafa ekki sömu grunntölu?",./prompt_testing/img/27.png,incorrect,v4,2.92118929233402
+incorrect,explanation,"Vel gert að byrja á því að umskrifa veldin og breyta kvaðratrótinni í veldið \(1/2\). Það sýnir góðan skilning á veldareglum.
+
+En ef þú skoðar annað skrefið í útreikningunum þínum, þar sem þú sameinar veldin í teljaranum: Þú ert með \(a^6 \cdot a^{1/2}\). Hvaða reglu notar þú þegar þú margfaldar saman veldi með sama stofn, og hvað færðu út úr því?",./prompt_testing/img/28.png,incorrect,v4,3.1241746661253273
+incorrect,explanation,"Vel gert að byrja á því að deila í gegnum ójöfnuna með -4 til að einfalda hana. Það er góð leið til að gera dæmið viðráðanlegra.
+
+Það er samt eitt mikilvægt atriði sem þarf að hafa í huga þegar unnið er með ójöfnur. Þegar þú deilir eða margfaldar báðar hliðar ójöfnu með neikvæðri tölu (eins og -4 í þessu tilfelli), manst þú hvað gerist þá við ójöfnumerkið sjálft?",./prompt_testing/img/29.png,incorrect,v4,2.337461124639958
+incorrect,explanation,"Það er frábært hjá þér að nota breytuskiptin \(t = x^2\) til þess að einfalda fjórðu stigs jöfnuna í annars stigs jöfnu. Þú þáttar jöfnuna líka rétt yfir í \((t + 1)^2 = 0\) og finnur réttilega að \(t = -1\). Ekki alveg rétt er þó síðasta skrefið þar sem þú leysir fyrir \(x\). Ef við munum að \(t = x^2\) og þú fannst að \(t = -1\), þá höfum við jöfnuna \(x^2 = -1\). Getur þú nefnt tölu sem gefur \(-1\) þegar hún er hafin í annað veldi?",./prompt_testing/img/30.png,incorrect,v4,2.5271497080102563
+incorrect,explanation,"Vel gert að sjá að nota þarf hlutaheildun (integration by parts) til að leysa þetta dæmi. Þú setur upp dæmið á réttan hátt miðað við regluna.
+
+En skoðum aðeins fyrsta skrefið. Þegar þú heildar \(\sin(x)\) til að finna stofnfallið, færðu þá \(\cos(x)\)?
+
+Hvað er afleiðan af \(\cos(x)\)?",./prompt_testing/img/31.png,incorrect,v4,2.0484350421465933
+incorrect,fix_first,"Þú byrjar rétt á því að ætla að finna hallatölu línunnar, en það virðist hafa orðið ruglingur við útreikninginn. Þegar þú notar formúluna fyrir hallatölu, \(h = \frac{y_2 - y_1}{x_2 - x_1}\), þarftu að gæta þess að setja \(y\)-hnitin í teljarann og \(x\)-hnitin í nefnarann. Skoðaðu aftur hvaða tölur eiga að fara hvert í brotið.",./prompt_testing/img/32.png,incorrect,v4,2.3838104996830225
+incorrect,fix_first,"Vel gert að átta þig á því að hér þarf að nota hlutaheildun. Það er hins vegar smá villa í fyrsta skrefinu hjá þér.
+
+Þegar þú heildar \(\cos(x)\) til að finna stofnfallið, mundu þá að afleiðan af \(\sin(x)\) er \(\cos(x)\). Geturðu athugað aftur hvort formerkið á fyrsta liðnum eigi að vera mínus?",./prompt_testing/img/33.png,incorrect,v4,3.1577347088605165
+incorrect,fix_first,"Þú byrjar vel á því að setja jöfnuna upp. Hins vegar hefur smá villa átt sér stað þegar þú margfaldaðir upp úr sviganum í fyrsta skrefinu. Þegar þú notar dreifiregluna á vinstri hliðinni, þá þarf talan 2 að margfaldast við báða liðina inni í sviganum. Skoðaðu aftur hvað gerist þegar þú margfaldar 2 við -3.",./prompt_testing/img/34.png,incorrect,v4,2.5616385829634964
+incorrect,fix_first,"Vel gert við að nota lograregluna rétt til að sameina liðina í \(\log((x-1)(x+1)) = 2\) og að margfalda rétt úr svigunum í \(\log(x^2 - 1) = 2\). 
+
+ Hins vegar er ekki alveg rétt skref þegar þú fjarlægir logrann. Mundu að þegar við leysum jöfnu með tugalögrum (\(\log\)), þá þurfum við að nota andhverfu hans sem er veldisvísisfallið með grunntölunni 10. 
+
+ Skoðaðu aftur hvað gerist við hægri hlið jöfnunnar þegar þú losar um \(x^2 - 1\) úr lögranum.",./prompt_testing/img/35.png,incorrect,v4,5.106691374909133
+incorrect,fix_first,"Vel gert að byrja á því að reyna að einfalda brotið áður en jafnan er leyst. Það er mjög góð nálgun.
+
+ Hins vegar er villu að finna í þáttuninni á teljaranum í fyrsta skrefinu. Þú skrifar að \(x^2 - 4\) sé það sama og \((x-2)^2\). Geturðu athugað hvort það sé örugglega rétt með því að margfalda úr svigunum \((x-2)(x-2)\)?",./prompt_testing/img/36.png,incorrect,v4,2.363667792174965
+fully_solved,full_solution,"Til þess að einfalda brotið \(\frac{x^2-9}{x-3}\) fylgjum við þessum skrefum:  Í fyrsta lagi þurfum við að huga að skilgreiningarmengi brotsins. Þar sem við megum aldrei deila með núlli, verður nefnarinn að vera frábrugðinn núlli: \[x - 3 \neq 0 \implies x \neq 3\]  Næst skoðum við teljarann, \(x^2 - 9\). Við sjáum að þetta er mismunur tveggja fertalna, þar sem \(9 = 3^2\). Við getum því þáttað teljarann með samokureglunni, \(a^2 - b^2 = (a-b)(a+b)\): \[x^2 - 9 = (x-3)(x+3)\]  Nú setjum við þáttuðu stærðina aftur inn í upprunalega brotið: \[\frac{x^2-9}{x-3} = \frac{(x-3)(x+3)}{x-3}\]  Þar sem við höfum skilgreint að \(x \neq 3\), þá er liðurinn \((x-3)\) ekki núll og við getum stytt hann út bæði í teljara og nefnara.  Eftir stendur: \[x+3, \text{ þar sem } x \neq 3\]  Lokasvarið er því \(x+3\) með því skilyrði að \(x\) sé ekki jafnt og 3.",./prompt_testing/img/37.png,fully_solved,v4,3.8381659579463303
+fully_solved,full_solution,"Hér er skref fyrir skref lausn á jöfnunni: \n\n\( \log(x-1) + \log(x+3) = 2 \) \n\n**1. Skilgreiningarmengi (Formengi)**\nFyrst þurfum við að gæta þess að stærðirnar inni í logrunum séu jákvæðar, þar sem logri af neikvæðri tölu eða núll er ekki skilgreindur. Því þarf að gilda:\n\( x - 1 > 0 \implies x > 1 \)\n\( x + 3 > 0 \implies x > -3 \)\nTil þess að bæði skilyrðin séu uppfyllt verður \( x > 1 \).\n\n**2. Sameining logranna**\nVið notum regluna um summu logra, \( \log(a) + \log(b) = \log(a \cdot b) \), til að sameina vinstri hlið jöfnunnar:\n\[ \log((x-1)(x+3)) = 2 \]\n\n**3. Losun við logrann**\nVið notum skilgreiningu lograns (með grunntöluna 10) og hefjum báðar hliðar upp í veldi með 10 sem grunntölu:\n\[ 10^{\log((x-1)(x+3))} = 10^2 \]\n\[ (x-1)(x+3) = 100 \]\n\n**4. Einföldun og annars stigs jafna**\nVið margföldum úr svigunum og komum jöfnunni á staðalform:\n\[ x^2 + 3x - x - 3 = 100 \]\n\[ x^2 + 2x - 3 = 100 \]\n\[ x^2 + 2x - 103 = 0 \]\n\n**5. Lausnarformúla annars stigs jöfnu**\nVið notum lausnarformúluna \( x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a} \) þar sem \( a=1, b=2, c=-103 \):\n\[ x = \frac{-2 \pm \sqrt{2^2 - 4(1)(-103)}}{2(1)} \]\n\[ x = \frac{-2 \pm \sqrt{4 + 412}}{2} \]\n\[ x = \frac{-2 \pm \sqrt{416}}{2} \]\n\n**6. Lokasvar miðað við skilyrði**\nVið höfum tvær mögulegar lausnir:\n\[ x_1 = \frac{-2 + \sqrt{416}}{2} \approx 9,2 \]\n\[ x_2 = \frac{-2 - \sqrt{416}}{2} \approx -11,2 \]\n\nÞar sem við settum skilyrðið \( x > 1 \) í upphafi, þá er \( x_2 \) ekki gild lausn. Eina lausnin er því:\n\[ x = \frac{-2 + \sqrt{416}}{2} \]",./prompt_testing/img/38.png,fully_solved,v4,5.21246520942077
+fully_solved,full_solution,"Við eigum að leysa jöfnuna með algildismerki: \(|2x - 3| = x + 1\). Þar sem algildi tölu er alltaf stærra en eða jafnt og núll, þá verður hægri hlið jöfnunnar að uppfylla skilyrðið \(x + 1 \geq 0\), sem þýðir að \(x \geq -1\). Við skiptum lausninni í tvö tilfelli byggt á skilgreiningu algildis. Tilfelli 1: Gerum ráð fyrir að stærðin innan algildismerkjanna sé stærri en eða jöfn og núll, það er \(2x - 3 \geq 0\). Þetta gefur okkur \(2x \geq 3\) eða \(x \geq \frac{3}{2}\). Í þessu tilfelli er \(|2x - 3| = 2x - 3\) og jafnan verður: \[2x - 3 = x + 1\] Við einangrum \(x\) með því að draga \(x\) frá báðum hliðum og bæta \(3\) við báðar hliðar: \[2x - x = 1 + 3\] \[x = 4\] Þar sem \(4 \geq \frac{3}{2}\) er þetta gild lausn. Tilfelli 2: Gerum ráð fyrir að stærðin innan algildismerkjanna sé neikvæð, það er \(2x - 3 < 0\). Þetta gefur okkur \(x < \frac{3}{2}\). Í þessu tilfelli er \(|2x - 3| = -(2x - 3) = -2x + 3\) og jafnan verður: \[-2x + 3 = x + 1\] Við einangrum \(x\) með því að færa \(x\) liðina yfir á vinstri hlið og fastatölurnar á þá hægri: \[-2x - x = 1 - 3\] \[-3x = -2\] Við deilum með \(-3\) báðum megin: \[x = \frac{-2}{-3} = \frac{2}{3}\] Þar sem \(\frac{2}{3} < \frac{3}{2}\) (og \(\frac{2}{3} \geq -1\)) er þetta líka gild lausn. Samanlagt eru lausnir jöfnunnar því: \[x = \frac{2}{3} \text{ og } x = 4\]",./prompt_testing/img/39.png,fully_solved,v4,8.208826540969312
+fully_solved,full_solution,"Við eigum að finna afleiðu fallsins \(f(x) = \ln(3x^2 + 1)\). Þetta er samsett fall þar sem ytra fallið er \(\ln(u)\) og innra fallið er \(u = 3x^2 + 1\). Til að deilda svona fall þurfum við að nota keðjuregluna. Keðjureglan segir að afleiða samsetts falls \(f(g(x))\) sé \(f'(g(x)) \cdot g'(x)\). Í okkar tilfelli lítur ferlið svona út: Skref 1: Deildum ytra fallið með tilliti til þess innra. Afleiðan af \(\ln(u)\) er \(\frac{1}{u}\). Þannig að fyrri hlutinn er: \[\frac{1}{3x^2 + 1}\] Skref 2: Deildum innra fallið \(3x^2 + 1\) með tilliti til \(x\). Við notum veldaregluna á hvorn lið fyrir sig: \[\frac{d}{dx}(3x^2 + 1) = 3 \cdot 2x + 0 = 6x\] Skref 3: Margföldum niðurstöðurnar saman samkvæmt keðjureglunni: \[f'(x) = \frac{1}{3x^2 + 1} \cdot 6x\] Skref 4: Einföldum útjöfnuna með því að setja \(6x\) í teljarann: \[f'(x) = \frac{6x}{3x^2 + 1}\] Lokasvarið er því \(f'(x) = \frac{6x}{3x^2 + 1}\). Athugaðu að þar sem \(3x^2 + 1\) er alltaf stærra en núll fyrir allar rauntölur \(x\), þá er fallið skilgreint fyrir öll \(x\).",./prompt_testing/img/40.png,fully_solved,v4,3.9500456671230495
+fully_solved,full_solution,"Hér er skref-fyrir-skref lausn á heildinu \(\int x \sin(x) \, dx\).
+
+Til þess að leysa þetta heildi notum við aðferð sem kallast hlutaheildun (e. integration by parts). Reglan fyrir hlutaheildun er:
+\[\int u \, dv = uv - \int v \, du\]
+
+Markmiðið er að velja \(u\) þannig að afleiða þess sé einfaldari, og \(dv\) þannig að auðvelt sé að finna stofnfall þess.
+
+Skref 1: Val á breytum
+Við látum:
+\(u = x\)
+\(dv = \sin(x) \, dx\)
+
+Skref 2: Diffrun og heildun
+Nú finnum við \(du\) með því að diffra \(u\), og \(v\) með því að heilda \(dv\):
+\(du = 1 \, dx\)
+\(v = \int \sin(x) \, dx = -\cos(x)\)
+
+Skref 3: Beiting reglunnar
+Við setjum þessi gildi inn í regluna fyrir hlutaheildun:
+\[\int x \sin(x) \, dx = (x)(-\cos(x)) - \int (-\cos(x)) \, dx\]
+
+Skref 4: Einföldun og lokaskref
+Við einföldum fyrri hlutann og drögum mínusinn út úr heildinu:
+\[= -x \cos(x) + \int \cos(x) \, dx\]
+
+Nú heildum við \(\cos(x)\), en stofnfall þess er \(\sin(x)\). Við megum ekki gleyma heildunarfastanum \(C\):
+\[= -x \cos(x) + \sin(x) + C\]
+
+Lokasvar:
+\[\int x \sin(x) \, dx = \sin(x) - x \cos(x) + C\]",./prompt_testing/img/41.png,fully_solved,v4,4.407467625103891
+fully_solved,explanation,"Vel gert! Þú hefur leyst þetta dæmi rétt og skipulega. 
+
+Það er mjög gott hjá þér að nota samokaregluna til þess að þátta teljarann í \((x+4)(x-4)\). Með því að gera það getur þú stytt \((x+4)\) út bæði í teljara og nefnara, sem gefur þér lokasvarið \(x-4\). Glæsileg vinnubrögð!",./prompt_testing/img/42.png,fully_solved,v4,2.13747529219836
+fully_solved,explanation,"Vel gert! Þetta er alveg hárrétt hjá þér.
+
+Þú fannst rétta núllstöðvar í teljaranum, þ.e. \(x = -1\) og \(x = 2\), og sást að deilt er með núlli þegar \(x = 4\). Formerkjakönnunin þín er mjög skýr og útreikningarnir á völdum gildum á hverju bili staðfesta hvar fallið er jákvætt eða neikvætt.
+
+Svarið þitt \(x \in [-1, 2] \cup (4, \infty)\) er rétt ritað þar sem þú notar hornklofa fyrir gildin sem gera tjáninguna jafna núlli og opna sviga fyrir \(4\) þar sem fallið er óskilgreint þar. Glæsilegt!",./prompt_testing/img/43.png,fully_solved,v4,3.2169428328052163
+fully_solved,explanation,"Vel gert! Þú hefur teiknað graf fallsins \(f(x) = x^2\) rétt. Þetta er falleg fleygbogi sem liggur í gegnum upphafspunktinn \((0,0)\) og er samhverfur um y-ásinn. Flott vinnubrögð!",./prompt_testing/img/44.png,fully_solved,v4,2.4546010000631213
+fully_solved,explanation,"Vel gert! Þú leystir jöfnuna rétt. Þú færðir \(2x\) yfir á vinstri hliðina og \(7\) yfir á þá hægri á alveg hátt, og reiknaðir síðan úr báðum hliðum til að finna rétt gildi fyrir \(x\).",./prompt_testing/img/45.png,fully_solved,v4,1.9390785000286996
+fully_solved,explanation,Vel gert! Þú hefur leyst þetta dæmi alveg rétt. Það er frábært að sjá hvernig þú notar margfeldisregluna réttilega: \[(uv)' = u'v + uv'\] Þú deildaðir \(x\) rétt sem \(1\) og afleiðan af \(\tan(x)\) er örugglega \(\sec^2(x)\). Lokasvarið þitt \(f'(x) = \tan(x) + x \sec^2(x)\) er fyllilega rétt. Gott hjá þér!,./prompt_testing/img/46.png,fully_solved,v4,2.6206337083131075
+incorrect,fix_first,"Vel gert að átta þig á því að þú þarft að nota deildunarreglur fyrir þetta fall. Það er góð hugmynd að reyna að einfalda stæðuna áður en þú diffrar, en endurritunin á fyrsta skrefinu er ekki alveg rétt. Þegar þú færir \(\tan(x)\) úr nefnara upp í teljara þá jafngildir það ekki því að margfalda beint við \(\tan(x)\). Getur þú skoðað aftur hvernig brotið breytist ef þú vilt nota margfeldisregluna í stað deildarreglunnar?",./prompt_testing/img/47.png,incorrect,v4,2.793585042003542
+correct_so_far,explanation,"Vel gert!   
+
+  Þú hefur liðað vinstri hliðina rétt og einfaldað hana í \(x^{2} + x - 6\). Einnig er hárrétt hjá þér að draga \(x^{2}\) frá báðum hliðum til að fá jöfnuna \(x - 6 = -1\). 
+
+  Þetta er allt hárrétt hjá þér til þessa. Hvað þarftu núna að gera við \(-6\) til þess að einangra \(x\) fullkomlega?",./prompt_testing/img/48.png,unclear,v4,3.3330738339573145
+correct_so_far,hint,"Þetta er góð byrjun á jöfnunni! Þú ert með verkefnið rétt uppsett. Til þess að einangra \(x\), hvaða aðgerð gætirðu framkvæmt á báðum hliðum jöfnunnar til þess að losna við nefnarann \(3\)?",./prompt_testing/img/49.png,correct_so_far,v4,2.066659915726632
+correct_so_far,hint,"Vel gert að byrja á þessu! Þú ert með jöfnuna \(\frac{2x-1}{3} + 4 = x\). Til þess að einfalda dæmið og einangra \(x\), hvaða aðgerð gætir þú framkvæmt á báðum hliðum jöfnunnar til þess að losna við brotið?",./prompt_testing/img/50.png,correct_so_far,v4,2.3785939579829574

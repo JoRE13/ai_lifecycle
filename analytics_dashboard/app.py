@@ -653,13 +653,14 @@ def get_top_error_types(start_date: date, end_date: date, top_n: int = 8) -> pd.
     query = text(
         """
         SELECT
-            TRIM(error_type) AS error_type,
+            TRIM(ee.error_type) AS error_type,
             COUNT(*) AS count
-        FROM attempts
-        WHERE DATE(created_at) BETWEEN :start_date AND :end_date
-          AND error_type IS NOT NULL
-          AND TRIM(error_type) <> ''
-          AND LOWER(TRIM(error_type)) <> 'unknown'
+        FROM error_events ee
+        JOIN attempts a ON a.id = ee.attempt_id
+        WHERE DATE(a.created_at) BETWEEN :start_date AND :end_date
+          AND ee.error_type IS NOT NULL
+          AND TRIM(ee.error_type) <> ''
+          AND LOWER(TRIM(ee.error_type)) <> 'unknown'
         GROUP BY 1
         ORDER BY count DESC
         LIMIT :top_n
@@ -1452,133 +1453,133 @@ with st.container(border=True, key="section-unclear-by-day"):
     )
     st.altair_chart(themed_chart(unclear_chart), use_container_width=True)
 
-# Latency section (all requested views) in one bounding box
-#with st.container(border=True, key="section-latency"):
-#    st.subheader("Greining biðtíma")
-#
-#    if latency_df.empty:
-#        st.info("Engin gögn fundust um biðtíma.")
-#    else:
-#        latency_mode_filter = st.multiselect(
-#            "Latency modes",
-#            options=MODE_ORDER,
-#            default=MODE_ORDER,
-#            key="latency_mode_filter",
-#        )
-#
-#        filtered_latency = latency_df[latency_df["mode"].isin(latency_mode_filter)] if latency_mode_filter else latency_df.iloc[0:0]
-#
-#        l1, l2 = st.columns(2)
-#
-#        with l1:
-#            st.markdown("**Þróun P50 / P95 biðtíma eftir tegund fyrirspurnar**")
-#            percentiles = latency_percentiles_by_day_and_mode(filtered_latency)
-#            if percentiles.empty:
-#                st.info("Enginn biðtími fyrir valda tegund.")
-#            else:
-#                p50 = percentiles[["day", "mode", "p50_ms"]].rename(columns={"p50_ms": "latency_ms"})
-#                p50["percentile"] = "p50"
-#                p95 = percentiles[["day", "mode", "p95_ms"]].rename(columns={"p95_ms": "latency_ms"})
-#                p95["percentile"] = "p95"
-#                trend_df = pd.concat([p50, p95], ignore_index=True)
-#                trend_chart = (
-#                    alt.Chart(trend_df)
-#                    .mark_line(point=False)
-#                    .encode(
-#                        x=alt.X("day:T", title="Dagsetning"),
-#                        y=alt.Y("latency_ms:Q", title="Biðtími (ms)", scale=alt.Scale(domainMin=0)),
-#                        color=alt.Color(
-#                            "mode:N",
-#                            scale=alt.Scale(domain=MODE_ORDER, range=[MODE_COLORS[m] for m in MODE_ORDER]),
-#                            title="Mode",
-#                        ),
-#                        strokeDash=alt.StrokeDash("percentile:N", title="Percentile"),
-#                        tooltip=[
-#                            alt.Tooltip("day:T", title="Dagsetning"),
-#                            alt.Tooltip("mode:N", title="Tegund"),
-#                            alt.Tooltip("percentile:N", title="Hundraðshlutamark"),
-#                            alt.Tooltip("latency_ms:Q", title="Biðtími (ms)", format=",.0f"),
-#                        ],
-#                    )
-#                )
-#                st.altair_chart(themed_chart(trend_chart), use_container_width=True)
-#
-#        with l2:
-#            st.markdown("**Dreifing biðtíma**")
-#            hist_chart = (
-#                alt.Chart(filtered_latency)
-#                .mark_bar(opacity=0.75, color=THEME["primary"])
-#                .encode(
-#                    x=alt.X("latency_ms:Q", bin=alt.Bin(maxbins=30), title="Biðtími (ms)"),
-#                    y=alt.Y("count():Q", title="Fjöldi fyrirspurna"),
-#                    tooltip=[alt.Tooltip("count():Q", title="Fjöldi fyrirspurna")],
-#                )
-#            )
-#            st.altair_chart(themed_chart(hist_chart), use_container_width=True)
-#
-#        l3, l4 = st.columns(2)
-#
-#        with l3:
-#            st.markdown("**Biðtími eftir tegund**")
-#            box_chart = (
-#                alt.Chart(filtered_latency)
-#                .mark_boxplot(size=40)
-#                .encode(
-#                    x=alt.X("mode:N", title="Mode", sort=MODE_ORDER, axis=alt.Axis(labelAngle=0)),
-#                    y=alt.Y("latency_ms:Q", title="Biðtími (ms)", scale=alt.Scale(domainMin=0)),
-#                    color=alt.Color(
-#                        "mode:N",
-#                        scale=alt.Scale(domain=MODE_ORDER, range=[MODE_COLORS[m] for m in MODE_ORDER]),
-#                        title="Tegund",
-#                    ),
-#                    tooltip=[alt.Tooltip("mode:N", title="Tegund")],
-#                )
-#            )
-#            st.altair_chart(themed_chart(box_chart), use_container_width=True)
-#
-#        with l4:
-#            st.markdown("**Biðtími vs Fjöldi tóka**")
-#            scatter_base = filtered_latency.dropna(subset=["tokens_total"])
-#            scatter = (
-#                alt.Chart(scatter_base)
-#                .mark_circle(size=55, opacity=0.5)
-#                .encode(
-#                    x=alt.X("tokens_total:Q", title="Fjöldi tókas"),
-#                    y=alt.Y("latency_ms:Q", title="Biðtími (ms)", scale=alt.Scale(domainMin=0)),
-#                    color=alt.Color(
-#                        "mode:N",
-#                        scale=alt.Scale(domain=MODE_ORDER, range=[MODE_COLORS[m] for m in MODE_ORDER]),
-#                        title="Mode",
-#                    ),
-#                    tooltip=[
-#                        alt.Tooltip("mode:N", title="Tegund"),
-#                        alt.Tooltip("tokens_total:Q", title="Fjöldi tóka", format=",.0f"),
-#                        alt.Tooltip("latency_ms:Q", title="Biðtími (ms)", format=",.0f"),
-#                    ],
-#                )
-#            )
-#            trend = scatter.transform_regression("tokens_total", "latency_ms").mark_line(color=THEME["text_primary"])
-#            st.altair_chart(themed_chart(scatter + trend), use_container_width=True)
-#
-#        st.markdown("**SLO compliance (% requests under threshold) by mode**")
-#        slo_df = build_slo_df(filtered_latency)
-#        slo_chart = (
-#            alt.Chart(slo_df)
-#            .mark_bar(cornerRadiusTopLeft=5, cornerRadiusTopRight=5)
-#            .encode(
-#                x=alt.X("threshold:N", title="Threshold"),
-#                y=alt.Y("pct:Q", title="Requests Within Threshold (%)", scale=alt.Scale(domain=[0, 100])),
-#                color=alt.Color(
-#                    "mode:N",
-#                    scale=alt.Scale(domain=MODE_ORDER, range=[MODE_COLORS[m] for m in MODE_ORDER]),
-#                    title="Mode",
-#                ),
-#                xOffset="mode:N",
-#                tooltip=[
-#                    alt.Tooltip("mode:N", title="Mode"),
-#                    alt.Tooltip("threshold:N", title="Threshold"),
-#                    alt.Tooltip("pct:Q", title="Percent", format=".1f"),
-#                ],
-#            )
-#        )
-#        st.altair_chart(themed_chart(slo_chart), use_container_width=True)
+#Latency section (all requested views) in one bounding box
+with st.container(border=True, key="section-latency"):
+    st.subheader("Greining biðtíma")
+
+    if latency_df.empty:
+        st.info("Engin gögn fundust um biðtíma.")
+    else:
+        latency_mode_filter = st.multiselect(
+            "Latency modes",
+            options=MODE_ORDER,
+            default=MODE_ORDER,
+            key="latency_mode_filter",
+        )
+
+        filtered_latency = latency_df[latency_df["mode"].isin(latency_mode_filter)] if latency_mode_filter else latency_df.iloc[0:0]
+
+        l1, l2 = st.columns(2)
+
+        with l1:
+            st.markdown("**Þróun P50 / P95 biðtíma eftir tegund fyrirspurnar**")
+            percentiles = latency_percentiles_by_day_and_mode(filtered_latency)
+            if percentiles.empty:
+                st.info("Enginn biðtími fyrir valda tegund.")
+            else:
+                p50 = percentiles[["day", "mode", "p50_ms"]].rename(columns={"p50_ms": "latency_ms"})
+                p50["percentile"] = "p50"
+                p95 = percentiles[["day", "mode", "p95_ms"]].rename(columns={"p95_ms": "latency_ms"})
+                p95["percentile"] = "p95"
+                trend_df = pd.concat([p50, p95], ignore_index=True)
+                trend_chart = (
+                    alt.Chart(trend_df)
+                    .mark_line(point=False)
+                    .encode(
+                        x=alt.X("day:T", title="Dagsetning"),
+                        y=alt.Y("latency_ms:Q", title="Biðtími (ms)", scale=alt.Scale(domainMin=0)),
+                        color=alt.Color(
+                            "mode:N",
+                            scale=alt.Scale(domain=MODE_ORDER, range=[MODE_COLORS[m] for m in MODE_ORDER]),
+                            title="Mode",
+                        ),
+                        strokeDash=alt.StrokeDash("percentile:N", title="Percentile"),
+                        tooltip=[
+                            alt.Tooltip("day:T", title="Dagsetning"),
+                            alt.Tooltip("mode:N", title="Tegund"),
+                            alt.Tooltip("percentile:N", title="Hundraðshlutamark"),
+                            alt.Tooltip("latency_ms:Q", title="Biðtími (ms)", format=",.0f"),
+                        ],
+                    )
+                )
+                st.altair_chart(themed_chart(trend_chart), use_container_width=True)
+
+        with l2:
+            st.markdown("**Dreifing biðtíma**")
+            hist_chart = (
+                alt.Chart(filtered_latency)
+                .mark_bar(opacity=0.75, color=THEME["primary"])
+                .encode(
+                    x=alt.X("latency_ms:Q", bin=alt.Bin(maxbins=30), title="Biðtími (ms)"),
+                    y=alt.Y("count():Q", title="Fjöldi fyrirspurna"),
+                    tooltip=[alt.Tooltip("count():Q", title="Fjöldi fyrirspurna")],
+                )
+            )
+            st.altair_chart(themed_chart(hist_chart), use_container_width=True)
+
+        l3, l4 = st.columns(2)
+
+        with l3:
+            st.markdown("**Biðtími eftir tegund**")
+            box_chart = (
+                alt.Chart(filtered_latency)
+                .mark_boxplot(size=40)
+                .encode(
+                    x=alt.X("mode:N", title="Mode", sort=MODE_ORDER, axis=alt.Axis(labelAngle=0)),
+                    y=alt.Y("latency_ms:Q", title="Biðtími (ms)", scale=alt.Scale(domainMin=0)),
+                    color=alt.Color(
+                        "mode:N",
+                        scale=alt.Scale(domain=MODE_ORDER, range=[MODE_COLORS[m] for m in MODE_ORDER]),
+                        title="Tegund",
+                    ),
+                    tooltip=[alt.Tooltip("mode:N", title="Tegund")],
+                )
+            )
+            st.altair_chart(themed_chart(box_chart), use_container_width=True)
+
+        with l4:
+            st.markdown("**Biðtími vs Fjöldi tóka**")
+            scatter_base = filtered_latency.dropna(subset=["tokens_total"])
+            scatter = (
+                alt.Chart(scatter_base)
+                .mark_circle(size=55, opacity=0.5)
+                .encode(
+                    x=alt.X("tokens_total:Q", title="Fjöldi tókas"),
+                    y=alt.Y("latency_ms:Q", title="Biðtími (ms)", scale=alt.Scale(domainMin=0)),
+                    color=alt.Color(
+                        "mode:N",
+                        scale=alt.Scale(domain=MODE_ORDER, range=[MODE_COLORS[m] for m in MODE_ORDER]),
+                        title="Mode",
+                    ),
+                    tooltip=[
+                        alt.Tooltip("mode:N", title="Tegund"),
+                        alt.Tooltip("tokens_total:Q", title="Fjöldi tóka", format=",.0f"),
+                        alt.Tooltip("latency_ms:Q", title="Biðtími (ms)", format=",.0f"),
+                    ],
+                )
+            )
+            trend = scatter.transform_regression("tokens_total", "latency_ms").mark_line(color=THEME["text_primary"])
+            st.altair_chart(themed_chart(scatter + trend), use_container_width=True)
+
+        st.markdown("**SLO compliance (% requests under threshold) by mode**")
+        slo_df = build_slo_df(filtered_latency)
+        slo_chart = (
+            alt.Chart(slo_df)
+            .mark_bar(cornerRadiusTopLeft=5, cornerRadiusTopRight=5)
+            .encode(
+                x=alt.X("threshold:N", title="Threshold"),
+                y=alt.Y("pct:Q", title="Requests Within Threshold (%)", scale=alt.Scale(domain=[0, 100])),
+                color=alt.Color(
+                    "mode:N",
+                    scale=alt.Scale(domain=MODE_ORDER, range=[MODE_COLORS[m] for m in MODE_ORDER]),
+                    title="Mode",
+                ),
+                xOffset="mode:N",
+                tooltip=[
+                    alt.Tooltip("mode:N", title="Mode"),
+                    alt.Tooltip("threshold:N", title="Threshold"),
+                    alt.Tooltip("pct:Q", title="Percent", format=".1f"),
+                ],
+            )
+        )
+        st.altair_chart(themed_chart(slo_chart), use_container_width=True)

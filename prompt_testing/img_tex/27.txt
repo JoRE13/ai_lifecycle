@@ -1,0 +1,3 @@
+27. Leysið $\ln(x+5) + \log_{2}(3) = 0$
+
+$\ln(x+5) + \log_{2}(x) = 0 \Leftrightarrow \ln(x^{2}+5x) = 0 \Leftrightarrow x^{2}+5x = 1$

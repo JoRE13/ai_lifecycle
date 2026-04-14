@@ -1,0 +1,3 @@
+Reiknið heildit $\int 2x^2 \log(x) dx$
+
+$\int 2x^2 \log(x) dx = $

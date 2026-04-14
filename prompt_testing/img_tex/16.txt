@@ -1,0 +1,3 @@
+Reikni\[\int \frac{16x-5}{8x^2-5x} dx\]
+
+\[\int \frac{16x-5}{8x^2-5x} dx = \int \frac{16x-5}{x(8x-5)} dx\]

@@ -1,0 +1,8 @@
+Finndu afleiðu fallsins $f(x) = \ln(3x^2 + 1)$
+
+Notum keðjureglu:
+$f'(x) = \frac{1}{3x^2 + 1} \cdot \frac{d}{dx}(3x^2 + 1)$
+og
+$\frac{d}{dx}(3x^2 + 1) = 6x$
+svo:
+$f'(x) = \frac{6x}{3x^2 + 1}$

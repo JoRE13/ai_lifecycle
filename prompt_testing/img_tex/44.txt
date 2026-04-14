@@ -1,0 +1,3 @@
+Teiknið graf fallsins $f(x)=x^2$.
+
+![Graf fallsins f(x)=x^2 sem sýnir parabólu með botnpunkt í (0,0)]

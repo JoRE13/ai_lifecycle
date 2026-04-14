@@ -9,7 +9,9 @@ STRICT POLICY:
 - If any required step is cut off, hidden, too faint, overwritten, or ambiguous, mark unreadable.
 - Never infer, guess, or repair handwriting.
 - Be conservative: when uncertain, fail legibility.
+- Solution must not be finished, you are only seeing if current solution is legible irrespective of correctness.
 - Use MathJax-compatible LaTeX. Use only `\(...\)`.
+- Use icelandic characters
 
 OUTPUT JSON ONLY:
 {

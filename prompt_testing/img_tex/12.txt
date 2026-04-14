@@ -1,0 +1,3 @@
+Lína fer í gegnum punktana $(3, -3)$ og $(-8, 8)$, hver er jafna línunnar?
+
+hallatala er $h = \frac{8 - (-3)}{-8 - 3} = \frac{11}{-11} = -1$

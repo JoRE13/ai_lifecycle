@@ -1,0 +1,5 @@
+13. Sannid a\~o $\lim_{x\to 1} x^2 = 1$
+
+Látum $\varepsilon > 0$ vera gefid. Viljum sýna a\~o til er $\delta > 0$ þ.a. ef $|x-1|<\delta$ pá er $|x^2-1|<\varepsilon$. 
+
+Nú er $|x^2-1| = |(x-1)(x+1)| = |x-1||x+1| < 

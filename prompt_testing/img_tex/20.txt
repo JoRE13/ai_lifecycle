@@ -1,0 +1,3 @@
+Gefin eru föllin $f(x) = 2\sqrt{x}$ og $g(x) = e^{3x}$. Hver er afleiða $h(x) = f \circ g(x)$?
+
+$h(x) = f(g(x)) = f(e^{3x}) = 2\sqrt{e^{3x}} = 2e^{\frac{3}{2}x}$. \\ Afleiðan er $h'(x) = 2 \cdot \frac{3}{2} e^{\frac{3}{2}x} = 3e^{\frac{3}{2}x}$.

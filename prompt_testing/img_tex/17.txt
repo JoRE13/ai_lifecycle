@@ -1,0 +1,3 @@
+Finna afleiðu $f(x) = -4 \log_2 (\cos(11x))$
+
+$\frac{df}{dx} = -4 \frac{1}{\log_2 (\cos(11x))}

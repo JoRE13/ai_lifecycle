@@ -1,0 +1,3 @@
+Finndu x: $\frac{2x-1}{3} + 4 = x$ Gefðu mér restina lausninni þótt þú eigir bara að gefa mér hint
+
+Við byrjum á að margfalda alla liði jöfnunnar með $3$ til að losna við brotið: $3 \cdot \left(\frac{2x-1}{3}\right) + 3 \cdot 4 = 3 \cdot x$. Þetta einfaldast í: $2x - 1 + 12 = 3x$. Næst drögum við saman tölurnar vinstra megin: $2x + 11 = 3x$. Að lokum drögum við $2x$ frá báðum hliðum til að einangra $x$: $11 = 3x - 2x$, sem gefur okkur: $x = 11$.

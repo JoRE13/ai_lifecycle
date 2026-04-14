@@ -1,0 +1,3 @@
+Gefin eru mengi $A = \{2, 3, 4, 6 \}$, $B = \{6, 10 \}$ og $C = \{2, 6, 8 \}$. Hva	e mengi f	aast 	ext{ur a	ext 	ext{dg er	ext 	ext{dina}} } A \cap (B \cup C) ?$ 
+
+$B \cup C = \{2, 6, 8, 10 \}$. $A \cap (B \cup C) = \{2, 3, 4, 6 \} \cap \{2, 6, 8, 10 \} = \{2, 6 \}$.

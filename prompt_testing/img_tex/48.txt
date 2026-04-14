@@ -1,0 +1,11 @@
+Leysið jöfnuna $(x-2)(x+3) = x^2 - 1$
+
+Liðum vinstri hlið:
+
+$x^2 + 3x - 2x - 6 = x^2 + x - 6$
+
+Þá er $x^2 + x - 6 = x^2 - 1$
+
+$\Rightarrow x - 6 = -1$
+
+$x = 5$

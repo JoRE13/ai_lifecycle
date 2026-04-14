@@ -1,0 +1,8 @@
+Finndu afleiðu fallsins $f(x) = x \tan x$
+
+Notum margfeldisreglu:
+$f'(x) = 1 \cdot \tan(x) + x \cdot \frac{d}{dx}(\tan x)$
+Diffruðum $\tan x$:
+$\frac{d}{dx}(\tan x) = \sec^2 x$
+Svo:
+$f'(x) = \tan x + x \sec^2(x)$

@@ -1,0 +1,3 @@
+Leysið $\frac{(x-2)(x+1)}{x-4} \geq 0$
+
+Gerum formerkjakönnun:\n\n\begin{tikzpicture}\n\draw[thick] (-2,0) -- (6,0);\n\draw[thick] (-2,-0.2) -- (-0.5,-0.2) -- (-0.5,0.4) -- (2.5,0.4) -- (2.5,-0.2) -- (4,-0.2) -- (4,0.4) -- (6,0.4);\n\node at (-0.5,-0.5) {$-1$};\n\node at (2.5,-0.5) {$2$};\n\node at (4,-0.5) {$4$};\n\node at (-1.25,-0.4) {$-$};\n\node at (1,0.6) {$0$};\n\node at (3.25,-0.4) {$-$};\n\node at (5,0.6) {$+$};\n\end{tikzpicture}\n\n$x=-2: \frac{(-2-2)(-2+1)}{-2-4} = \frac{-4 \cdot -1}{-6} = -\frac{2}{3} < 0$\n\n$x=0: \frac{(0-2)(0+1)}{0-4} = \frac{(-2) \cdot 1}{-4} = \frac{1}{2} > 0$\n\n$x=3: \frac{(3-2)(3+1)}{3-4} = \frac{1 \cdot 4}{-1} = -\frac{4}{1} < 0$\n\n$x=5: \frac{(5-2)(5+1)}{5-4} = \frac{3 \cdot 6}{1} = 18 > 0$\n\nSvo $x \in [-1, 2] \cup (4, \infty)$

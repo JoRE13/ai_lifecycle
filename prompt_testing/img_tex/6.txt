@@ -1,0 +1,3 @@
+Skrifid spÃ­rnaÃ¶lu $e^{\frac{3}{2}i - 2\ln(8)} \cdot \frac{\pi i(1-\frac{3}{\pi})}{2} - 2\ln(2)}$ Ã¡ forminnu $x+iy$
+
+ViÃ° hÃ¶fum $e^{\frac{3}{2}i - 2\ln(8)} \cdot \frac{\pi i(1-\frac{3}{\pi})}{2} - 2\ln(2)} = e^{\frac{3}{2}i - 2\ln(8)} \cdot \frac{\pi i(1-\frac{3}{\pi})}{2} - 2\ln(2)} = e^{\frac{3}{2}i - 6\ln(2)} \cdot \frac{\pi i(1-\frac{3}{\pi})}{2} - 2\ln(2)} = e^{\ln(2^{-8}) + i(-\frac{3}{2} - \frac{\pi i(1-\frac{3}{\pi})}{2})} = e^{\ln(2^{-8}) + i(-\frac{3}{2} - \frac{\pi}{2} + \frac{3}{2})} = e^{\ln(2^{-8}) + i(-\frac{\pi}{2})} \approx e^{\ln(2^{-8})} (\cos(-\frac{\pi}{2}) + i \sin(-\frac{\pi}{2})) = 2^{-8} (0-i) = -i \cdot 2^{-8}$

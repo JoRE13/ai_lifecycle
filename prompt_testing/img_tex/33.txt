@@ -1,0 +1,3 @@
+33. Reikni heildi $\int\cos(x)e^xdx.$
+
+$\int\cos(x)e^xdx=-\sin(x)e^x+\int(-\sin(x)e^x)dx=-\sin(x)e^x-\int\sin(x)e^xdx$

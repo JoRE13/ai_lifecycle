@@ -1,0 +1,3 @@
+Sýnið að $\cos^2(x) - \sin^2(x) = 2\cos^2(x) - 1$
+
+Við höfum $2\cos^2(x) - 1 = 2\cos^2(x) - (\sin^2(x) + \cos^2(x)) = \cos^2(x) - \sin^2(x)$
