@@ -11,7 +11,7 @@ from uuid import UUID, uuid4
 
 from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import JSONResponse
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageDraw, UnidentifiedImageError
 from sqlmodel import Session, select
 
 from backend.auth.deps import get_current_user
@@ -36,7 +36,7 @@ PROMPTS_BASE = Path(__file__).resolve().parents[1] / "prompts"
 PROMPTS_ROOT = PROMPTS_BASE / "modes"
 PROMPTS_EXPERT_ROOT = PROMPTS_BASE / "modes_expert"
 LEGIBILITY_PROMPT_ROOT = PROMPTS_BASE / "legibility"
-ERROR_PROMPT_PATH_V3 = PROMPTS_BASE / "errors" / "v3" / "prompt.txt"
+ERROR_PROMPT_PATH_V4 = PROMPTS_BASE / "errors" / "v4" / "prompt.txt"
 DEFAULT_MODE_PROMPT_VARIANT = (os.getenv("QUERY_PROMPT_VARIANT") or "v4").strip().lower()
 DEFAULT_LEGIBILITY_PROMPT_VARIANT = (os.getenv("QUERY_LEGIBILITY_PROMPT_VARIANT") or "v3").strip().lower()
 ExpertMode = Literal["off", "clarity", "strict"]
@@ -118,7 +118,7 @@ def _load_legibility_prompt(*, prompt_variant: Literal["v2", "v3"]) -> str:
 
 def _load_deferred_error_prompt() -> str:
     try:
-        return ERROR_PROMPT_PATH_V3.read_text(encoding="utf-8")
+        return ERROR_PROMPT_PATH_V4.read_text(encoding="utf-8")
     except FileNotFoundError as exc:
         raise HTTPException(status_code=500, detail="Deferred error prompt file not found") from exc
 
@@ -743,6 +743,77 @@ def _record_error_event_from_deferred_payload(
     return topic
 
 
+def _as_bounded_float(value: object, *, minimum: float = 0.0, maximum: float = 1.0) -> float | None:
+    number = _as_float_or_none(value)
+    if number is None:
+        return None
+    if number < minimum:
+        return minimum
+    if number > maximum:
+        return maximum
+    return number
+
+
+def _coerce_error_box(value: object, *, page_count: int) -> dict[str, float | int] | None:
+    if not isinstance(value, dict):
+        return None
+
+    page = _as_int_or_none(value.get("page"))
+    if page is None:
+        page = 1
+    page = max(1, min(page, page_count))
+
+    x_min = _as_bounded_float(value.get("x_min"))
+    y_min = _as_bounded_float(value.get("y_min"))
+    x_max = _as_bounded_float(value.get("x_max"))
+    y_max = _as_bounded_float(value.get("y_max"))
+    if None in {x_min, y_min, x_max, y_max}:
+        return None
+    if x_min >= x_max or y_min >= y_max:
+        return None
+
+    return {
+        "page": page,
+        "x_min": x_min,
+        "y_min": y_min,
+        "x_max": x_max,
+        "y_max": y_max,
+    }
+
+
+def _annotate_merged_solution_image(
+    *,
+    solution_pages_bytes: list[bytes],
+    error_box: dict[str, float | int],
+) -> bytes:
+    solution_pages = [
+        _bytes_to_pil_image(page_bytes, filename=f"solution_{index}.png")
+        for index, page_bytes in enumerate(solution_pages_bytes, start=1)
+    ]
+    merged_image, placements = _merge_solution_pages_for_artifact_image(solution_pages)
+
+    page_index = int(error_box["page"]) - 1
+    if page_index < 0 or page_index >= len(placements):
+        raise ValueError("error_box page is out of range")
+
+    placement = placements[page_index]
+    left = placement["x_offset"] + int(float(error_box["x_min"]) * placement["width"])
+    top = placement["y_offset"] + int(float(error_box["y_min"]) * placement["height"])
+    right = placement["x_offset"] + int(float(error_box["x_max"]) * placement["width"])
+    bottom = placement["y_offset"] + int(float(error_box["y_max"]) * placement["height"])
+    if right <= left or bottom <= top:
+        raise ValueError("error_box produced an invalid rectangle")
+
+    draw = ImageDraw.Draw(merged_image)
+    stroke_width = max(3, min(merged_image.width, merged_image.height) // 200)
+    draw.rectangle((left, top, right, bottom), outline="red", width=stroke_width)
+    draw.text((left, max(0, top - 24)), "Error", fill="red")
+
+    buffer = BytesIO()
+    merged_image.save(buffer, format="PNG")
+    return buffer.getvalue()
+
+
 def _run_deferred_error_analysis(
     *,
     attempt_id: UUID,
@@ -758,6 +829,7 @@ def _run_deferred_error_analysis(
     prob_bytes: bytes,
     prob_filename: str | None,
     solution_pages_bytes: list[bytes],
+    solution_image_key: str,
 ) -> None:
     classification_prompt = _augment_prompt_for_pages(
         base_prompt=_augment_deferred_error_prompt(
@@ -789,7 +861,7 @@ def _run_deferred_error_analysis(
         "pipelineMode": pipeline_mode,
         "expertMode": expert_mode,
         "requestId": deferred_request_id,
-        "promptVersion": "errors/v3/prompt.txt",
+        "promptVersion": "errors/v4/prompt.txt",
         "environment": environment,
     }
 
@@ -827,8 +899,25 @@ def _run_deferred_error_analysis(
             "wrong_step": "",
             "correct_step": message_is,
             "error_type": "uncategorized",
+            "error_box": None,
             "confidence": 0.0,
         }
+
+    error_box = _coerce_error_box(payload.get("error_box"), page_count=len(solution_pages_bytes))
+    if error_box is not None:
+        try:
+            annotated_solution_bytes = _annotate_merged_solution_image(
+                solution_pages_bytes=solution_pages_bytes,
+                error_box=error_box,
+            )
+            upload_bytes(
+                key=solution_image_key,
+                data=annotated_solution_bytes,
+                content_type="image/png",
+            )
+        except Exception:
+            error_box = None
+    payload["error_box"] = error_box
 
     with Session(engine) as session:
         user = session.get(User, user_id)
@@ -856,7 +945,13 @@ def _run_deferred_error_analysis(
             event_type="error_classified",
             mode=mode,
             verdict="incorrect",
-            metadata_json=json.dumps({"prompt_version": "errors/v3/prompt.txt"}),
+            metadata_json=json.dumps(
+                {
+                    "prompt_version": "errors/v4/prompt.txt",
+                    "error_box": error_box,
+                    "solution_image_overwritten": error_box is not None,
+                }
+            ),
         )
         session.commit()
 
@@ -930,6 +1025,15 @@ def _normalize_page_count(_value: int | None, *, uploaded_pages: int) -> int:
 
 
 def _merge_solution_pages_for_artifact(solution_pages: list[Image.Image]) -> bytes:
+    merged, _placements = _merge_solution_pages_for_artifact_image(solution_pages)
+    buffer = BytesIO()
+    merged.save(buffer, format="PNG")
+    return buffer.getvalue()
+
+
+def _merge_solution_pages_for_artifact_image(
+    solution_pages: list[Image.Image],
+) -> tuple[Image.Image, list[dict[str, int]]]:
     if not solution_pages:
         raise HTTPException(status_code=422, detail="At least one solution page is required")
 
@@ -959,14 +1063,21 @@ def _merge_solution_pages_for_artifact(solution_pages: list[Image.Image]) -> byt
     )
 
     y_offset = vertical_padding
+    placements: list[dict[str, int]] = []
     for page in normalized_pages:
         x_offset = horizontal_padding + ((max_width - page.width) // 2)
         merged.paste(page, (x_offset, y_offset))
+        placements.append(
+            {
+                "x_offset": x_offset,
+                "y_offset": y_offset,
+                "width": page.width,
+                "height": page.height,
+            }
+        )
         y_offset += page.height + separator_height
 
-    buffer = BytesIO()
-    merged.save(buffer, format="PNG")
-    return buffer.getvalue()
+    return merged, placements
 
 
 @router.post("/query")
@@ -1508,6 +1619,7 @@ async def query(
             prob_bytes=prob_bytes,
             prob_filename=prob_image.filename,
             solution_pages_bytes=solution_pages_bytes,
+            solution_image_key=solution_image_key,
         )
 
     response_payload = dict(payload)

@@ -79,11 +79,19 @@ class LegibilityResponse(BaseModel):
 
 
 class DeferredErrorResponse(BaseModel):
+    class ErrorBox(BaseModel):
+        page: int | None = None
+        x_min: float
+        y_min: float
+        x_max: float
+        y_max: float
+
     topic: str | None = None
     subtopic: str | None = None
     wrong_step: str | None = None
     correct_step: str | None = None
     error_type: str
+    error_box: ErrorBox | None = None
     confidence: float | None = None
 
 
