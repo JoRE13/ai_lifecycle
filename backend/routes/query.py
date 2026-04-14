@@ -38,7 +38,7 @@ PROMPTS_EXPERT_ROOT = PROMPTS_BASE / "modes_expert"
 LEGIBILITY_PROMPT_ROOT = PROMPTS_BASE / "legibility"
 ERROR_PROMPT_PATH_V4 = PROMPTS_BASE / "errors" / "v4" / "prompt.txt"
 DEFAULT_MODE_PROMPT_VARIANT = (os.getenv("QUERY_PROMPT_VARIANT") or "v6").strip().lower()
-DEFAULT_LEGIBILITY_PROMPT_VARIANT = (os.getenv("QUERY_LEGIBILITY_PROMPT_VARIANT") or "v3").strip().lower()
+DEFAULT_LEGIBILITY_PROMPT_VARIANT = (os.getenv("QUERY_LEGIBILITY_PROMPT_VARIANT") or "v4").strip().lower()
 ExpertMode = Literal["off", "clarity", "strict"]
 SUCCESS_VERDICTS = {"correct_so_far", "fully_correct", "fully_solved"}
 READING_CONFIRM_CONFIDENCE_MIN = 0.30
@@ -61,11 +61,13 @@ def _resolve_mode_prompt_variant() -> Literal["v1", "v2", "v3", "v4", "v5", "v6"
     return "v6"
 
 
-def _resolve_legibility_prompt_variant() -> Literal["v2", "v3"]:
+def _resolve_legibility_prompt_variant() -> Literal["v2", "v3", "v4"]:
     configured = (os.getenv("QUERY_LEGIBILITY_PROMPT_VARIANT") or DEFAULT_LEGIBILITY_PROMPT_VARIANT).strip().lower()
     if configured == "v2":
         return "v2"
-    return "v3"
+    if configured == "v3":
+        return "v3"
+    return "v4"
 
 
 def _resolve_pipeline_mode(value: str | None) -> Literal["single_pass", "two_pass"]:
@@ -114,7 +116,7 @@ def _resolve_mode_prompt_path(
     return PROMPTS_ROOT / prompt_variant / mode / "prompt.txt"
 
 
-def _load_legibility_prompt(*, prompt_variant: Literal["v2", "v3"]) -> str:
+def _load_legibility_prompt(*, prompt_variant: Literal["v2", "v3", "v4"]) -> str:
     prompt_path = LEGIBILITY_PROMPT_ROOT / prompt_variant / "prompt.txt"
     try:
         return prompt_path.read_text(encoding="utf-8")
@@ -179,37 +181,22 @@ def _coerce_legibility_regions(value: object) -> list[dict[str, object]]:
     return regions
 
 
-def _coerce_missing_parts(value: object) -> list[str]:
-    if not isinstance(value, list):
-        return []
-
-    parts: list[str] = []
-    for item in value[:8]:
-        text = _text_or_none(item, max_len=160)
-        if text is not None:
-            parts.append(text)
-    return parts
-
-
 def _evaluate_legibility_payload(
     payload: dict[str, object],
     *,
     fail_closed: bool,
-) -> tuple[bool, bool | None, list[dict[str, object]], list[str]]:
+) -> tuple[bool, bool | None, list[dict[str, object]]]:
     all_readable = _as_bool_or_none(payload.get("all_readable"))
-    regions = _coerce_legibility_regions(payload.get("ambiguous_regions"))
-    missing_parts = _coerce_missing_parts(payload.get("missing_parts"))
-    failed = bool(regions) or bool(missing_parts) or all_readable is False
+    regions = _coerce_legibility_regions(payload.get("ambiguous_steps"))
+    failed = bool(regions) or all_readable is False
     if fail_closed and all_readable is None:
         failed = True
-    return failed, all_readable, regions, missing_parts
+    return failed, all_readable, regions
 
 
 def _build_unclear_payload(
     *,
     regions: list[dict[str, object]],
-    missing_parts: list[str],
-    fallback_message: str | None = None,
 ) -> dict[str, object]:
     if regions:
         parts: list[str] = []
@@ -227,14 +214,8 @@ def _build_unclear_payload(
             f"Ég get ekki lesið lausnina nægilega skýrt ({details}). "
             "Vinsamlegast skrifaðu þessi skref skýrar og sendu aftur."
         )
-    elif missing_parts:
-        details = "; ".join(missing_parts[:2])
-        message = (
-            f"Það vantar hluta af lausninni ({details}). "
-            "Vinsamlegast bættu við þeim hluta og sendu aftur."
-        )
     else:
-        message = fallback_message or (
+        message = (
             "Ég get ekki staðfest lausnina því skriftin er ólæsileg á mikilvægum stöðum. "
             "Vinsamlegast skrifaðu skrefin skýrar og sendu aftur."
         )
@@ -248,8 +229,7 @@ def _build_unclear_payload(
         "correct_approach": "",
         "error_confidence": None,
         "all_readable": False,
-        "ambiguous_regions": regions,
-        "missing_parts": missing_parts,
+        "ambiguous_steps": regions,
     }
 
 
@@ -449,32 +429,13 @@ def _augment_deferred_error_prompt(*, base_prompt: str, message_is: str) -> str:
     )
 
 
-def _coerce_interpreted_reading_entries(
+def _build_ambiguous_step_entries(
     *,
-    payload: dict[str, object],
     page_count: int,
-    fallback_regions: list[dict[str, object]],
+    ambiguous_steps: list[dict[str, object]],
 ) -> list[dict[str, object]]:
-    interpreted_steps = _coerce_confirmed_reading_entries(
-        payload.get("interpreted_steps"),
-        page_count=page_count,
-    )
-    if interpreted_steps:
-        return interpreted_steps
-
-    interpreted_text = _text_or_none(payload.get("interpreted_text"), max_len=1_000)
-    if interpreted_text:
-        return [
-            {
-                "id": "reading_1",
-                "page": 1 if page_count >= 1 else None,
-                "label": "Heildarlestur",
-                "text": interpreted_text,
-            }
-        ]
-
     fallback_entries: list[dict[str, object]] = []
-    for index, region in enumerate(fallback_regions[:8], start=1):
+    for index, region in enumerate(ambiguous_steps[:8], start=1):
         if not isinstance(region, dict):
             continue
         snippet = _text_or_none(region.get("snippet"), max_len=160)
@@ -489,7 +450,7 @@ def _coerce_interpreted_reading_entries(
             {
                 "id": f"reading_{index}",
                 "page": page,
-                "label": f"Bls. {page}" if page is not None else f"Skref {index}",
+                "label": f"Óskýrt skref á bls. {page}" if page is not None else f"Óskýrt skref {index}",
                 "text": text,
             }
         )
@@ -498,17 +459,12 @@ def _coerce_interpreted_reading_entries(
 
 def _build_confirm_reading_payload(
     *,
-    regions: list[dict[str, object]],
-    missing_parts: list[str],
+    ambiguous_steps: list[dict[str, object]],
     interpreted_reading: list[dict[str, object]],
     reading_confidence: float | None,
-    fallback_message: str | None = None,
 ) -> dict[str, object]:
     confidence_value = reading_confidence if reading_confidence is not None else 0.5
-    message = (
-        fallback_message
-        or "Ég er ekki alveg viss um lesturinn á lausninni. Vinsamlegast staðfestu eða leiðréttu textann áður en ég met skrefin."
-    )
+    message = "Ég er ekki alveg viss um lesturinn á sumum skrefum. Vinsamlegast staðfestu eða leiðréttu aðeins þessi óskýru skref áður en ég met lausnina."
     return {
         "verdict": "unclear",
         "response_type": "confirm_reading",
@@ -520,8 +476,7 @@ def _build_confirm_reading_payload(
         "all_readable": False,
         "reading_confidence": confidence_value,
         "interpreted_reading": interpreted_reading,
-        "ambiguous_regions": regions,
-        "missing_parts": missing_parts,
+        "ambiguous_steps": ambiguous_steps,
     }
 
 
@@ -1316,7 +1271,6 @@ async def query(
             legibility_failed,
             _legibility_all_readable,
             legibility_regions,
-            legibility_missing_parts,
         ) = _evaluate_legibility_payload(legibility_payload_raw, fail_closed=True)
 
         selected_prompt_version = legibility_prompt_version
@@ -1341,26 +1295,21 @@ async def query(
 
         if legibility_failed:
             reading_confidence = _as_float_or_none(legibility_payload_raw.get("reading_confidence"))
-            interpreted_reading = _coerce_interpreted_reading_entries(
-                payload=legibility_payload_raw,
+            interpreted_reading = _build_ambiguous_step_entries(
                 page_count=resolved_page_count,
-                fallback_regions=legibility_regions,
+                ambiguous_steps=legibility_regions,
             )
             if interpreted_reading and (
                 reading_confidence is None or reading_confidence >= READING_CONFIRM_CONFIDENCE_MIN
             ):
                 payload = _build_confirm_reading_payload(
-                    regions=legibility_regions,
-                    missing_parts=legibility_missing_parts,
+                    ambiguous_steps=legibility_regions,
                     interpreted_reading=interpreted_reading,
                     reading_confidence=reading_confidence,
-                    fallback_message=_text_or_none(legibility_payload_raw.get("message_is")),
                 )
             else:
                 payload = _build_unclear_payload(
                     regions=legibility_regions,
-                    missing_parts=legibility_missing_parts,
-                    fallback_message=_text_or_none(legibility_payload_raw.get("message_is")),
                 )
         legibility_prob_pil.close()
         for page in legibility_solution_pages:

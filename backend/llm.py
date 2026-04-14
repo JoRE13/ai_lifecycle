@@ -63,19 +63,10 @@ class LegibilityRegion(BaseModel):
     reason: str | None = None
 
 
-class LegibilityInterpretedStep(BaseModel):
-    page: int | None = None
-    text: str
-
-
 class LegibilityResponse(BaseModel):
     all_readable: bool
-    ambiguous_regions: list[LegibilityRegion] = Field(default_factory=list)
-    missing_parts: list[str] = Field(default_factory=list)
-    message_is: str | None = None
     reading_confidence: float | None = None
-    interpreted_text: str | None = None
-    interpreted_steps: list[LegibilityInterpretedStep] = Field(default_factory=list)
+    ambiguous_steps: list[LegibilityRegion] = Field(default_factory=list)
 
 
 class DeferredErrorResponse(BaseModel):
