@@ -1,9 +1,6 @@
-# Ratatoskur - Final Project Report (Draft)
+# Ratatoskur - Final Project Report
 
-This report follows the required final-project structure and documents the current final-state system.  
-Two items are intentionally left as explicit placeholders for final polishing later:
-1. Monitoring screenshots from current live traces/dashboard views.
-2. One concrete incident write-up from recent production-like usage.
+This report follows the required 8-section final-project structure and documents the current final-state system.
 
 ## 4.1 Problem & Users
 Ratatoskur addresses a specific learning problem: students often get stuck while solving math problems on paper, but the support tools available to them are either too generic (full-solution calculators) or too rigid (static exercise books). In practice, many students need help that is contextual, step-aware, and available exactly at the moment they are working through their own handwritten solution. The core product goal is therefore not just to provide an answer, but to provide tutoring feedback that matches the student's current step, catches mistakes early, and preserves the student's own reasoning process.
@@ -17,16 +14,8 @@ Our understanding of the problem evolved materially since Assignment 1. Initiall
 ## 4.2 Technical Architecture
 Ratatoskur is implemented as an iOS frontend with a Python backend and external model/storage services. The architecture intentionally separates interaction, orchestration, persistence, and observability concerns.
 
-```mermaid
-flowchart LR
-    U[Student on iPad/iPhone\nSwiftUI + PencilKit] --> API[FastAPI Backend]
-    API --> DB[(Neon Postgres)]
-    API --> R2[(Cloudflare R2)]
-    API --> GEM[Gemini API]
-    API --> LF[Langfuse]
-    DB --> DASH[Analytics Views / Dashboard]
-    LF --> DASH
-```
+**Figure 1. System architecture (same diagram as presentation):**
+![Ratatoskur system architecture](./background.png)
 
 From a data-flow perspective, the primary path begins when a user creates or opens a problem and writes one or more handwritten pages. The frontend sends problem image data, solution pages, drawing payloads, selected mode, and context metadata to `/query`. The backend validates payload structure and limits, runs legibility and reasoning (or single-pass reasoning, depending on runtime settings), persists artifacts and attempt metadata, and returns structured feedback. Attempts, error events, and stage metrics are then available for analytics summaries, error-bank views, and personalized exam targeting.
 
@@ -39,24 +28,30 @@ Prompt management is explicit and versioned in the backend prompt tree (`prompts
 ## 4.3 LLM Integration & Prompt Strategy
 The system uses Gemini models in a structured, task-routed way rather than a single monolithic prompt.
 
-For main notebook reasoning, we use `gemini-3.1-flash-lite-preview` with JSON-schema constrained outputs (Pydantic-backed contracts). For deferred error classification and exam answer extraction, dedicated calls are used with task-specific schemas. The key design decision was to treat model responses as typed contracts, not free text, and reject malformed outputs.
+Our model layer is centered on the Gemini 3 Flash family, with configuration tuned by task type. In practice, the system uses different model/thinking settings across phases (for example, legibility/reasoning/error categorization), while keeping a strict JSON-schema contract at every boundary. For deferred error classification and exam answer extraction, dedicated calls are used with task-specific schemas. The key design decision was to treat model responses as typed contracts, not free text, and reject malformed outputs.
 
-The prompting techniques that worked best were structured outputs with explicit schema validation, mode-conditioned prompting (`hint`, `check_solution`, `reveal`) with strict behavioral boundaries, two-pass orchestration for uncertain handwriting (legibility first, reasoning second), taxonomy-guided outputs for error typing, and task-specific prompt families instead of a single universal prompt.
+The prompting techniques that worked best were zero-shot and one/few-shot structured prompting, explicit schema-constrained outputs, mode-conditioned prompting (`hint`, `check_solution`, `reveal`) with strict behavioral boundaries, two-pass orchestration for uncertain handwriting (legibility first, reasoning second), taxonomy-guided outputs for error typing, and task-specific prompt families instead of a single universal prompt.
 
-Prompt evolution from Assignment 3 to the final version followed a clear path. Early versions focused on baseline role instructions and output format. Later versions introduced stronger behavioral policies, few-shot grounding, stricter response consistency, and clearer unclear-input handling. Assignment 3 version notes show this progression and its effect on both accuracy and feasibility behavior, culminating in the v4 baseline that we carried forward into final-stage integration.
+Prompt evolution from Assignment 3 to the final version followed a clear path. Early versions focused on baseline role instructions and output format. Later versions introduced stronger behavioral policies, few-shot grounding, stricter response consistency, and clearer unclear-input handling. Architecturally, this evolved from one prompt handling all behavior to a phased setup with focused prompts per mode plus optional legibility and explicit error-categorization prompts. The latest evaluated prompt iteration in our final flow is v6.
 
 Several advanced patterns were implemented. First, a multi-turn clarification/confirmation loop allows the backend to return `confirm_reading` when handwriting is uncertain but interpretable, after which the user edits or approves interpreted text before grading proceeds. Second, pipeline routing allows configurable two-pass vs single-pass execution based on runtime settings. Third, expert-mode routing allows alternate prompt paths for stricter `check_solution` behavior without duplicating route logic. Fourth, deferred background analysis performs post-response error classification for analytics/error-bank updates without blocking immediate user response.
 
 These patterns collectively improved controllability, debuggability, and user trust.
 
 ## 4.4 Evaluation & Quality Assurance
-Evaluation builds directly on Assignment 3 methodology to preserve comparability. We keep the same 50-case labeled dataset (`assignment3.csv`) as the anchor benchmark and then validate behavior in full app-stack conditions.
+Evaluation builds directly on Assignment 3 methodology to preserve comparability. We keep the same 50-case handwritten dataset as the anchor benchmark and compare the newest prompt iteration (v6) to the Assignment 3 baseline (a3), including both label-based evaluation and LLM-as-judge scoring.
 
-Current quantitative reference points are the Assignment-3 selected baseline (v4) at **96.0% correctness** with **0 policy violations** over 50 cases, and the Assignment-4 app-stack subset (20 evaluated rows) at **95.0% verdict accuracy**, **0.0% non-feasible ratio**, and **1 mismatch** (case 48).
+Current quantitative reference points are:
+- label-based comparison: **v6 accuracy 0.96** vs **a3 accuracy 0.96**,
+- non-feasibility ratio: **0** for both v6 and a3,
+- LLM-as-judge aggregate score: **v6 average 3.70** vs **a3 average 3.76**,
+- average latency for v6 in evaluation runs: approximately **17 seconds**.
 
-This indicates that policy behavior remained broadly stable when moving from isolated dataset evaluation into the full product system.
+This indicates that core decision behavior stayed stable, while pedagogical quality dimensions remained competitive but mixed across modes.
 
-The key historical failure case was ambiguous handwriting (`id=48`), where earlier behavior could incorrectly proceed with confident interpretation. We now treat this class as a first-order safety problem. The implemented mitigation combines fail-closed legibility checks, confidence normalization, `confirm_reading` when interpretation is recoverable, and `ask_clarification` when it is not.
+For LLM-as-judge, we score each response on five dimensions: mathematical correctness (MC), pedagogical helpfulness (PH), policy compliance (PC), clarity (C), and specificity (S), each on a 1-5 scale. Mode-level trends in the current comparison are: `check` improved slightly on policy but dropped on helpfulness/specificity, `hint` remained strong but slightly lower than a3 overall, and `reveal` improved materially (from 3.6 to 4.6 average). This is important because it shows that aggregate averages hide mode-specific quality movement; in product terms, the final flow is strongest in complete-solution explanation while still needing refinement on strict check-mode pedagogy.
+
+The key historical failure class is ambiguous handwriting. In the current setup, the explicit legibility phase mitigates this by catching uncertain reads before final reasoning. In our current benchmark comparison, the specific legibility prompt catches one of two unclear cases in the v6 set, which confirms improvement but also highlights remaining room for robustness gains.
 
 Quality assurance is layered across strict API-side input validation and upload constraints, typed output contracts with JSON/schema checks, bounded retry/backoff and explicit error surfacing, canonical error taxonomy normalization for analytic consistency, exam-specific validation for topics/modes/pack sizes and OCR input safety, auth/session checks with rotation semantics, and frontend preflight validation plus action-state constraints.
 
@@ -65,41 +60,58 @@ In short, the final system is no longer just "prompt and reply"; it is a guarded
 **Deferred refinement note:** if we run a fresh end-of-semester full evaluation pass on the same 50-case benchmark, we will replace numeric values while preserving this methodology and structure.
 
 ## 4.5 Deployment & Monitoring
-The application is operated as a locally run system for the final course context (native iOS frontend launched from Xcode, backend service running locally, cloud database/storage services active). This deployment strategy was selected because public iOS deployment overhead is disproportionate for this course phase, while still allowing a live, end-to-end demo and real usage traces.
+The application is operated as a hybrid deployment for the final course context: backend services are hosted on Render, while the iOS frontend is run locally on test devices. This setup gives us a live cloud API environment with realistic monitoring, while preserving a manageable mobile distribution workflow for the course phase.
 
-Monitoring combines platform-level and product-level telemetry. On the platform side, we track latency, token usage, cost estimates, mode/model metadata, and trace IDs. On the product side, we track attempt outcomes, error-event distributions, and feedback signals (including thumbs/comment paths) to connect technical behavior with user impact.
+Monitoring combines platform-level and product-level telemetry via two operational views: a Langfuse dashboard for prompt/model traces and an admin analytics dashboard for user-behavior data. On the platform side, we track latency, token usage, cost estimates, mode/model metadata, and trace IDs. On the product side, we track attempt outcomes, error-event distributions, and feedback signals (including thumbs/comment paths) to connect technical behavior with user impact.
 
 Evidence from prior observability runs includes an average latency around 24.823 seconds, p95 latency around 87.697 seconds, and tracked token usage with estimated cost from traced calls.
 
 This monitoring layer is not only diagnostic; it informs product priorities. For example, user-testing feedback about perceived slowness directly matches latency/timeout patterns seen in traces and has been treated as an active optimization track rather than a one-off bug.
 
-**To insert before final submission/presentation:**
-- [TO ADD LATER] Monitoring screenshot 1 (trace detail view).
-- [TO ADD LATER] Monitoring screenshot 2 (latency/tokens aggregate view).
-- [TO ADD LATER] Monitoring screenshot 3 (quality/feedback trend view, if available).
-- [TO ADD LATER] One concrete incident narrative (symptom, root cause hypothesis, mitigation).
+**Monitoring evidence from real usage:**
+
+Figure 2. Langfuse trace view (`/query` request stage breakdown)
+![Langfuse trace view](./trace_view.png)
+
+Figure 3. Latency over time
+![Latency over time dashboard](./latency_overtime.png)
+
+Figure 4. Average latency and average token usage
+![Average latency and token usage dashboard](./avglatency_and_avgtokens.png)
+
+Figure 5. Analytics/admin dashboard view
+![Admin analytics dashboard view](./dashboard_view.png)
 
 ## 4.6 Feature Plan Retrospective
-In Assignment 6 we planned five core improvements. Looking back:
+In Assignment 6 we planned five core improvements. Table 1 revisits each planned item and states its final status.
 
-The first goal, user-based homepage statistics, was completed and expanded beyond a simple counter panel. We now show comparative weekly metrics, activity streak context, and mode-related behavior signals that support self-reflection.
+| Planned A6 feature | Final status | Notes |
+|---|---|---|
+| User-based statistics on homepage | Completed | Expanded beyond counters to weekly context and behavior signals. |
+| Error bank for users | Completed | Structured taxonomy, summaries, and detail drill-down for reflection. |
+| Lower latency | Completed (with ongoing optimization) | Reduced friction via prompt/pipeline reliability improvements and observability-driven tuning. |
+| Generate problems from user errors | Descoped | Scope/dependency growth; moved to backlog rather than shipping partial behavior. |
+| Anonymous data collection | Partially completed | Backend schema/foundation implemented; not activated as a full in-product workflow. |
 
-The second goal, a user error bank, was also completed. Importantly, this became more than a static list: structured error extraction, normalized taxonomy, summary views, and detailed event views now form a coherent loop from mistake detection to user-visible reflection.
-
-The third goal, latency reduction, is the one that is not fully complete. We improved reliability and degraded-mode behavior (validation, retries, safer unclear handling, and UX flow improvements), but user testing still shows response-time friction. We classify this as partially complete and still active.
-
-The fourth goal, generating problems from user errors, was completed. Personal exam packs now target user error patterns automatically and also allow manual target selection. This is one of the most important shipped learning features from the final phase.
-
-The fifth goal, anonymous data collection, is implemented on the backend foundation level (anon identifiers, consent fields, structured evaluation/dataset schema, analytics tracking). The remaining gap is UX exposure and communication of consent controls in the iOS surface.
-
-We also added major features not originally in the A6 list, including one-level folder/subfolder organization with safer archive/delete behavior, extensive PDF workflow upgrades, full unclear-reading confirmation UX, substantial canvas/fullscreen/persistence stabilization, and stronger onboarding/profile clarity updates.
+We also added major features not originally in the A6 list, including an explicit legibility phase, explicit error categorization, agentic-vision style error detection workflow, one-level folder/subfolder organization with safer archive/delete behavior, extensive PDF workflow upgrades, substantial writing/notebook/toolbar UX stabilization (including canvas and fullscreen behavior), share-problem workflows, and stronger onboarding/profile clarity updates.
 
 This retrospective shows that the roadmap was largely delivered, but also that usability and reliability discoveries during testing caused us to invest more heavily in interaction quality than initially forecast.
 
 ## 4.7 User Testing & Interaction Data
-We conducted moderated testing with five external participants (non-group members), each completing a six-task scenario designed to cover the primary flow: account/folder setup, solving and iterating on problems, hint usage, error-bank inspection, and PDF submission creation/export.
+We conducted moderated testing with five external participants (non-group members), each completing a standardized six-task scenario designed to cover the primary flow: account/folder setup, solving and iterating on problems, hint usage, seeded-error recovery, error-bank inspection, and PDF submission creation/export. Sessions were approximately 20 to 30 minutes, with think-aloud prompting and no intervention unless a participant was blocked for more than about 60 seconds.
 
 All participants completed all tasks (30/30 total completions), which indicates that the system is operable end-to-end under guided testing. However, completion alone did not mean smooth UX. Timing patterns and think-aloud notes showed that the most time-consuming tasks were those involving multi-step problem solving and AI feedback waits.
+
+Interaction timing data (from `task_results_filled.csv`, with one documented outlier excluded: U4-T5 = 54:49) is summarized below:
+
+| Task | Description (short) | Median time | Mean time |
+|---|---|---:|---:|
+| T1 | Login + folder + subfolder | 2m 24s | 2m 29s |
+| T2 | Solve + review + show solution | 4m 37s | 4m 20s |
+| T3 | New problem + hint + complete | 4m 42s | 4m 31s |
+| T4 | Seeded error + recovery | 4m 01s | 3m 39s |
+| T5 | Open error bank entry | 0m 22s | 0m 28s |
+| T6 | Create/export PDF submission | 1m 45s | 1m 41s |
 
 SUS results were 72.5, 67.5, 95.0, 72.5, and 92.5 (mean 80.0, median 72.5), indicating above-average usability with noticeable friction clusters. Qualitative findings were consistent across users: folder hierarchy discoverability was confusing in earlier versions, latency/timeout behavior reduced trust in some flows, media/canvas control discoverability needed better affordances, and missing name capture during registration caused downstream PDF friction.
 
@@ -117,5 +129,5 @@ Our most important **technical** takeaway is that reliability in AI products com
 ---
 
 ## Coverage Note
-This draft explicitly covers every required written-report section (`4.1` through `4.8`) from the final project specification.  
-Before submission, we only need to finalize the deferred monitoring evidence placeholders in `4.5` and optionally refresh final quantitative values in `4.4` if we run a new benchmark pass.
+This report explicitly covers every required written-report section (`4.1` through `4.8`) from the final project specification.  
+The report content is submission-ready; remaining work is packaging deliverables (slides PDF + report markdown in the final zip) and final presentation/demo execution.
