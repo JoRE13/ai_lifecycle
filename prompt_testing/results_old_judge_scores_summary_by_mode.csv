@@ -1,0 +1,4 @@
+mode,cases,verdict_accuracy_pct,avg_overall,avg_math,avg_helpfulness,avg_policy,avg_clarity,avg_specificity,avg_latency_s
+check_solution,22,90.9,3.23,3.73,2.95,4.5,4.55,2.64,60.0
+hint,23,100.0,4.3,4.43,4.26,4.91,4.52,3.65,60.0
+reveal,5,100.0,3.6,3.6,3.8,4.6,4.6,3.8,60.0

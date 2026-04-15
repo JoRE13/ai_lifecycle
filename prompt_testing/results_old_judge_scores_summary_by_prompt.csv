@@ -1,0 +1,2 @@
+prompt_version,cases,verdict_accuracy_pct,avg_overall,avg_math,avg_helpfulness,avg_policy,avg_clarity,avg_specificity,avg_latency_s
+v4,50,96.0,3.76,4.04,3.64,4.7,4.54,3.22,60.0

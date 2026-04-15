@@ -38,6 +38,7 @@ PROMPTS_EXPERT_ROOT = PROMPTS_BASE / "modes_expert"
 LEGIBILITY_PROMPT_ROOT = PROMPTS_BASE / "legibility"
 ERROR_PROMPT_PATH_V4 = PROMPTS_BASE / "errors" / "v4" / "prompt.txt"
 DEFAULT_MODE_PROMPT_VARIANT = (os.getenv("QUERY_PROMPT_VARIANT") or "v6").strip().lower()
+DEFAULT_EXPERT_MODE_PROMPT_VARIANT = (os.getenv("QUERY_EXPERT_PROMPT_VARIANT") or "v4").strip().lower()
 DEFAULT_LEGIBILITY_PROMPT_VARIANT = (os.getenv("QUERY_LEGIBILITY_PROMPT_VARIANT") or "v4").strip().lower()
 ExpertMode = Literal["off", "clarity", "strict"]
 SUCCESS_VERDICTS = {"correct_so_far", "fully_correct", "fully_solved"}
@@ -70,6 +71,15 @@ def _resolve_legibility_prompt_variant() -> Literal["v2", "v3", "v4"]:
     return "v4"
 
 
+def _resolve_expert_mode_prompt_variant() -> Literal["v2", "v3", "v4"]:
+    configured = (os.getenv("QUERY_EXPERT_PROMPT_VARIANT") or DEFAULT_EXPERT_MODE_PROMPT_VARIANT).strip().lower()
+    if configured == "v2":
+        return "v2"
+    if configured == "v3":
+        return "v3"
+    return "v4"
+
+
 def _resolve_pipeline_mode(value: str | None) -> Literal["single_pass", "two_pass"]:
     configured = (value or "two_pass").strip().lower()
     if configured == "single_pass":
@@ -90,9 +100,15 @@ def _load_prompt(
     mode: Literal["hint", "check_solution", "reveal"],
     *,
     prompt_variant: Literal["v1", "v2", "v3", "v4", "v5", "v6"],
+    expert_prompt_variant: Literal["v2", "v3", "v4"],
     expert_mode: ExpertMode,
 ) -> str:
-    prompt_path = _resolve_mode_prompt_path(mode=mode, prompt_variant=prompt_variant, expert_mode=expert_mode)
+    prompt_path = _resolve_mode_prompt_path(
+        mode=mode,
+        prompt_variant=prompt_variant,
+        expert_prompt_variant=expert_prompt_variant,
+        expert_mode=expert_mode,
+    )
     try:
         return prompt_path.read_text(encoding="utf-8")
     except FileNotFoundError as exc:
@@ -106,10 +122,11 @@ def _resolve_mode_prompt_path(
     *,
     mode: Literal["hint", "check_solution", "reveal"],
     prompt_variant: Literal["v1", "v2", "v3", "v4", "v5", "v6"],
+    expert_prompt_variant: Literal["v2", "v3", "v4"],
     expert_mode: ExpertMode,
 ) -> Path:
     if mode == "check_solution" and expert_mode != "off":
-        expert_prompt_path = PROMPTS_EXPERT_ROOT / prompt_variant / expert_mode / mode / "prompt.txt"
+        expert_prompt_path = PROMPTS_EXPERT_ROOT / expert_prompt_variant / expert_mode / mode / "prompt.txt"
         if expert_prompt_path.exists():
             return expert_prompt_path
 
@@ -1086,18 +1103,21 @@ async def query(
     request_started_perf = time.perf_counter()
     preprocess_started_perf = request_started_perf
     prompt_variant = _resolve_mode_prompt_variant()
+    expert_prompt_variant = _resolve_expert_mode_prompt_variant()
     legibility_prompt_variant = _resolve_legibility_prompt_variant()
     pipeline_mode = _resolve_pipeline_mode(pipeline_mode)
     resolved_expert_mode = _normalize_expert_mode(expert_mode)
     mode_prompt_path = _resolve_mode_prompt_path(
         mode=mode,
         prompt_variant=prompt_variant,
+        expert_prompt_variant=expert_prompt_variant,
         expert_mode=resolved_expert_mode,
     )
 
     base_prompt = _load_prompt(
         mode,
         prompt_variant=prompt_variant,
+        expert_prompt_variant=expert_prompt_variant,
         expert_mode=resolved_expert_mode,
     )
     legibility_base_prompt = _load_legibility_prompt(prompt_variant=legibility_prompt_variant)

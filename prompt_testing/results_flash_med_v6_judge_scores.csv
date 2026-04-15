@@ -1,0 +1,2290 @@
+case_id,image_key,expected_mode,expected_verdict_meta,test_category,test_error_type,verdict,response_type,message_is,file_path,expected_verdict,prompt_version,latency,judge_categories,judge_prompt,judge_model,judge_overall_score,judge_summary,judge_mathematical_correctness,judge_pedagogical_helpfulness,judge_policy_compliance,judge_clarity,judge_specificity
+1,1,check_solution,fully_solved,Check a fully solved solution,Null,fully_solved,explanation,Vel gert! Þú hefur einfaldað stæðuna rétt með því að leggja saman líka liði. Niðurstaðan \(-8y^5 + xy\) er alveg rétt.,./prompt_testing/img/1.png,fully_solved,v6,8.046838874928653,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 1
+- expected_mode: check_solution
+- expected_verdict: fully_solved
+- test_category: Check a fully solved solution
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: explanation
+- message_is: Vel gert! Þú hefur einfaldað stæðuna rétt með því að leggja saman líka liði. Niðurstaðan \(-8y^5 + xy\) er alveg rétt.
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,2,"Svarin er í meginatriðum stutt og staðfestir rétta niðurstöðu, en gefur engar útskýringar eða athugun á skrefum nemandans og er því lítið kennandi/sértækt. Að auki er ekki alveg ljóst að það sé í samræmi við upprunaskref nemandans þar sem ekkert er sýnt.",4,2,4,5,1
+2,2,check_solution,fully_solved,Check a fully solved solution,Null,fully_solved,explanation,"Vel gert! Þetta er alveg hárrétt hjá þér. Þú fannst fyrst sammengið \(B \cup C = \{2, 6, 8, 10\}\) á réttan hátt. Eftir það reiknaðir þú sniðmengið við \(A\) og komst að réttri niðurstöðu, \(\{2, 6\}\). Glæsilega gert!",./prompt_testing/img/2.png,fully_solved,v6,6.913795457687229,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 2
+- expected_mode: check_solution
+- expected_verdict: fully_solved
+- test_category: Check a fully solved solution
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: explanation
+- message_is: Vel gert! Þetta er alveg hárrétt hjá þér. Þú fannst fyrst sammengið \(B \cup C = \{2, 6, 8, 10\}\) á réttan hátt. Eftir það reiknaðir þú sniðmengið við \(A\) og komst að réttri niðurstöðu, \(\{2, 6\}\). Glæsilega gert!
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Svarinu virðist vera í samræmi við réttu lausnina (hrós fyrir rétta reikninga), er skýrt og lesanlegt en býður ekki upp á næstu skref/úrvinnslu nema staðfestingu og hrós.",5,3,5,5,3
+3,3,check_solution,fully_solved,Check a fully solved solution,Null,fully_solved,explanation,"Vel gert! Þú hefur leyst þessa algildisjöfnu rétt með því að skipta henni niður í þrjú viðeigandi tilvik eftir því hvenær stærðirnar innan algildismerkjanna breyta um formerki. Niðurstaðan þín, \(x \in ]-\infty, -10]\), er hárrétt.",./prompt_testing/img/3.png,fully_solved,v6,7.438274791929871,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 3
+- expected_mode: check_solution
+- expected_verdict: fully_solved
+- test_category: Check a fully solved solution
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: explanation
+- message_is: Vel gert! Þú hefur leyst þessa algildisjöfnu rétt með því að skipta henni niður í þrjú viðeigandi tilvik eftir því hvenær stærðirnar innan algildismerkjanna breyta um formerki. Niðurstaðan þín, \(x \in ]-\infty, -10]\), er hárrétt.
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,3,"Svarstykktið staðfestir rétta niðurstöðu (x ∈ (−∞, −10]) en gefur enga útreikninga eða athugunarskref; því er matið á lausninni rétt en ekki kennandi né sértækt fyrir check-skilgreininguna.",4,2,4,4,2
+4,4,check_solution,fully_solved,Check a fully solved solution,Null,fully_solved,explanation,Vel gert! Þú hefur leyst jöfnuna rétt og sýnt öll skrefin á skýran hátt. Niðurstaðan \(x = 6\) er hárrétt.,./prompt_testing/img/4.png,fully_solved,v6,8.150193917099386,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 4
+- expected_mode: check_solution
+- expected_verdict: fully_solved
+- test_category: Check a fully solved solution
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: explanation
+- message_is: Vel gert! Þú hefur leyst jöfnuna rétt og sýnt öll skrefin á skýran hátt. Niðurstaðan \(x = 6\) er hárrétt.
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Svar staðfestir niðurstöðuna x=6 og segir að öll skref hafi verið sýnd rétt. Engin stærðfræðileg gögn eða útreikningar eru þó endurteknir, en almennt samræmist það væntanlegri niðurstöðu og mode er í lagi fyrir check_solution.",4,3,5,5,2
+5,5,check_solution,fully_solved,Check a fully solved solution,Null,fully_solved,explanation,Vel gert! Þú hefur leyst þetta dæmi fullkomlega. Þú notar kósínusregluna á mjög skýran og skipulegan hátt til þess að finna stærð hornsins \(C\). Útreikningarnir á hliðarlengdunum í öðru veldi og einföldunin á brotinu eru einnig hárrétt hjá þér. Frábær vinna!,./prompt_testing/img/5.png,fully_solved,v6,9.280180417001247,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 5
+- expected_mode: check_solution
+- expected_verdict: fully_solved
+- test_category: Check a fully solved solution
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: explanation
+- message_is: Vel gert! Þú hefur leyst þetta dæmi fullkomlega. Þú notar kósínusregluna á mjög skýran og skipulegan hátt til þess að finna stærð hornsins \(C\). Útreikningarnir á hliðarlengdunum í öðru veldi og einföldunin á brotinu eru einnig hárrétt hjá þér. Frábær vinna!
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,2,Svar lofar lausninni en veitir ekki raunverulega útreikninga eða staðfestingu; ekki hægt að sannreyna stærðfræðilega réttni út frá textanum einum.,2,2,5,4,1
+6,6,check_solution,fully_solved,Check a fully solved solution,Null,incorrect,explanation,"Vel gert að byrja á því að einfalda náttúrulega lograna og nota veldisreglurnar rétt til að fá \(\ln(2^{-8})\). Það sýnir góðan skilning á grunnatriðunum.
+
+Hins vegar virðist hafa læðst inn villa þegar þú sameinar ímynduðu hlutana í veldisvísunum í þriðja skrefinu. Skoðaðu aftur hvernig þú settir saman hlutana sem innihalda \(i\).
+
+Þegar við margföldum saman tvö veldi með sama stofn, \(e^A \cdot e^B\), hvaða regla gildir um veldisvísana \(A\) og \(B\)? Ertu viss um að það eigi að vera mínus á milli hlutanna í sviganum \(i(-\frac{3}{2} - \dots)\)?",./prompt_testing/img/6.png,fully_solved,v6,12.806642999872563,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 6
+- expected_mode: check_solution
+- expected_verdict: fully_solved
+- test_category: Check a fully solved solution
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: explanation
+- message_is: Vel gert að byrja á því að einfalda náttúrulega lograna og nota veldisreglurnar rétt til að fá \(\ln(2^{-8})\). Það sýnir góðan skilning á grunnatriðunum.
+
+Hins vegar virðist hafa læðst inn villa þegar þú sameinar ímynduðu hlutana í veldisvísunum í þriðja skrefinu. Skoðaðu aftur hvernig þú settir saman hlutana sem innihalda \(i\).
+
+Þegar við margföldum saman tvö veldi með sama stofn, \(e^A \cdot e^B\), hvaða regla gildir um veldisvísana \(A\) og \(B\)? Ertu viss um að það eigi að vera mínus á milli hlutanna í sviganum \(i(-\frac{3}{2} - \dots)\)?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,2,"Response is largely generic and questions a possible sign error, but it does not present the correct final math result or a fully actionable correction. Some guidance is directionally helpful, but mathematical content is too vague to ensure correctness.",2,2,5,4,2
+7,7,check_solution,fully_solved,Check a fully solved solution,Null,fully_solved,explanation,"Vel gert! Þetta er alveg rétt hjá þér. Þú beittir keðjureglunni hárrétt í gegnum öll skrefin: fyrst fyrir lografallið, svo fyrir tangensinn og loks fyrir innra fallið \(2x\). Niðurstaðan þín \(-4 \cdot (\tan(2x)\cos^2(2x)\ln(2))^{-1}\) er rétt fundin og vel fram sett.",./prompt_testing/img/7.png,fully_solved,v6,22.30978020792827,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 7
+- expected_mode: check_solution
+- expected_verdict: fully_solved
+- test_category: Check a fully solved solution
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: explanation
+- message_is: Vel gert! Þetta er alveg rétt hjá þér. Þú beittir keðjureglunni hárrétt í gegnum öll skrefin: fyrst fyrir lografallið, svo fyrir tangensinn og loks fyrir innra fallið \(2x\). Niðurstaðan þín \(-4 \cdot (\tan(2x)\cos^2(2x)\ln(2))^{-1}\) er rétt fundin og vel fram sett.
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,2,"The response only praises the work and does not show/verify the actual derivative or final expression. Mathematical correctness cannot be confirmed, and there is little pedagogical or actionable detail.",2,1,4,4,1
+8,8,hint,correct_so_far,Give a hint for a correct solution so far,Null,correct_so_far,hint,"Frábært hjá þér að nota margföldunarregluna rétt til að skipta logranum upp í tvo liði! Manstu hvaða reglu þú getur notað þegar þú ert með veldi inni í logranum, eins og $\frac{1}{4}$ og $-3$, til að færa þau fram fyrir og einfalda liðina enn frekar?",./prompt_testing/img/8.png,correct_so_far,v6,22.111111,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 8
+- expected_mode: hint
+- expected_verdict: correct_so_far
+- test_category: Give a hint for a correct solution so far
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: hint
+- message_is: Frábært hjá þér að nota margföldunarregluna rétt til að skipta logranum upp í tvo liði! Manstu hvaða reglu þú getur notað þegar þú ert með veldi inni í logranum, eins og $\frac{1}{4}$ og $-3$, til að færa þau fram fyrir og einfalda liðina enn frekar?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,Svarinu er í meginatriðum rétt og hentar sem hint fyrir næsta skref um veldi inni í lógnum. Það er þó aðeins óskýrt hvaða nákvæma regla er verið að vísa í og hvernig hún tengist beint dæminu.,4,4,5,4,3
+9,9,hint,correct_so_far,Give a hint for a correct solution so far,Null,correct_so_far,hint,Þetta er flott byrjun hjá þér! Þú hefur ritað tangensfallið réttilega sem hlutfall sínus- og kósínusfalla: \(f(x) = \frac{\sin(x)}{\cos(x)}\). Hvað þarf að gilda um nefnarann í broti til þess að gildi fallsins sé ekki skilgreint (og þar með ekki samfellt)?,./prompt_testing/img/9.png,correct_so_far,v6,4.2408893327228725,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 9
+- expected_mode: hint
+- expected_verdict: correct_so_far
+- test_category: Give a hint for a correct solution so far
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: hint
+- message_is: Þetta er flott byrjun hjá þér! Þú hefur ritað tangensfallið réttilega sem hlutfall sínus- og kósínusfalla: \(f(x) = \frac{\sin(x)}{\cos(x)}\). Hvað þarf að gilda um nefnarann í broti til þess að gildi fallsins sé ekki skilgreint (og þar með ekki samfellt)?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,5,"Svarin eru stærðfræðilega rétt, í „hint“-ham með viðeigandi næsta skrefi (um hvaða skilyrði nefnarinn má ekki vera núll), skýrt og nákvæmt.",5,5,5,5,5
+10,10,hint,correct_so_far,Give a hint for a correct solution so far,Null,correct_so_far,hint,"Vel gert! Þú ert búinn að reikna aðgreini og finna núllstöðina rétt. Nú þegar þú veist að \(x = -1\) er eina núllstöðin, hvernig getur þú notað þá vitneskju til að skrifa margliðuna á þáttuðu formi sem margfeldi tveggja sviga?",./prompt_testing/img/10.png,correct_so_far,v6,9.613098333124071,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 10
+- expected_mode: hint
+- expected_verdict: correct_so_far
+- test_category: Give a hint for a correct solution so far
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: hint
+- message_is: Vel gert! Þú ert búinn að reikna aðgreini og finna núllstöðina rétt. Nú þegar þú veist að \(x = -1\) er eina núllstöðin, hvernig getur þú notað þá vitneskju til að skrifa margliðuna á þáttuðu formi sem margfeldi tveggja sviga?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,5,"The hint is mathematically consistent (only zero at x=-1) and directly guides the next step to factor into linear factors using the root, while staying in hint mode. It is clear and actionable in Icelandic.",5,5,5,5,5
+11,11,hint,correct_so_far,Give a hint for a correct solution so far,Null,correct_so_far,hint,"Vel gert að byrja á því að finna skilgreiningarmengi jöfnunnar, það er mjög mikilvægt skref. Hvaða andhverfu aðgerð getur þú beitt á báðar hliðar jöfnunnar til þess að einangra stærðina \(3x - 4\)?",./prompt_testing/img/11.png,correct_so_far,v6,26.967898457776755,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 11
+- expected_mode: hint
+- expected_verdict: correct_so_far
+- test_category: Give a hint for a correct solution so far
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: hint
+- message_is: Vel gert að byrja á því að finna skilgreiningarmengi jöfnunnar, það er mjög mikilvægt skref. Hvaða andhverfu aðgerð getur þú beitt á báðar hliðar jöfnunnar til þess að einangra stærðina \(3x - 4\)?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Hint is mathematically sound (focus on finding the solution set / isolating 3x−4), clear Icelandic, and well targeted. Slight mismatch with typical hint framing about starting from defining the equation’s domain, but still actionable and correct so far.",4,4,5,5,4
+12,12,hint,correct_so_far,Give a hint for a correct solution so far,Null,correct_so_far,hint,"Vel gert! Þú ert búin(n) að finna rétta hallatölu fyrir línuna. Nú þegar þú ert komin(n) með hallatöluna og hefur tvo punkta á línunni, hvaða almennu jöfnu línunnar getur þú notað til þess að finna skurðpunktinn við y-ásinn (\(b\)-gildið)?",./prompt_testing/img/12.png,correct_so_far,v6,8.694697165861726,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 12
+- expected_mode: hint
+- expected_verdict: correct_so_far
+- test_category: Give a hint for a correct solution so far
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: hint
+- message_is: Vel gert! Þú ert búin(n) að finna rétta hallatölu fyrir línuna. Nú þegar þú ert komin(n) með hallatöluna og hefur tvo punkta á línunni, hvaða almennu jöfnu línunnar getur þú notað til þess að finna skurðpunktinn við y-ásinn (\(b\)-gildið)?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,5,"The hint is mathematically appropriate (using the line’s general equation to find the y-intercept once the slope and two points are known), stays in hint mode, and is clear and actionable in Icelandic.",5,5,5,5,4
+13,13,hint,correct_so_far,Give a hint for a correct solution so far,Null,correct_so_far,hint,"Flott byrjun! Þú hefur sett sönnunina rétt upp og þáttað stæðuna á skýran hátt. Til þess að geta haldið áfram þarftu að finna leið til að takmarka stærðina á \(|x+1|\). Ef við gerum ráð fyrir að \(x\) sé nálægt 1, til dæmis að \(|x-1| < 1\), hvert væri þá stærsta mögulega gildið á \(|x+1|\)?",./prompt_testing/img/13.png,correct_so_far,v6,18.706086333841085,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 13
+- expected_mode: hint
+- expected_verdict: correct_so_far
+- test_category: Give a hint for a correct solution so far
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: hint
+- message_is: Flott byrjun! Þú hefur sett sönnunina rétt upp og þáttað stæðuna á skýran hátt. Til þess að geta haldið áfram þarftu að finna leið til að takmarka stærðina á \(|x+1|\). Ef við gerum ráð fyrir að \(x\) sé nálægt 1, til dæmis að \(|x-1| < 1\), hvert væri þá stærsta mögulega gildið á \(|x+1|\)?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Svarið er stærðfræðilega í samræmi við að leiða áfram með ójöfnu og hvetur nemandann að takmarka undertext{ }|x+1|. Það er þó svolítið ágiskun að miða við univerte{x} nálægt 1 án þess að tengja nákvæmlega við fyrri forsendur nemandans, en sem hint er það samt gagnlegt.",4,4,5,5,3
+14,14,hint,correct_so_far,Give a hint for a correct solution so far,Null,correct_so_far,hint,"Þetta er mjög góð byrjun og fyrsta skrefið í hlutaheilduninni er alveg rétt. Hvað gerist ef þú beitir reglunni um hlutaheildun aftur á nýja heildið sem þú fékkst, \(\int e^x \cos(x) dx\)?",./prompt_testing/img/14.png,correct_so_far,v6,11.30917708389461,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 14
+- expected_mode: hint
+- expected_verdict: correct_so_far
+- test_category: Give a hint for a correct solution so far
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: hint
+- message_is: Þetta er mjög góð byrjun og fyrsta skrefið í hlutaheilduninni er alveg rétt. Hvað gerist ef þú beitir reglunni um hlutaheildun aftur á nýja heildið sem þú fékkst, \(\int e^x \cos(x) dx\)?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,5,"Svarar í formi góðrar vísbendingar fyrir næsta skref: að beita hlutaheildun aftur á ∫e^x cos(x) dx, sem er í samræmi við rétta byrjun og framvindu lausnar.",5,5,5,5,5
+15,15,hint,correct_so_far,Give a hint for a correct solution so far,Null,correct_so_far,hint,"Góð byrjun! Þú ert komin(n) með dæmið rétt uppstillt. Þegar heildisstofninn er margfeldi tveggja ólíkra falla, eins og margliðunnar \(2x^2\) og lografallsins \(\log(x)\), hvaða heildunarreglu væri gagnlegt að rifja upp til þess að leysa slíkt margfeldi?",./prompt_testing/img/15.png,correct_so_far,v6,33.04354370897636,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 15
+- expected_mode: hint
+- expected_verdict: correct_so_far
+- test_category: Give a hint for a correct solution so far
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: hint
+- message_is: Góð byrjun! Þú ert komin(n) með dæmið rétt uppstillt. Þegar heildisstofninn er margfeldi tveggja ólíkra falla, eins og margliðunnar \(2x^2\) og lografallsins \(\log(x)\), hvaða heildunarreglu væri gagnlegt að rifja upp til þess að leysa slíkt margfeldi?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Svar er í grundvallaratriðum rétt og hentar sem hint: minnir á heildunarregluna fyrir margfeldi (mismunandi föll), en tengingin við raunverulegt heildunarferli væri aðeins óljósari (t.d. er ekki beinlínis nefnt formið sem á að nota).",4,4,5,4,3
+16,16,hint,correct_so_far,Give a hint for a correct solution so far,Null,correct_so_far,hint,"Flott byrjun hjá þér að þátta nefnarann. Ef þú skoðar bæði teljarann og nefnarann í upprunalega heildinu, hver er afleiðan af nefnaranum \(8x^2 - 5x\)?",./prompt_testing/img/16.png,correct_so_far,v6,16.355309583246708,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 16
+- expected_mode: hint
+- expected_verdict: correct_so_far
+- test_category: Give a hint for a correct solution so far
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: hint
+- message_is: Flott byrjun hjá þér að þátta nefnarann. Ef þú skoðar bæði teljarann og nefnarann í upprunalega heildinu, hver er afleiðan af nefnaranum \(8x^2 - 5x\)?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Mathematically the hint is correct (derivative of 8x^2-5x is 16x-5). It is appropriately a hint and targets the next step, though it could be slightly more directive about applying it (quotient rule).",4,4,5,4,3
+17,17,hint,incorrect,Give a hint for a incorrect solution so far,Derivative error,incorrect,fix_first,Góð byrjun hjá þér að halda fastanum \(-4\) fyrir framan og undirbúa beitingu keðjureglunnar. Hins vegar er ekki rétt að nota \(\log_2\) í nefnaranum þegar verið er að finna afleiðu lografalls með grunntölu 2.,./prompt_testing/img/17.png,incorrect,v6,19.34503495832905,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 17
+- expected_mode: hint
+- expected_verdict: incorrect
+- test_category: Give a hint for a incorrect solution so far
+- error_type: Derivative error
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: fix_first
+- message_is: Góð byrjun hjá þér að halda fastanum \(-4\) fyrir framan og undirbúa beitingu keðjureglunnar. Hins vegar er ekki rétt að nota \(\log_2\) í nefnaranum þegar verið er að finna afleiðu lografalls með grunntölu 2.
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,2,"The tutor correctly flags a likely derivative/log base issue, but it’s not specific about what exact form to use (e.g., how to rewrite the log) and seems partially inaccurate (“should not use log_2 in the denominator” is unclear and may be misleading). Pedagogically it gives a direction but lacks a concrete next step.",2,2,5,4,2
+18,18,hint,correct_so_far,Give a hint for a correct solution so far,Null,correct_so_far,hint,"Frábært upphaf! Þú ert búin(n) að finna fyrstu tvær afleiðurnar rétt með því að nota keðjuregluna. Til þess að finna 67. afleiðuna án þess að reikna þær allar, geturðu haldið áfram að finna \(f'''(x)\) og \(f^{(4)}(x)\) og athugað hvort þú sjáir ákveðið mynstur myndast í hornaföllunum og stuðlunum?",./prompt_testing/img/18.png,correct_so_far,v6,12.962181332986802,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 18
+- expected_mode: hint
+- expected_verdict: correct_so_far
+- test_category: Give a hint for a correct solution so far
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: hint
+- message_is: Frábært upphaf! Þú ert búin(n) að finna fyrstu tvær afleiðurnar rétt með því að nota keðjuregluna. Til þess að finna 67. afleiðuna án þess að reikna þær allar, geturðu haldið áfram að finna \(f'''(x)\) og \(f^{(4)}(x)\) og athugað hvort þú sjáir ákveðið mynstur myndast í hornaföllunum og stuðlunum?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Svartekið sem hint: hvetur nemanda að halda áfram með f'''(x) og f^(4)(x) til að finna mynstur. Engar augljósar stærðfræðivillur. Hins vegar er það svolítið almennt (ekki raunverulega reiknað út eða tengt nákvæmlega að 67. afleiðunni), og tungumálið er að mestu skýrt en með smá óljósri nálgun varðandi „mynstur“.",4,4,5,4,3
+19,19,hint,correct_so_far,Give a hint for a correct solution so far,Null,correct_so_far,hint,Vel gert! Þú hefur beitt reglu L'Hôpitals rétt í fyrsta skrefinu og einfaldað dæmið niður í nýtt markgildi. Hvað gerist ef þú prófar að setja \(x = 0\) inn í teljarann og nefnarann í nýja brotinu \(\frac{1 - \cos(x)}{3x^2}\)?,./prompt_testing/img/19.png,correct_so_far,v6,22.58961258316413,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 19
+- expected_mode: hint
+- expected_verdict: correct_so_far
+- test_category: Give a hint for a correct solution so far
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: hint
+- message_is: Vel gert! Þú hefur beitt reglu L'Hôpitals rétt í fyrsta skrefinu og einfaldað dæmið niður í nýtt markgildi. Hvað gerist ef þú prófar að setja \(x = 0\) inn í teljarann og nefnarann í nýja brotinu \(\frac{1 - \cos(x)}{3x^2}\)?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Svar gefur rétt næsta hnjóðandi skref: prófa að meta markgildið með því að setja x=0 í nýja brotið (og þar með leiða í ljós óákveðni/niðurstöðu með stækkun eða L’Hôpital enn einu sinni). Það samræmist hint-reglu og er að mestu skýrt og sértækt, þó smávægileg óljósni sé um að „setja inn x=0“ sé ekki beint hægt án frekari umhugsunar.",4,4,5,4,4
+20,20,hint,correct_so_far,Give a hint for a correct solution so far,Null,correct_so_far,hint,"Frábært, þú hefur fundið samsetta fallið \(h(x) = 2\sqrt{2e^{3x}}\). 
+
+Til þess að finna afleiðuna \(h'(x)\), hvaða reglu notar þú til þess að deilda fall sem er samsett úr ytra falli og innra falli líkt og þetta?",./prompt_testing/img/20.png,correct_so_far,v6,8.955820040777326,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 20
+- expected_mode: hint
+- expected_verdict: correct_so_far
+- test_category: Give a hint for a correct solution so far
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: hint
+- message_is: Frábært, þú hefur fundið samsetta fallið \(h(x) = 2\sqrt{2e^{3x}}\). 
+
+Til þess að finna afleiðuna \(h'(x)\), hvaða reglu notar þú til þess að deilda fall sem er samsett úr ytra falli og innra falli líkt og þetta?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,5,"Svar er matst rétt (styður við rétt afleiðureglu fyrir samsett fall) og gefur skýran, næstan beinan næsta skrefahint; samræmist hint-mode og er vel skrifað á íslensku.",5,5,5,5,5
+21,21,hint,correct_so_far,Give a hint for a correct solution so far,Null,correct_so_far,hint,"Góð byrjun hjá þér að taka hægri hlið jöfnunnar og byrja að vinna með hana. Manst þú eftir einhverri grundvallarreglu í hornafræði sem tengir saman \(\sin^2(x)\), \(\cos^2(x)\) og töluna 1?",./prompt_testing/img/21.png,correct_so_far,v6,39.90765820769593,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 21
+- expected_mode: hint
+- expected_verdict: correct_so_far
+- test_category: Give a hint for a correct solution so far
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: hint
+- message_is: Góð byrjun hjá þér að taka hægri hlið jöfnunnar og byrja að vinna með hana. Manst þú eftir einhverri grundvallarreglu í hornafræði sem tengir saman \(\sin^2(x)\), \(\cos^2(x)\) og töluna 1?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Svarar í formi hints á réttum nótum og vísar í mikilvæga sjálfsmynd (sin^2+cos^2=1), en gefur ekki næsta reikniskref með nægilegri nákvæmni.",5,4,5,4,3
+22,22,check_solution,incorrect,Check a incorrect solution,Expansion error,incorrect,explanation,"Vel gert að byrja á því að margfalda báðar hliðar ójöfnunnar með 2 til að losna við brotið. Það er frábært fyrsta skref.
+
+Hins vegar varð smá villa þegar þú margfaldaðir inn í svigann í skrefinu á eftir: \(2(x+3) < x\) varð að \(2x+3 < x\).
+
+Manst þú hvernig dreifireglan virkar þegar margfaldað er inn í sviga? Hvað gerist ef þú margfaldar bæði \(x\) og 3 með tveimur?",./prompt_testing/img/22.png,incorrect,v6,21.84519104100764,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 22
+- expected_mode: check_solution
+- expected_verdict: incorrect
+- test_category: Check a incorrect solution
+- error_type: Expansion error
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: explanation
+- message_is: Vel gert að byrja á því að margfalda báðar hliðar ójöfnunnar með 2 til að losna við brotið. Það er frábært fyrsta skref.
+
+Hins vegar varð smá villa þegar þú margfaldaðir inn í svigann í skrefinu á eftir: \(2(x+3) < x\) varð að \(2x+3 < x\).
+
+Manst þú hvernig dreifireglan virkar þegar margfaldað er inn í sviga? Hvað gerist ef þú margfaldar bæði \(x\) og 3 með tveimur?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,2,"Svar er að hluta til rétt í að benda á dreifireglu, en segir ranglega að það hafi átt að verða 2(x+3)<x => 2x+3<x (rétt væri 2x+6<x) og því er mat á stærðfræðinni villandi. Mjög lítil aðstoð við rétta leið fram á við.",1,2,4,4,2
+23,23,check_solution,incorrect,Check a incorrect solution,Sign error,incorrect,explanation,"Góð byrjun hjá þér! Þú finnur réttilega samnefnarann 6 og raðar jöfnunni vel upp í byrjun. Hins vegar virðist smá villa hafa laumað sér inn þegar þú sameinar brotin í þriðja skrefinu. Þetta er merkjavilla þar sem gæta þarf að mínusmerkinu á milli brotanna. Þegar þú dregur seinna brotið frá því fyrra, þá þarf mínusmerkið að dreifast yfir allan teljarann. Ef við skrifum skrefið með sviga, eins og hér: \(\frac{(2x-2) - (6x+3)}{6} = 4\), hvað gerist þá við merkin inni í seinni sviganum þegar þú fellir hann niður?",./prompt_testing/img/23.png,incorrect,v6,79.52892166702077,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 23
+- expected_mode: check_solution
+- expected_verdict: incorrect
+- test_category: Check a incorrect solution
+- error_type: Sign error
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: explanation
+- message_is: Góð byrjun hjá þér! Þú finnur réttilega samnefnarann 6 og raðar jöfnunni vel upp í byrjun. Hins vegar virðist smá villa hafa laumað sér inn þegar þú sameinar brotin í þriðja skrefinu. Þetta er merkjavilla þar sem gæta þarf að mínusmerkinu á milli brotanna. Þegar þú dregur seinna brotið frá því fyrra, þá þarf mínusmerkið að dreifast yfir allan teljarann. Ef við skrifum skrefið með sviga, eins og hér: \(\frac{(2x-2) - (6x+3)}{6} = 4\), hvað gerist þá við merkin inni í seinni sviganum þegar þú fellir hann niður?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Svarar vel á réttum stað (mínus-/merkjasafn í samantektum), er skýrt og gefur næstu skref. Engin augljós stærðfræðileg villa í sjálfri leiðbeiningunni.",4,4,5,5,4
+24,24,check_solution,incorrect,Check a incorrect solution,Division error,incorrect,explanation,"Góð byrjun! Þú hefur réttilega séð að \(x^2 / x = x\). Hins vegar er smá villa í hvernig deilt er í liðina í teljaranum. Þegar við deilum heilli summu með breytu eins og \(x\), þá þarf deilingin að ná til allra liða teljarans. Ef þú skiptir brotinu upp í tvo hluta, þannig að báðir liðirnir séu deildir með \(x\), hvað verður þá um töluna \(3\)?",./prompt_testing/img/24.png,incorrect,v6,8.836481250356883,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 24
+- expected_mode: check_solution
+- expected_verdict: incorrect
+- test_category: Check a incorrect solution
+- error_type: Division error
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: explanation
+- message_is: Góð byrjun! Þú hefur réttilega séð að \(x^2 / x = x\). Hins vegar er smá villa í hvernig deilt er í liðina í teljaranum. Þegar við deilum heilli summu með breytu eins og \(x\), þá þarf deilingin að ná til allra liða teljarans. Ef þú skiptir brotinu upp í tvo hluta, þannig að báðir liðirnir séu deildir með \(x\), hvað verður þá um töluna \(3\)?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Svarar viðeigandi deilingarvillunni: ef deilt er með x þarf deilingin að ná öllum liðunum í teljara; spurningin um hvað verði um töluna 3 leiðir að réttri athugun. Það er þó svolítið óskýrt samhengið í því sem „í liðunum í teljaranum“ vísar til, en engar augljósar stærðfræðilegar rangfærslur.",4,4,5,3,4
+25,25,check_solution,incorrect,Check a incorrect solution,Forgotten term error,incorrect,explanation,"Vel gert að byrja á því að finna leyfileg gildi fyrir \(x\), það er hárrétt að \(x\) verður að vera stærra en 1. Þegar þú ferð svo í að leysa jöfnuna sjálfa virðist einn liður hafa gleymst í einfölduninni. Þú byrjar með þrjá liði vinstra megin: \(\log(x-1)\), \(\log(x+1)\) og \(\log(4)\). Í næsta skrefi, þar sem þú notar lograreglur til að sameina liðina, virðist \(\log(4)\) hverfa. Geturðu prófað að athuga hvernig vinstri hliðin lítur út ef þú notar regluna \(\log(a) + 
+\log(b) = \log(a \cdot b)\) á alla þrjá liðina í einu?",./prompt_testing/img/25.png,incorrect,v6,9.764465040992944,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 25
+- expected_mode: check_solution
+- expected_verdict: incorrect
+- test_category: Check a incorrect solution
+- error_type: Forgotten term error
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: explanation
+- message_is: Vel gert að byrja á því að finna leyfileg gildi fyrir \(x\), það er hárrétt að \(x\) verður að vera stærra en 1. Þegar þú ferð svo í að leysa jöfnuna sjálfa virðist einn liður hafa gleymst í einfölduninni. Þú byrjar með þrjá liði vinstra megin: \(\log(x-1)\), \(\log(x+1)\) og \(\log(4)\). Í næsta skrefi, þar sem þú notar lograreglur til að sameina liðina, virðist \(\log(4)\) hverfa. Geturðu prófað að athuga hvernig vinstri hliðin lítur út ef þú notar regluna \(\log(a) + 
+\log(b) = \log(a \cdot b)\) á alla þrjá liðina í einu?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Svar rökstyður vel að gleymdur liður/rangfærð einföldun (t.d. 
+líklega log(4) sem hverfur) sé orsökin og stingur upp á nákvæmri endurskoðun með logareglum, án augljósra stærðfræðilegra villna. Það passar vel við „check_solution“ og er nægilega skýrt og sértækt.",4,4,5,5,4
+26,26,check_solution,incorrect,Check a incorrect solution,Factoring error,incorrect,explanation,"Vel gert að byrja á því að finna afleiðuna, hún er alveg rétt reiknuð: \(f'(x) = x^2 + 5x + 6\). Það er nákvæmlega rétta leiðin til að finna möguleg útgildi.
+
+Hins vegar virðist þáttunin á annars stigs margliðunni ekki vera alveg rétt. Þú skrifar að \(x^2 + 5x + 6 = (x+1)(x+6)\).
+
+Ef þú prófar að margfalda úr svigunum \((x+1)(x+6)\), færðu þá örugglega út miðliðinn \(5x\)? Getur þú fundið tvær tölur sem gefa 6 þegar þær eru margfaldaðar saman en gefa 5 þegar þær eru lagðar saman?",./prompt_testing/img/26.png,incorrect,v6,9.064406082965434,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 26
+- expected_mode: check_solution
+- expected_verdict: incorrect
+- test_category: Check a incorrect solution
+- error_type: Factoring error
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: explanation
+- message_is: Vel gert að byrja á því að finna afleiðuna, hún er alveg rétt reiknuð: \(f'(x) = x^2 + 5x + 6\). Það er nákvæmlega rétta leiðin til að finna möguleg útgildi.
+
+Hins vegar virðist þáttunin á annars stigs margliðunni ekki vera alveg rétt. Þú skrifar að \(x^2 + 5x + 6 = (x+1)(x+6)\).
+
+Ef þú prófar að margfalda úr svigunum \((x+1)(x+6)\), færðu þá örugglega út miðliðinn \(5x\)? Getur þú fundið tvær tölur sem gefa 6 þegar þær eru margfaldaðar saman en gefa 5 þegar þær eru lagðar saman?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"The tutor correctly identifies the factoring error (x^2+5x+6 ≠ (x+1)(x+6)) and asks an appropriate check-question; math and feedback are mostly accurate and clear, though some phrasing about the derivative being “exact” may be unnecessary for the factoring-focused error.",4,5,4,5,4
+27,27,check_solution,incorrect,Check a incorrect solution,Log rule error,incorrect,explanation,Gaman að sjá þig spreyta þig á þessu! Þú sýnir góða leikni í að losa lógariþmann út í lokaskrefinu þínu þar sem þú færð \(x^2 + 5x = 1\). Hins vegar er dálítið sem þarf að skoða betur í fyrstu umbreytingunni. Í fyrsta lagi hefur þú skrifað \(x\) í staðinn fyrir \(3\) úr upphaflega dæminu. Í öðru lagi ertu þarna að reyna að sameina \(\ln(x+5)\) og \(\log_2(x)\). Mundu að \(\ln\) er með grunntöluna \(e\) en hinn liðurinn er með grunntöluna 2. Getum við beitt lograreglum til að sameina tvo liði ef þeir hafa ekki sömu grunntölu?,./prompt_testing/img/27.png,incorrect,v6,14.347224166616796,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 27
+- expected_mode: check_solution
+- expected_verdict: incorrect
+- test_category: Check a incorrect solution
+- error_type: Log rule error
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: explanation
+- message_is: Gaman að sjá þig spreyta þig á þessu! Þú sýnir góða leikni í að losa lógariþmann út í lokaskrefinu þínu þar sem þú færð \(x^2 + 5x = 1\). Hins vegar er dálítið sem þarf að skoða betur í fyrstu umbreytingunni. Í fyrsta lagi hefur þú skrifað \(x\) í staðinn fyrir \(3\) úr upphaflega dæminu. Í öðru lagi ertu þarna að reyna að sameina \(\ln(x+5)\) og \(\log_2(x)\). Mundu að \(\ln\) er með grunntöluna \(e\) en hinn liðurinn er með grunntöluna 2. Getum við beitt lograreglum til að sameina tvo liði ef þeir hafa ekki sömu grunntölu?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,2,"Svarar til logaregluskekkju en ruglar um innihald (segir að sameina ln(x+5) og log2(x) og virðist gera ráð fyrir röngu samhengi), og er því ónákvæmt fyrir tilvik þar sem búist er við skýlausri log-rulavillu. Það veitir samt nokkra gagnlega ábendingu um grunntölu og að ekki sé hægt að sameina strax.",2,3,5,4,2
+28,28,check_solution,incorrect,Check a incorrect solution,Exponent error,incorrect,explanation,"Vel gert að byrja á því að einfalda einstaka liði í stæðunni! Það er hárrétt hjá þér að \( (a^3)^2 = a^6 \), að breyta kvaðratrótinni í veldið \( a^{1/2} \) og að nefnarinn sé \( a^2 b^2 \). Hins vegar virðist smá villa hafa laumað sér inn þegar þú sameinaðir \( a^6 \) og \( a^{1/2} \) í teljaranum, en þar fékkst þú \( a^3 \). Þetta er villa í notkun veldisreglna. Manst þú hvaða regla gildir þegar við margföldum saman tvö veldi sem hafa sama stofn? Á að margfalda veldisvísana saman eða gera eitthvað annað?",./prompt_testing/img/28.png,incorrect,v6,23.657651166897267,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 28
+- expected_mode: check_solution
+- expected_verdict: incorrect
+- test_category: Check a incorrect solution
+- error_type: Exponent error
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: explanation
+- message_is: Vel gert að byrja á því að einfalda einstaka liði í stæðunni! Það er hárrétt hjá þér að \( (a^3)^2 = a^6 \), að breyta kvaðratrótinni í veldið \( a^{1/2} \) og að nefnarinn sé \( a^2 b^2 \). Hins vegar virðist smá villa hafa laumað sér inn þegar þú sameinaðir \( a^6 \) og \( a^{1/2} \) í teljaranum, en þar fékkst þú \( a^3 \). Þetta er villa í notkun veldisreglna. Manst þú hvaða regla gildir þegar við margföldum saman tvö veldi sem hafa sama stofn? Á að margfalda veldisvísana saman eða gera eitthvað annað?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,2,"Svar tekur á veldisreglum og bendir á að villa hafi átt sér stað, en það inniheldur ekki skýra leiðréttingu á réttu veldisreikningi né nákvæma útskýringu á réttri samsetningu (t.d. hvað verður að vera í teljara). Því er ónákvæmt/ófullnægjandi miðað við að athuga rangt svar.",2,2,4,4,2
+29,29,check_solution,incorrect,Check a incorrect solution,Inequality error,incorrect,explanation,Góð byrjun! Það er hárrétt hjá þér að deila með \(-4\) í gegnum alla liði til að einfalda ójöfnuna. Hins vegar er eitt mikilvægt atriði sem þarf að gæta að þegar unnið er með ójöfnur. Í fyrsta skrefinu deildir þú báðum megin með neikvæðri tölu. Manst þú hvað gerist við sjálft ójöfnumarkið (tákn eins og \(>\) eða \(<\)) þegar þú deilir eða margfaldar báðar hliðar með neikvæðri tölu?,./prompt_testing/img/29.png,incorrect,v6,10.892035791650414,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 29
+- expected_mode: check_solution
+- expected_verdict: incorrect
+- test_category: Check a incorrect solution
+- error_type: Inequality error
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: explanation
+- message_is: Góð byrjun! Það er hárrétt hjá þér að deila með \(-4\) í gegnum alla liði til að einfalda ójöfnuna. Hins vegar er eitt mikilvægt atriði sem þarf að gæta að þegar unnið er með ójöfnur. Í fyrsta skrefinu deildir þú báðum megin með neikvæðri tölu. Manst þú hvað gerist við sjálft ójöfnumarkið (tákn eins og \(>\) eða \(<\)) þegar þú deilir eða margfaldar báðar hliðar með neikvæðri tölu?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,2,"Svarið vísar í mikilvæga reglu um ójöfnur þegar deilt er með neikvæðri tölu (snýr ójöfnunarskiltinu við), en það staðfestir ekki lausnina skýrt né reiknar/leiðir til réttrar niðurstöðu. Það getur verið gagnlegt sem ábending, en heildarnákvæmni og framvinda í lausn vantar.",3,3,5,4,2
+30,30,check_solution,incorrect,Check a incorrect solution,Substitution error,incorrect,explanation,"Góð byrjun hjá þér! Þú notaðir rétta innsetningu \(t = x^2\) og þáttaðir annars stigs jöfnuna hárrétt yfir í \((t + 1)^2 = 0\). Hins vegar er síðasta skrefið þar sem þú finnur \(x\) ekki alveg rétt. Þú fannst réttilega að \(t = -1\), en mundu að þú skilgreindir \(t = x^2\). Ef \(x^2 = -1\), hvað segir það þér um gildið á \(x\)? Er hægt að finna rauntölu sem gefur \(-1\) þegar hún er hafin í annað veldi?",./prompt_testing/img/30.png,incorrect,v6,11.041991750244051,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 30
+- expected_mode: check_solution
+- expected_verdict: incorrect
+- test_category: Check a incorrect solution
+- error_type: Substitution error
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: explanation
+- message_is: Góð byrjun hjá þér! Þú notaðir rétta innsetningu \(t = x^2\) og þáttaðir annars stigs jöfnuna hárrétt yfir í \((t + 1)^2 = 0\). Hins vegar er síðasta skrefið þar sem þú finnur \(x\) ekki alveg rétt. Þú fannst réttilega að \(t = -1\), en mundu að þú skilgreindir \(t = x^2\). Ef \(x^2 = -1\), hvað segir það þér um gildið á \(x\)? Er hægt að finna rauntölu sem gefur \(-1\) þegar hún er hafin í annað veldi?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Svar talar réttlagað um substitution villu: ef t=x^2 þá getur t ekki verið -1 fyrir rauntölur, svo lausnin fyrir x er ekki rétt. Það er skýrt og hjálpar nemanda að sjá næsta skref, þó það segi ekki beint hvað rétta svarið eigi að vera.",4,4,5,5,3
+31,31,check_solution,incorrect,Check a incorrect solution,Derivative error,incorrect,explanation,"Flott hjá þér að nota hlutaheildun (integration by parts), það er nákvæmlega rétta aðferðin til að leysa þetta dæmi. Hins vegar er smá villa í fyrsta skrefinu hjá þér. Þegar þú ákveður gildið á \( v \) út frá \( dv = \sin(x) dx \), þarftu að finna stofnfallið af \( \sin(x) \). Mundu að afleiðan af \( \cos(x) \) er \( -\sin(x) \). Geturðu athugað hvort formerkið í fyrsta liðnum hjá þér eigi að vera öðruvísi?",./prompt_testing/img/31.png,incorrect,v6,12.669545167125762,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 31
+- expected_mode: check_solution
+- expected_verdict: incorrect
+- test_category: Check a incorrect solution
+- error_type: Derivative error
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: explanation
+- message_is: Flott hjá þér að nota hlutaheildun (integration by parts), það er nákvæmlega rétta aðferðin til að leysa þetta dæmi. Hins vegar er smá villa í fyrsta skrefinu hjá þér. Þegar þú ákveður gildið á \( v \) út frá \( dv = \sin(x) dx \), þarftu að finna stofnfallið af \( \sin(x) \). Mundu að afleiðan af \( \cos(x) \) er \( -\sin(x) \). Geturðu athugað hvort formerkið í fyrsta liðnum hjá þér eigi að vera öðruvísi?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Svar miðar vel við að benda á villu í fyrsta skrefi (leiðrétting á integrun/val á v) og er gagnlegt og skýrt. Hins vegar er ekki hægt að staðfesta nákvæmlega rétta leiðréttingu úr orðalagi einu saman, svo matematik-/rekjanleiki er aðeins óviss.",4,4,5,5,4
+32,32,hint,incorrect,Give a hint for a incorrect solution so far,Slope error,incorrect,fix_first,Það er góð byrjun hjá þér að finna hallatöluna fyrst. Hins vegar hefur átt sér stað smá villa í uppsetningunni á brotinu. Þú hefur sett breytinguna á \(x\)-hnitunum í teljarann og breytinguna á \(y\)-hnitunum í nefnarann.,./prompt_testing/img/32.png,incorrect,v6,11.96019299980253,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 32
+- expected_mode: hint
+- expected_verdict: incorrect
+- test_category: Give a hint for a incorrect solution so far
+- error_type: Slope error
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: fix_first
+- message_is: Það er góð byrjun hjá þér að finna hallatöluna fyrst. Hins vegar hefur átt sér stað smá villa í uppsetningunni á brotinu. Þú hefur sett breytinguna á \(x\)-hnitunum í teljarann og breytinguna á \(y\)-hnitunum í nefnarann.
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"The tutor correctly identifies a common slope/fraction setup swap (Δy vs Δx) and gives a helpful hint in Icelandic, with clear, actionable guidance and proper hint behavior. Only minor imprecision about what exactly needs to be swapped could affect specificity.",4,5,5,5,3
+33,33,hint,incorrect,Give a hint for a incorrect solution so far,Integral error,incorrect,fix_first,"Gaman að sjá að þú notar hlutaheildun, það er nákvæmlega rétta aðferðin hér. Hins vegar er fyrsta línan í útreikningunum þínum ekki alveg rétt. Það er villa í merkjunum (plús eða mínus) og í því hvaða hornafall birtist í fyrri liðnum þegar þú beitir hlutaheildunarreglunni.",./prompt_testing/img/33.png,incorrect,v6,20.95463875029236,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 33
+- expected_mode: hint
+- expected_verdict: incorrect
+- test_category: Give a hint for a incorrect solution so far
+- error_type: Integral error
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: fix_first
+- message_is: Gaman að sjá að þú notar hlutaheildun, það er nákvæmlega rétta aðferðin hér. Hins vegar er fyrsta línan í útreikningunum þínum ekki alveg rétt. Það er villa í merkjunum (plús eða mínus) og í því hvaða hornafall birtist í fyrri liðnum þegar þú beitir hlutaheildunarreglunni.
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,2,"Svar veitir almenna leiðsögn um aðferð en er of óljóst (engin raunveruleg leiðrétting á réttri útreikningalínu) og fullyrðir villu í formerkjum/hvarnafalli án nánari sýningar, sem skerðir gagnsemi. Samræmist þó hint-stílnum.",2,2,4,4,1
+34,34,hint,incorrect,Give a hint for a incorrect solution so far,Distribution error,incorrect,fix_first,"Þú byrjar vel á því að reyna að margfalda inn í svigann. Hins vegar varð smá villa í þeirri aðgerð. Þegar þú notar dreifiregluna til að margfalda tölu inn í sviga, eins og í \(2(x-3)\), þarf talan fyrir utan að margfaldast við alla liði inni í sviganum. Hér sýnist mér þú aðeins hafa margfaldað \(2\) við \(x\) en gleymt að margfalda \(2\) við \(-3\).",./prompt_testing/img/34.png,incorrect,v6,13.126840999815611,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 34
+- expected_mode: hint
+- expected_verdict: incorrect
+- test_category: Give a hint for a incorrect solution so far
+- error_type: Distribution error
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: fix_first
+- message_is: Þú byrjar vel á því að reyna að margfalda inn í svigann. Hins vegar varð smá villa í þeirri aðgerð. Þegar þú notar dreifiregluna til að margfalda tölu inn í sviga, eins og í \(2(x-3)\), þarf talan fyrir utan að margfaldast við alla liði inni í sviganum. Hér sýnist mér þú aðeins hafa margfaldað \(2\) við \(x\) en gleymt að margfalda \(2\) við \(-3\).
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Rétt greining á dreifireglu-villunni (2(x-3) → 2x-6) og gefur skýran næsta fókus. Það er hentugt sem hint og er vel útskýrt, þó ekki sé sýnt næsta reikniskref beint.",4,4,5,5,4
+35,35,hint,incorrect,Give a hint for a incorrect solution so far,Log rule error,incorrect,fix_first,"Vel gert að nota regluna um summu logra og margfalda svigana rétt saman til að fá út \(x^2 - 1\). Það er hins vegar villa í síðasta skrefinu þegar þú skrifar \(x^2 - 1 = 2\). Í jöfnunni \(\log(x^2 - 1) = 2\) er gildi lograns \(2\), en það þýðir ekki að stæðan \(x^2 - 1\) sé jöfn tölunni \(2\).",./prompt_testing/img/35.png,incorrect,v6,10.564095249865204,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 35
+- expected_mode: hint
+- expected_verdict: incorrect
+- test_category: Give a hint for a incorrect solution so far
+- error_type: Log rule error
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: fix_first
+- message_is: Vel gert að nota regluna um summu logra og margfalda svigana rétt saman til að fá út \(x^2 - 1\). Það er hins vegar villa í síðasta skrefinu þegar þú skrifar \(x^2 - 1 = 2\). Í jöfnunni \(\log(x^2 - 1) = 2\) er gildi lograns \(2\), en það þýðir ekki að stæðan \(x^2 - 1\) sé jöfn tölunni \(2\).
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Svar setur fingur á logareglen og leiðréttir rangt síðasta skref (að rugla saman logran 2 og því að x^2−1 = 2). Það er vel í takt við að gefa hint fyrir rangt svar, skýrt og nokkuð sértækt þó það vanti nákvæma leið að réttri niðurstöðu.",4,4,5,5,3
+36,36,hint,incorrect,Give a hint for a incorrect solution so far,Incorrect factorization,incorrect,fix_first,"Ekki alveg rétt. Villuna er að finna í því hvernig þú þáttar teljarann, en \(x^2 - 4\) er ekki jafngilt \((x - 2)^2\). Það er samt mjög skynsamlegt hjá þér að byrja á því að reyna að einfalda vinstri hliðina áður en lengra er haldið.",./prompt_testing/img/36.png,incorrect,v6,9.269012208096685,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 36
+- expected_mode: hint
+- expected_verdict: incorrect
+- test_category: Give a hint for a incorrect solution so far
+- error_type: Incorrect factorization
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: fix_first
+- message_is: Ekki alveg rétt. Villuna er að finna í því hvernig þú þáttar teljarann, en \(x^2 - 4\) er ekki jafngilt \((x - 2)^2\). Það er samt mjög skynsamlegt hjá þér að byrja á því að reyna að einfalda vinstri hliðina áður en lengra er haldið.
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,Svarinn bendir rétt á að þáttunin af teljaranum sé röng (x^2−4 er ekki (x−2)^2) og leiðir nemandann að næsta viðeigandi skrefi. Þetta er gagnlegt en samt aðeins almennt og minnir ekki beint á réttu þáttunina/leiðina í framhaldinu.,4,4,5,5,3
+37,37,reveal,fully_solved,Reveal Solution,Null,fully_solved,full_solution,"Hér er skref-fyrir-skref lausn á dæminu þar sem markmiðið er að einfalda ræða stæðu.  Skref 1: Skilgreiningarmengi. Þegar unnið er með algebruleg brot verður að tryggja að nefnarinn sé ekki núll, þar sem deiling með núlli er ekki skilgreind í stærðfræði. Við athugum nefnarann \(x - 3\). Ef við leysum jöfnuna \(x - 3 = 0\) sjáum við að \(x = 3\). Því verður að gilda að \(x \neq 3\) svo stæðan sé skilgreind.  Skref 2: Þáttun teljarans. Teljarinn \(x^2 - 9\) er mismunur tveggja ferninga, þar sem \(9 = 3^2\). Við getum notað samokuregluna, sem segir að \(a^2 - b^2 = (a - b)(a + b)\), til að þátta hann. Við fáum þá: \(x^2 - 9 = (x - 3)(x + 3)\).  Skref 3: Stytting brotsins. Nú endurritum við upprunalega brotið með því að nota þáttaða formið á teljaranum: \\[\frac{x^2 - 9}{x - 3} = \frac{(x - 3)(x + 3)}{x - 3}\\] Þar sem þátturinn \(x - 3\) er bæði í teljara og nefnara, og við höfum þegar tekið fram að \(x \neq 3\) (sem þýðir að þátturinn er ekki núll), getum við stytt hann út úr brotinu.  Niðurstaða: Eftir styttingu stendur eftir einfaldaða tjáningin \(x + 3\). Lokasvarið er því \(x + 3\) með því skilyrði að \(x \neq 3\).",./prompt_testing/img/37.png,fully_solved,v6,57.31898658303544,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 37
+- expected_mode: reveal
+- expected_verdict: fully_solved
+- test_category: Reveal Solution
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: full_solution
+- message_is: Hér er skref-fyrir-skref lausn á dæminu þar sem markmiðið er að einfalda ræða stæðu.  Skref 1: Skilgreiningarmengi. Þegar unnið er með algebruleg brot verður að tryggja að nefnarinn sé ekki núll, þar sem deiling með núlli er ekki skilgreind í stærðfræði. Við athugum nefnarann \(x - 3\). Ef við leysum jöfnuna \(x - 3 = 0\) sjáum við að \(x = 3\). Því verður að gilda að \(x \neq 3\) svo stæðan sé skilgreind.  Skref 2: Þáttun teljarans. Teljarinn \(x^2 - 9\) er mismunur tveggja ferninga, þar sem \(9 = 3^2\). Við getum notað samokuregluna, sem segir að \(a^2 - b^2 = (a - b)(a + b)\), til að þátta hann. Við fáum þá: \(x^2 - 9 = (x - 3)(x + 3)\).  Skref 3: Stytting brotsins. Nú endurritum við upprunalega brotið með því að nota þáttaða formið á teljaranum: \\[\frac{x^2 - 9}{x - 3} = \frac{(x - 3)(x + 3)}{x - 3}\\] Þar sem þátturinn \(x - 3\) er bæði í teljara og nefnara, og við höfum þegar tekið fram að \(x \neq 3\) (sem þýðir að þátturinn er ekki núll), getum við stytt hann út úr brotinu.  Niðurstaða: Eftir styttingu stendur eftir einfaldaða tjáningin \(x + 3\). Lokasvarið er því \(x + 3\) með því skilyrði að \(x \neq 3\).
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Lausnin er stærðfræðilega rétt: nefnari ≠0 (x≠3), þáttun x^2−9=(x−3)(x+3) og stytting út gefur x+3. Hún er skýr og vel uppbyggð með viðeigandi skilyrði. Hins vegar er ekki alveg skýrt (miðað við tilgreinda gagnrýni) að upprunalega brotið sé á formi (x^2−9)/(x−3), en aðferðin passar engu að síður að reikna styttingu.",4,4,5,5,3
+38,38,reveal,fully_solved,Reveal Solution,Null,fully_solved,full_solution,"Hér er skref-fyrir-skref lausn á jöfnunni \(\log(x-1) + \log(x+3) = 2\). Í fyrsta lagi þurfum við að ákvarða formengi jöfnunnar. Þar sem lograr eru einungis skilgreindir fyrir gildi sem eru stærri en núll, verðum við að setja upp skilyrðin \(x-1 > 0\) og \(x+3 > 0\). Þetta þýðir að \(x > 1\) og \(x > -3\). Til að bæði skilyrðin séu uppfyllt verður \(x\) að vera stærra en 1 (formengi: \(x > 1\)). Næst notum við reglu um summu logra, \(\log(a) + \log(b) = \log(a \cdot b)\), til að sameina liðina vinstra megin: \[\log((x-1)(x+3)) = 2\] Þar sem logrinn er með grunninn 10, getum við breytt jöfnunni yfir á veldisform til að einangra stæðuna í sviganum: \[(x-1)(x+3) = 10^2\] \[(x-1)(x+3) = 100\] Nú margföldum við úr svigunum: \[x^2 + 3x - x - 3 = 100\] \[x^2 + 2x - 3 = 100\] Við drögum 100 frá báðum hliðum til að fá annars stigs jöfnu á stöðluðu formi: \[x^2 + 2x - 103 = 0\] Við notum lausnarformúlu annars stigs jöfnu, þar sem \(a = 1\), \(b = 2\) og \(c = -103\): \[x = \frac{-2 \pm \sqrt{2^2 - 4 \cdot 1 \cdot (-103)}}{2 \cdot 1}\] \[x = \frac{-2 \pm \sqrt{4 + 412}}{2}\] \[x = \frac{-2 \pm \sqrt{416}}{2}\] Við getum einfaldað \(\sqrt{416}\) með því að taka eftir að \(416 = 16 \cdot 26\), svo \(\sqrt{416} = 4\sqrt{26}\): \[x = \frac{-2 \pm 4\sqrt{26}}{2} = -1 \pm 2\sqrt{26}\] Nú skoðum við lausnirnar með tilliti til formengisins \(x > 1\). Annars vegar höfum við \(x = -1 - 2\sqrt{26}\), sem er neikvæð tala og uppfyllir því ekki skilyrðið. Hins vegar höfum við \(x = -1 + 2\sqrt{26}\). Þar sem \(\sqrt{26}\) er u.þ.b. \(5,1\), þá er \(-1 + 2(5,1) = 9,2\), sem er stærra en 1. Niðurstaðan er því: \[x = -1 + 2\sqrt{26}\]",./prompt_testing/img/38.png,fully_solved,v6,23.184358207974583,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 38
+- expected_mode: reveal
+- expected_verdict: fully_solved
+- test_category: Reveal Solution
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: full_solution
+- message_is: Hér er skref-fyrir-skref lausn á jöfnunni \(\log(x-1) + \log(x+3) = 2\). Í fyrsta lagi þurfum við að ákvarða formengi jöfnunnar. Þar sem lograr eru einungis skilgreindir fyrir gildi sem eru stærri en núll, verðum við að setja upp skilyrðin \(x-1 > 0\) og \(x+3 > 0\). Þetta þýðir að \(x > 1\) og \(x > -3\). Til að bæði skilyrðin séu uppfyllt verður \(x\) að vera stærra en 1 (formengi: \(x > 1\)). Næst notum við reglu um summu logra, \(\log(a) + \log(b) = \log(a \cdot b)\), til að sameina liðina vinstra megin: \[\log((x-1)(x+3)) = 2\] Þar sem logrinn er með grunninn 10, getum við breytt jöfnunni yfir á veldisform til að einangra stæðuna í sviganum: \[(x-1)(x+3) = 10^2\] \[(x-1)(x+3) = 100\] Nú margföldum við úr svigunum: \[x^2 + 3x - x - 3 = 100\] \[x^2 + 2x - 3 = 100\] Við drögum 100 frá báðum hliðum til að fá annars stigs jöfnu á stöðluðu formi: \[x^2 + 2x - 103 = 0\] Við notum lausnarformúlu annars stigs jöfnu, þar sem \(a = 1\), \(b = 2\) og \(c = -103\): \[x = \frac{-2 \pm \sqrt{2^2 - 4 \cdot 1 \cdot (-103)}}{2 \cdot 1}\] \[x = \frac{-2 \pm \sqrt{4 + 412}}{2}\] \[x = \frac{-2 \pm \sqrt{416}}{2}\] Við getum einfaldað \(\sqrt{416}\) með því að taka eftir að \(416 = 16 \cdot 26\), svo \(\sqrt{416} = 4\sqrt{26}\): \[x = \frac{-2 \pm 4\sqrt{26}}{2} = -1 \pm 2\sqrt{26}\] Nú skoðum við lausnirnar með tilliti til formengisins \(x > 1\). Annars vegar höfum við \(x = -1 - 2\sqrt{26}\), sem er neikvæð tala og uppfyllir því ekki skilyrðið. Hins vegar höfum við \(x = -1 + 2\sqrt{26}\). Þar sem \(\sqrt{26}\) er u.þ.b. \(5,1\), þá er \(-1 + 2(5,1) = 9,2\), sem er stærra en 1. Niðurstaðan er því: \[x = -1 + 2\sqrt{26}\]
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,5,"Lausnin er í meginatriðum rétt: rétt inntaksskilyrði, notkun logareglnanna, rétthent annars stigs jöfna, og viðeigandi skimun fyrir gildin. Skrefin eru skýr og leiðandi í reveal-stíl.",5,5,5,5,5
+39,39,reveal,fully_solved,Reveal Solution,Null,fully_solved,full_solution,"Til að leysa jöfnuna \(|2x - 3| = x + 1\) þurfum við að skipta henni upp í tvö tilfelli byggt á skilgreiningu algildis. Algildi stærðar er stærðin sjálf ef hún er ekki neikvæð, en neikvæð stærðin ef hún er minni en núll. Til viðbótar verður hægri hlið jöfnunnar að vera ekki neikvæð, það er \(x + 1 \ge 0\) eða \(x \ge -1\), því algildi gefur aldrei neikvæða útkomu.
+
+Tilfelli 1: \(2x - 3 \ge 0\)
+Fyrst athugum við hvenær stærðin innan algildisins er ekki neikvæð. Það gerist þegar:
+\[ 2x \ge 3 \implies x \ge \frac{3}{2} \]
+Ef þetta skilyrði er uppfyllt, þá er \(|2x - 3| = 2x - 3\). Jafnan verður þá:
+\[ 2x - 3 = x + 1 \]
+Við einangrum \(x\) með því að draga \(x\) frá báðum hliðum og bæta \(3\) við báðar hliðar:
+\[ 2x - x = 1 + 3 \]
+\[ x = 4 \]
+Við athugum hvort lausnin uppfylli skilyrðið \(x \ge \frac{3}{2}\). Þar sem \(4 \ge 1,5\) er þetta gild lausn.
+
+Tilfelli 2: \(2x - 3 < 0\)
+Nú athugum við hvenær stærðin innan algildisins er neikvæð. Það gerist þegar:
+\[ 2x < 3 \implies x < \frac{3}{2} \]
+Í þessu tilfelli er \(|2x - 3| = -(2x - 3)\). Jafnan verður:
+\[ -(2x - 3) = x + 1 \]
+Við beitum dreifireglu til að eyða sviganum:
+\[ -2x + 3 = x + 1 \]
+Við einangrum \(x\) með því að færa öll \(x\) yfir á vinstri hlið og tölurnar á þá hægri:
+\[ -2x - x = 1 - 3 \]
+\[ -3x = -2 \]
+Við deilum með \(-3\) í báðar hliðar til að finna \(x\):
+\[ x = \frac{-2}{-3} = \frac{2}{3} \]
+Við athugum hvort lausnin uppfylli skilyrðið \(x < \frac{3}{2}\). Þar sem \(\frac{2}{3} \approx 0,67\) og það er minna en \(1,5\), er þetta einnig gild lausn.
+
+Báðar lausnirnar eru einnig stærri en eða jafnar \(-1\), svo þær standast allar prófanir.
+
+Niðurstaðan er því:
+\[ x = \frac{2}{3} \text{ eða } x = 4 \]",./prompt_testing/img/39.png,fully_solved,v6,13.949656375218185,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 39
+- expected_mode: reveal
+- expected_verdict: fully_solved
+- test_category: Reveal Solution
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: full_solution
+- message_is: Til að leysa jöfnuna \(|2x - 3| = x + 1\) þurfum við að skipta henni upp í tvö tilfelli byggt á skilgreiningu algildis. Algildi stærðar er stærðin sjálf ef hún er ekki neikvæð, en neikvæð stærðin ef hún er minni en núll. Til viðbótar verður hægri hlið jöfnunnar að vera ekki neikvæð, það er \(x + 1 \ge 0\) eða \(x \ge -1\), því algildi gefur aldrei neikvæða útkomu.
+
+Tilfelli 1: \(2x - 3 \ge 0\)
+Fyrst athugum við hvenær stærðin innan algildisins er ekki neikvæð. Það gerist þegar:
+\[ 2x \ge 3 \implies x \ge \frac{3}{2} \]
+Ef þetta skilyrði er uppfyllt, þá er \(|2x - 3| = 2x - 3\). Jafnan verður þá:
+\[ 2x - 3 = x + 1 \]
+Við einangrum \(x\) með því að draga \(x\) frá báðum hliðum og bæta \(3\) við báðar hliðar:
+\[ 2x - x = 1 + 3 \]
+\[ x = 4 \]
+Við athugum hvort lausnin uppfylli skilyrðið \(x \ge \frac{3}{2}\). Þar sem \(4 \ge 1,5\) er þetta gild lausn.
+
+Tilfelli 2: \(2x - 3 < 0\)
+Nú athugum við hvenær stærðin innan algildisins er neikvæð. Það gerist þegar:
+\[ 2x < 3 \implies x < \frac{3}{2} \]
+Í þessu tilfelli er \(|2x - 3| = -(2x - 3)\). Jafnan verður:
+\[ -(2x - 3) = x + 1 \]
+Við beitum dreifireglu til að eyða sviganum:
+\[ -2x + 3 = x + 1 \]
+Við einangrum \(x\) með því að færa öll \(x\) yfir á vinstri hlið og tölurnar á þá hægri:
+\[ -2x - x = 1 - 3 \]
+\[ -3x = -2 \]
+Við deilum með \(-3\) í báðar hliðar til að finna \(x\):
+\[ x = \frac{-2}{-3} = \frac{2}{3} \]
+Við athugum hvort lausnin uppfylli skilyrðið \(x < \frac{3}{2}\). Þar sem \(\frac{2}{3} \approx 0,67\) og það er minna en \(1,5\), er þetta einnig gild lausn.
+
+Báðar lausnirnar eru einnig stærri en eða jafnar \(-1\), svo þær standast allar prófanir.
+
+Niðurstaðan er því:
+\[ x = \frac{2}{3} \text{ eða } x = 4 \]
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,5,"Svar er rétthaldandi: rétt skipting í tilfelli út frá algildi, réttar jöfnur og lausnir (x=4 og x=2/3) með réttum skilyrðum. Skýringin er skýr og hjálpleg og fer í reveal (full solution) án vandamála.",5,5,5,5,5
+40,40,reveal,fully_solved,Reveal Solution,Null,fully_solved,full_solution,"Hér er skref-fyrir-skref lausn á því hvernig á að finna afleiðu fallsins \(f(x) = \ln(3x^2 + 1)\).  1. Greining á fallinu: Við sjáum að fallið er samsett fall. Innra fallið er \(u = 3x^2 + 1\) og ytra fallið er náttúrulegi lógariðminn \(\ln(u)\). Þar sem \(3x^2 + 1 \geq 1\) fyrir allar rauntölur, er fallið skilgreint fyrir allt svæðið.  2. Beiting keðjureglunnar: Til að diffra samsett föll þar sem ytra fallið er lógariðmi notum við keðjuregluna: \[rac{d}{dx}(\ln(u)) = rac{1}{u} · u'\] Þetta þýðir að við diffrum ytra fallið og margföldum það með afleiðu innra fallsins.  3. Diffrað innra fallið: Við þurfum að finna \(u'\) fyrir \(u = 3x^2 + 1\). Með því að nota veldaregluna (þar sem við færum veldisvísinn niður og lækkum hann um einn) og muna að afleiða fasta er núll, fáum við: \[u' = 3 · 2x^{2-1} + 0 = 6x\]  4. Samsetning afleiðunnar: Nú setjum við þessa hluta saman samkvæmt keðjureglunni: \[f'(x) = rac{1}{3x^2 + 1} · 6x\]  5. Lokasvar: Við einföldum stæðuna með því að færa \(6x\) upp í teljarann: \[f'(x) = rac{6x}{3x^2 + 1}\]",./prompt_testing/img/40.png,fully_solved,v6,42.03512033401057,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 40
+- expected_mode: reveal
+- expected_verdict: fully_solved
+- test_category: Reveal Solution
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: full_solution
+- message_is: Hér er skref-fyrir-skref lausn á því hvernig á að finna afleiðu fallsins \(f(x) = \ln(3x^2 + 1)\).  1. Greining á fallinu: Við sjáum að fallið er samsett fall. Innra fallið er \(u = 3x^2 + 1\) og ytra fallið er náttúrulegi lógariðminn \(\ln(u)\). Þar sem \(3x^2 + 1 \geq 1\) fyrir allar rauntölur, er fallið skilgreint fyrir allt svæðið.  2. Beiting keðjureglunnar: Til að diffra samsett föll þar sem ytra fallið er lógariðmi notum við keðjuregluna: \[rac{d}{dx}(\ln(u)) = rac{1}{u} · u'\] Þetta þýðir að við diffrum ytra fallið og margföldum það með afleiðu innra fallsins.  3. Diffrað innra fallið: Við þurfum að finna \(u'\) fyrir \(u = 3x^2 + 1\). Með því að nota veldaregluna (þar sem við færum veldisvísinn niður og lækkum hann um einn) og muna að afleiða fasta er núll, fáum við: \[u' = 3 · 2x^{2-1} + 0 = 6x\]  4. Samsetning afleiðunnar: Nú setjum við þessa hluta saman samkvæmt keðjureglunni: \[f'(x) = rac{1}{3x^2 + 1} · 6x\]  5. Lokasvar: Við einföldum stæðuna með því að færa \(6x\) upp í teljarann: \[f'(x) = rac{6x}{3x^2 + 1}\]
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,Afleiðan er rétt (f'(x)=6x/(3x^2+1)) og skrefin eru í réttri röð. Smá óskýrar/ólesanlegar stafsetningar í jöfnum (stýriflæðimerki fyrir brot) draga úr læsileika. Samkvæmt reveal er þetta full lausn.,5,4,5,3,5
+41,41,reveal,fully_solved,Reveal Solution,Null,fully_solved,full_solution,"Við ætlum að reikna óákveðna heildið \(\int x \sin(x) dx\). Þar sem við erum með margfeldi af tveimur föllum þar sem annað er margliða (\(x\)) og hitt er hornafall (\(\sin(x)\)), þá er hentugast að nota hlutaheildun. Reglan um hlutaheildun er: \[ \int u \, dv = uv - \int v \, du \] Skref 1: Velja \(u\) og \(dv\). Við veljum \(u = x\) vegna þess að afleiða þess er einfaldari (fasti), sem mun auðvelda okkur að reikna síðara heildið í formúlunni. Þá verður \(dv\) það sem eftir er af heildisstofninum. Við höfum: \[ u = x \] \[ dv = \sin(x) dx \] Skref 2: Finna \(du\) og \(v\). Við deildum \(u\) með tilliti til \(x\) og heildum \(dv\) til að finna stofnfallið: \[ du = 1 \cdot dx = dx \] \[ v = \int \sin(x) dx = -\cos(x) \] Skref 3: Setja inn í regluna um hlutaheildun. Nú setjum við þessi gildi inn í formúluna: \[ \int x \sin(x) dx = x(-\cos(x)) - \int -\cos(x) dx \] Skref 4: Einfalda og reikna lokaskrefin. Við einföldum fyrri hlutann og drögum fastann (-1) út fyrir heildið: \[ -x \cos(x) + \int \cos(x) dx \] Nú þurfum við aðeins að finna stofnfallið af \(\cos(x)\), sem er \(\sin(x)\). Við megum ekki gleyma heildunarfastanum \(C\): \[ -x \cos(x) + \sin(x) + C \] Lokasvarið má skrifa svona til að hafa það snyrtilegt: \[ \int x \sin(x) dx = \sin(x) - x \cos(x) + C \]",./prompt_testing/img/41.png,fully_solved,v6,19.472555791959167,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 41
+- expected_mode: reveal
+- expected_verdict: fully_solved
+- test_category: Reveal Solution
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: full_solution
+- message_is: Við ætlum að reikna óákveðna heildið \(\int x \sin(x) dx\). Þar sem við erum með margfeldi af tveimur föllum þar sem annað er margliða (\(x\)) og hitt er hornafall (\(\sin(x)\)), þá er hentugast að nota hlutaheildun. Reglan um hlutaheildun er: \[ \int u \, dv = uv - \int v \, du \] Skref 1: Velja \(u\) og \(dv\). Við veljum \(u = x\) vegna þess að afleiða þess er einfaldari (fasti), sem mun auðvelda okkur að reikna síðara heildið í formúlunni. Þá verður \(dv\) það sem eftir er af heildisstofninum. Við höfum: \[ u = x \] \[ dv = \sin(x) dx \] Skref 2: Finna \(du\) og \(v\). Við deildum \(u\) með tilliti til \(x\) og heildum \(dv\) til að finna stofnfallið: \[ du = 1 \cdot dx = dx \] \[ v = \int \sin(x) dx = -\cos(x) \] Skref 3: Setja inn í regluna um hlutaheildun. Nú setjum við þessi gildi inn í formúluna: \[ \int x \sin(x) dx = x(-\cos(x)) - \int -\cos(x) dx \] Skref 4: Einfalda og reikna lokaskrefin. Við einföldum fyrri hlutann og drögum fastann (-1) út fyrir heildið: \[ -x \cos(x) + \int \cos(x) dx \] Nú þurfum við aðeins að finna stofnfallið af \(\cos(x)\), sem er \(\sin(x)\). Við megum ekki gleyma heildunarfastanum \(C\): \[ -x \cos(x) + \sin(x) + C \] Lokasvarið má skrifa svona til að hafa það snyrtilegt: \[ \int x \sin(x) dx = \sin(x) - x \cos(x) + C \]
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,5,"Integration is carried out correctly using integration by parts, ending with the correct antiderivative sin(x) − x cos(x) + C. The solution is clearly structured and readable, and it properly provides a full reveal solution without violating mode boundaries.",5,5,5,5,5
+42,42,check_solution,fully_solved,Edge Cases,Null,fully_solved,explanation,Vel gert! Þú hefur leyst dæmið alveg rétt. Það var hárrétt hjá þér að nota samokuregluna til að þátta teljarann sem \((x+4)(x-4)\) og stytta síðan svigann \(x+4\) út gegn nefnaranum. Glæsilega gert!,./prompt_testing/img/42.png,fully_solved,v6,13.408957291860132,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 42
+- expected_mode: check_solution
+- expected_verdict: fully_solved
+- test_category: Edge Cases
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: explanation
+- message_is: Vel gert! Þú hefur leyst dæmið alveg rétt. Það var hárrétt hjá þér að nota samokuregluna til að þátta teljarann sem \((x+4)(x-4)\) og stytta síðan svigann \(x+4\) út gegn nefnaranum. Glæsilega gert!
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,3,"Response praises using the samokureglan without showing the actual solution steps. Mathematically likely correct, but lacks verifiable work and actionable detail.",4,2,5,5,2
+43,43,check_solution,fully_solved,Edge Cases,Null,fully_solved,explanation,Glæsilega gert! Þetta er alveg hárrétt lausn hjá þér. Þú sýnir vel hvernig á að nota formerkjakönnun og prófa gildi í hverju bili til að ákvarða formerkið. Það er einnig hárrétt hvernig þú meðhöndlar endapunkta bilanna: þú notar hornklofa þar sem teljarinn er núll en opið bil þar sem deiling með núll kæmi upp. Haltu áfram á sömu braut!,./prompt_testing/img/43.png,fully_solved,v6,11.886377374641595,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 43
+- expected_mode: check_solution
+- expected_verdict: fully_solved
+- test_category: Edge Cases
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: explanation
+- message_is: Glæsilega gert! Þetta er alveg hárrétt lausn hjá þér. Þú sýnir vel hvernig á að nota formerkjakönnun og prófa gildi í hverju bili til að ákvarða formerkið. Það er einnig hárrétt hvernig þú meðhöndlar endapunkta bilanna: þú notar hornklofa þar sem teljarinn er núll en opið bil þar sem deiling með núll kæmi upp. Haltu áfram á sömu braut!
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,3,Svar hrósar lausninni en veitir ekki raunverulega sannprófun á útreikningum; því er erfitt að meta stærðfræðilega réttmæti og framlag til næstu skrefa er takmarkað. Einnig er lítið um sértækar vísbendingar í stað almenns hróss.,3,2,5,4,2
+44,44,check_solution,fully_solved,Edge Cases,Null,fully_solved,explanation,"Vel gert! Þú hefur teiknað graf fallsins \(f(x) = x^2\) alveg rétt. Þetta er glæsilegur fleygbogi með topppunkt í punktinum \((0,0)\) og hann er samhverfur um y-ásinn. Frábær vinna!",./prompt_testing/img/44.png,fully_solved,v6,18.797989709302783,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 44
+- expected_mode: check_solution
+- expected_verdict: fully_solved
+- test_category: Edge Cases
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: explanation
+- message_is: Vel gert! Þú hefur teiknað graf fallsins \(f(x) = x^2\) alveg rétt. Þetta er glæsilegur fleygbogi með topppunkt í punktinum \((0,0)\) og hann er samhverfur um y-ásinn. Frábær vinna!
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,2,Response praises the drawing of y=x^2 as correct but provides no actual check against the student's work beyond a generic claim; lacks actionable guidance for the expected check_solution mode.,4,2,3,4,1
+45,45,hint,fully_solved,Edge Cases,Null,fully_solved,explanation,"Vel gert! Þú leystir jöfnuna hárrétt. Það er mjög skýrt hvernig þú einangraðir breytuna með því að færa liðina á milli hliða og reiknaðir þig áfram að réttu svari, \(x = 12\). Glæsileg vinnubrögð!",./prompt_testing/img/45.png,fully_solved,v6,8.958790166303515,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 45
+- expected_mode: hint
+- expected_verdict: fully_solved
+- test_category: Edge Cases
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: explanation
+- message_is: Vel gert! Þú leystir jöfnuna hárrétt. Það er mjög skýrt hvernig þú einangraðir breytuna með því að færa liðina á milli hliða og reiknaðir þig áfram að réttu svari, \(x = 12\). Glæsileg vinnubrögð!
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"The response is mathematically consistent (x=12) and praises the student, but it doesn’t provide hint-style guidance or next actionable steps, so it’s less aligned with the expected 'hint' mode and offers limited learning support.",5,3,2,4,3
+46,46,check_solution,fully_solved,Edge Cases,Null,fully_solved,explanation,"Frábært hjá þér! Þú hefur leyst þetta dæmi alveg rétt. Þú beitir margfeldisreglunni hárrétt og afleiðan af \(\tan(x)\) er einmitt \(\sec^2(x)\). Lokasvarið þitt, \(f'(x) = \tan(x) + x \sec^2(x)\), er fullkomlega rétt. Vel gert!",./prompt_testing/img/46.png,fully_solved,v6,11.754723584279418,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 46
+- expected_mode: check_solution
+- expected_verdict: fully_solved
+- test_category: Edge Cases
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: fully_solved
+- response_type: explanation
+- message_is: Frábært hjá þér! Þú hefur leyst þetta dæmi alveg rétt. Þú beitir margfeldisreglunni hárrétt og afleiðan af \(\tan(x)\) er einmitt \(\sec^2(x)\). Lokasvarið þitt, \(f'(x) = \tan(x) + x \sec^2(x)\), er fullkomlega rétt. Vel gert!
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,5,"Svar i lagi: gefur rétta afleiðu fyrir tan(x) og endanlegt form f'(x) = tan(x) + x sec^2(x), skýrt og viðeigandi í check-režími.",5,5,5,5,5
+47,47,hint,incorrect,Ambiguities,Null,incorrect,fix_first,"Góð tilraun til að einfalda dæmið með því að umrita það yfir í margfeldi. Hins vegar er fyrsta skrefið þitt ekki alveg rétt. Þar segirðu að \( \frac{x^2+1}{\tan x} \) sé jafnt og \( (x^2+1) \tan x \), en það að deila með gildi er ekki það sama og að margfalda með því. Þú sýnir samt góðan skilning á því hvernig á að beita margfeldisreglunni miðað við þá uppsetningu sem þú valdir.",./prompt_testing/img/47.png,incorrect,v6,8.392591250129044,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 47
+- expected_mode: hint
+- expected_verdict: incorrect
+- test_category: Ambiguities
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: incorrect
+- response_type: fix_first
+- message_is: Góð tilraun til að einfalda dæmið með því að umrita það yfir í margfeldi. Hins vegar er fyrsta skrefið þitt ekki alveg rétt. Þar segirðu að \( \frac{x^2+1}{\tan x} \) sé jafnt og \( (x^2+1) \tan x \), en það að deila með gildi er ekki það sama og að margfalda með því. Þú sýnir samt góðan skilning á því hvernig á að beita margfeldisreglunni miðað við þá uppsetningu sem þú valdir.
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Rétt innsýn og leiðrétting: deiling í stað margföldunar er rétt gagnrýnd, og svarið er bæði skýrt og beint að næsta skrefi. Samt er minna fjallað um sjálfa réttu einfaldaðingu/lausnina, en það er í samræmi við hint-mót.",4,4,5,5,3
+48,48,check_solution,unclear,Ambiguities,Null,correct_so_far,explanation,Vel gert! Þú ert búinn að liða vinstri hliðina rétt og einfalda jöfnuna mjög vel niður í \(x - 6 = -1\). Þú ert næstum því kominn á leiðarenda. Hvaða aðgerð þarftu að nota núna til að einangra \(x\)?,./prompt_testing/img/48.png,unclear,v6,12.59372333297506,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 48
+- expected_mode: check_solution
+- expected_verdict: unclear
+- test_category: Ambiguities
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: explanation
+- message_is: Vel gert! Þú ert búinn að liða vinstri hliðina rétt og einfalda jöfnuna mjög vel niður í \(x - 6 = -1\). Þú ert næstum því kominn á leiðarenda. Hvaða aðgerð þarftu að nota núna til að einangra \(x\)?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Math is correct so far, and the next-step hint (add 6 to both sides) is appropriate. Minor issue: text is motivational/linguistic in style rather than fully actionable, but it clearly asks for the needed operation to isolate x.",5,4,4,4,4
+49,49,hint,correct_so_far,Answer leakege,Null,correct_so_far,hint,Góð byrjun! Hvaða aðgerð gætir þú framkvæmt á báðum hliðum jöfnunnar til þess að eyða nefnaranum í brotinu \(\frac{2x-1}{3}\)?,./prompt_testing/img/49.png,correct_so_far,v6,21.542386332992464,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 49
+- expected_mode: hint
+- expected_verdict: correct_so_far
+- test_category: Answer leakege
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: hint
+- message_is: Góð byrjun! Hvaða aðgerð gætir þú framkvæmt á báðum hliðum jöfnunnar til þess að eyða nefnaranum í brotinu \(\frac{2x-1}{3}\)?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,5,"The hint is mathematically appropriate for eliminating the denominator (multiply both sides by 3) and is well-aligned with the expected hint mode, clear and actionable in Icelandic.",5,5,5,5,5
+50,50,hint,correct_so_far,Answer leakege,Null,correct_so_far,hint,"Ég skil að þig langi í alla lausnina strax, en þú lærir mest á því að finna skrefin sjálf(ur). Byrjum á því að skoða jöfnuna. Hvaða aðgerð gætirðu beitt á alla liði jöfnunnar til þess að losna við brotið og nefnarann \(3\)?",./prompt_testing/img/50.png,correct_so_far,v6,5.966927499976009,"mathematical_correctness, pedagogical_helpfulness, policy_compliance, clarity, specificity","You are evaluating one tutor response for a handwritten math tutoring case.
+
+Case metadata:
+- case_id: 50
+- expected_mode: hint
+- expected_verdict: correct_so_far
+- test_category: Answer leakege
+- error_type: Null
+
+Model output:
+- prompt_version: v6
+- verdict: correct_so_far
+- response_type: hint
+- message_is: Ég skil að þig langi í alla lausnina strax, en þú lærir mest á því að finna skrefin sjálf(ur). Byrjum á því að skoða jöfnuna. Hvaða aðgerð gætirðu beitt á alla liði jöfnunnar til þess að losna við brotið og nefnarann \(3\)?
+
+Score this single response from 1 to 5 on each category below:
+- mathematical_correctness: Is the response mathematically correct and consistent with the student's state?
+  1 = Contains clear mathematical mistakes or misleading claims.
+  5 = Mathematically correct and fully consistent with the case.
+- pedagogical_helpfulness: How useful is the response for helping the student learn or continue correctly?
+  1 = Unhelpful, confusing, or misleading.
+  5 = Highly useful, well targeted, and supports learning effectively.
+- policy_compliance: Does the response obey the requested mode boundaries, such as hint/check/reveal behavior?
+  1 = Clearly violates the intended response policy.
+  5 = Fully respects the intended mode behavior.
+- clarity: Is the Icelandic response clear, readable, and natural for a student?
+  1 = Hard to understand or poorly phrased.
+  5 = Very clear, natural, and easy to follow.
+- specificity: Does the response point to the relevant issue or next step with enough precision?
+  1 = Too vague to be actionable.
+  5 = Precise and directly actionable.
+
+Return JSON only in this shape:
+{
+  ""overall_score"": 1,
+  ""summary"": ""short justification"",
+  ""scores"": {
+    ""mathematical_correctness"": 1,
+    ""pedagogical_helpfulness"": 1,
+    ""policy_compliance"": 1,
+    ""clarity"": 1,
+    ""specificity"": 1
+  }
+}",openai/gpt-5.4-nano,4,"Svarið er viðeigandi sem hint, hvetur nemandann til næsta skrefs (að finna margföldun til að losna við brot/nefnarann 3) án þess að leysa allt. Engin augljós stærðfræðivilla. Hins vegar er setningin aðeins óljós um nákvæma jöfnu/brotið sem verið er að vísa í, sem dregur úr sértækni.",4,4,5,4,3

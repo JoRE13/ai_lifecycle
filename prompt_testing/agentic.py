@@ -6,6 +6,11 @@ import pandas as pd
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 import os
+import base64
+import json
+import mimetypes
+from pathlib import Path
+from urllib import request, error
 
 class LLMResponse(BaseModel):
     verdict: str
@@ -19,19 +24,10 @@ class LegibilityRegion(BaseModel):
     reason: str | None = None
 
 
-class LegibilityInterpretedStep(BaseModel):
-    page: int | None = None
-    text: str
-
-
 class LegibilityResponse(BaseModel):
     all_readable: bool
     reading_confidence: float | None = None
-    interpreted_text: str | None = None
-    interpreted_steps: list[LegibilityInterpretedStep] = Field(default_factory=list)
-    ambiguous_regions: list[LegibilityRegion] = Field(default_factory=list)
-    missing_parts: list[str] = Field(default_factory=list)
-    message_is: str | None = None
+    ambiguous_steps: list[LegibilityRegion] = Field(default_factory=list)
 
 class LatexResponse(BaseModel):
     problem: str
@@ -39,12 +35,10 @@ class LatexResponse(BaseModel):
     
 
 load_dotenv()
+load_dotenv(Path(__file__).with_name(".env"))
 api_key = os.getenv("GEMINI_API_KEY")
+openrouter_api_key = os.getenv("OPENROUTER_API_KEY")
 
-client = OpenAI(
-  base_url="https://openrouter.ai/api/v1",
-  api_key=os.getenv("OPENROUTER_API_KEY"),
-)
 
 client = genai.Client(api_key=api_key)
 df = pd.read_csv("./prompt_testing/test_cases.csv")
@@ -58,7 +52,7 @@ def call_model_with_retry(prompt: str, image, basemodel, max_retries=5) -> str:
                 config={
                     "response_mime_type": "application/json",
                     "response_json_schema": basemodel.model_json_schema(),
-                    "thinking_config": {"thinking_level": "medium"},
+                    "thinking_config": {"thinking_level": "low"},
                 },
             )
             return resp.text
@@ -68,6 +62,95 @@ def call_model_with_retry(prompt: str, image, basemodel, max_retries=5) -> str:
             wait = 2 ** attempt
             print(f"Server busy, retrying in {wait}s...")
             time.sleep(wait)
+
+
+def _extract_json_object(text: str) -> str:
+    text = text.strip()
+    if text.startswith("```"):
+        lines = text.splitlines()
+        if lines and lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].startswith("```"):
+            lines = lines[:-1]
+        text = "\n".join(lines).strip()
+
+    start = text.find("{")
+    end = text.rfind("}")
+    if start == -1 or end == -1 or end <= start:
+        raise ValueError("Response did not contain a JSON object")
+    return text[start : end + 1]
+
+
+def call_openrouter_legibility_with_retry(prompt: str, image_path: str, basemodel, max_retries=5) -> str:
+    if not openrouter_api_key:
+        raise RuntimeError("OPENROUTER_API_KEY is not set")
+
+    mime_type, _ = mimetypes.guess_type(image_path)
+    if not mime_type:
+        mime_type = "image/png"
+
+    image_bytes = Path(image_path).read_bytes()
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+
+    response_schema = basemodel.model_json_schema()
+    payload = {
+        "model": "openai/gpt-5.4-nano",
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {
+                        "type": "image_url",
+                        "image_url": {"url": f"data:{mime_type};base64,{image_base64}"},
+                    },
+                ],
+            }
+        ],
+        "response_format": {
+            "type": "json_schema",
+            "json_schema": {
+                "name": basemodel.__name__,
+                "strict": True,
+                "schema": response_schema,
+            },
+        },
+    }
+
+    headers = {
+        "Authorization": f"Bearer {openrouter_api_key}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "http://localhost",
+        "X-Title": "ai_lifecycle_prompt_testing",
+    }
+
+    for attempt in range(max_retries):
+        try:
+            req = request.Request(
+                "https://openrouter.ai/api/v1/chat/completions",
+                data=json.dumps(payload).encode("utf-8"),
+                headers=headers,
+                method="POST",
+            )
+            with request.urlopen(req) as resp:
+                body = json.loads(resp.read().decode("utf-8"))
+            content = body["choices"][0]["message"]["content"]
+            return _extract_json_object(content)
+        except error.HTTPError as exc:
+            if attempt == max_retries - 1:
+                detail = exc.read().decode("utf-8", errors="replace")
+                raise RuntimeError(f"OpenRouter HTTP {exc.code}: {detail}") from exc
+            wait = 2 ** attempt
+            print(f"OpenRouter busy, retrying in {wait}s...")
+            time.sleep(wait)
+        except Exception:
+            if attempt == max_retries - 1:
+                raise
+            wait = 2 ** attempt
+            print(f"OpenRouter request failed, retrying in {wait}s...")
+            time.sleep(wait)
+
+
 def evaluate():
     mode_map = {
         "reveal": 0,
@@ -75,7 +158,7 @@ def evaluate():
         "hint": 2,
     }
 
-    for v in ["v5"]:
+    for v in ["v6"]:
         prompts = []
         for mode in mode_map:
             with open(f"./backend/prompts/modes/{v}/{mode}/prompt.txt", "r") as file:
@@ -117,7 +200,7 @@ def evaluate():
             time.sleep(1)
 
         result_df = pd.DataFrame(rows)
-        result_df.to_csv(f"./prompt_testing/results_{"flash_med_v5"}.csv", index=False)
+        result_df.to_csv(f"./prompt_testing/results_{"flash_med_v6"}.csv", index=False)
       
 def evaluate_2():
     mode_map = {
@@ -175,6 +258,7 @@ def legibility():
     with open("./backend/prompts/legibility/v4/prompt.txt", 'r') as file:
         prompt = file.read()
     for row in df.itertuples():
+        if row.id in [6,48]:
             file_path = f"./prompt_testing/img/{row.image}"
             print(f"Processing {file_path}")
 
@@ -217,5 +301,5 @@ def latex():
 
 
 if __name__ == "__main__":
-    latex()
+    legibility()
        

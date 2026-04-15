@@ -637,7 +637,7 @@ def call_deferred_error_with_retry(
         mode=mode,
         response_schema=DeferredErrorResponse,
         model_name="gemini-3-flash-preview",
-        thinking_level=None,
+        thinking_level="high",
         max_retries=max_retries,
         regenerate=regenerate,
         trace_name=trace_name,
