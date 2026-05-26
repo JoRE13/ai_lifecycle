@@ -1,0 +1,31 @@
+﻿user_id,date,task_id,task_name,completed,elapsed_text,help_needed,key_note
+U1,2026-04-07,T1,Login + folder + subfolder,Y,2:24,Y,Subfolder concept unclear
+U1,2026-04-07,T2,Solve + review steps + show solution,Y,5:41,Y,Writing responsiveness + high latency
+U1,2026-04-07,T3,New problem + first step + hint + complete,Y,3:52,N,Camera button sometimes opened camera roll
+U1,2026-04-07,T4,Seeded error + hint + recovery,Y,4:01,N,Did not notice seeded error until AI response
+U1,2026-04-07,T5,Open error bank entry,Y,9s,N,Found quickly
+U1,2026-04-07,T6,Create and export PDF submission,Y,1:54,Y,Name missing in profile for PDF
+U2,2026-04-08,T1,Login + folder + subfolder,Y,3:39,Y,Subfolder creation and selected icon clarity issues
+U2,2026-04-08,T2,Solve + review steps + show solution,Y,3:11,N,Initial image requirement missed; camera inconsistency
+U2,2026-04-08,T3,New problem + first step + hint + complete,Y,4:42,Y,Fullscreen discoverability issue
+U2,2026-04-08,T4,Seeded error + hint + recovery,Y,4:09,N,Recovered correctly
+U2,2026-04-08,T5,Open error bank entry,Y,17s,N,No major issue
+U2,2026-04-08,T6,Create and export PDF submission,Y,2:49,N,Name/profile dependency caused brief detour
+U3,2026-04-10,T1,Login + folder + subfolder,Y,1:47,N,Create-folder location and structure confusion
+U3,2026-04-10,T2,Solve + review steps + show solution,Y,6:30,Y,Timeout/server-error period caused frustration
+U3,2026-04-10,T3,New problem + first step + hint + complete,Y,5:27,N,Wanted double-tap pen->eraser
+U3,2026-04-10,T4,Seeded error + hint + recovery,Y,3:38,N,Recovered after feedback
+U3,2026-04-10,T5,Open error bank entry,Y,27s,N,Did not realize entries are expandable
+U3,2026-04-10,T6,Create and export PDF submission,Y,1:17,N,Name/profile dependency repeated
+U4,2026-04-10,T1,Login + folder + subfolder,Y,2:51,N,Could not tell which avatar was selected
+U4,2026-04-10,T2,Solve + review steps + show solution,Y,4:37,Y,Toolkit visible before image caused confusion
+U4,2026-04-10,T3,New problem + first step + hint + complete,Y,4:57,Y,Thought add-page meant new problem
+U4,2026-04-10,T4,Seeded error + hint + recovery,Y,4:38,N,Hint-on-error behavior unclear
+U4,2026-04-10,T5,Open error bank entry,Y,54:49,N,Recorded value appears anomalous in notes/PDF
+U4,2026-04-10,T6,Create and export PDF submission,Y,1:45,N,Name/profile dependency repeated
+U5,2026-04-13,T1,Login + folder + subfolder,Y,1:43,N,Root-folder terminology unclear initially
+U5,2026-04-13,T2,Solve + review steps + show solution,Y,1:40,N,Flow smooth; latency acceptable
+U5,2026-04-13,T3,New problem + first step + hint + complete,Y,3:37,N,One poor/slow hint response with formatting issues
+U5,2026-04-13,T4,Seeded error + hint + recovery,Y,1:51,N,Smooth recovery
+U5,2026-04-13,T5,Open error bank entry,Y,58s,N,Initially looked in wrong view
+U5,2026-04-13,T6,Create and export PDF submission,Y,41s,N,Export smooth but problems were in root folder

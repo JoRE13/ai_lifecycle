@@ -1,0 +1,476 @@
+Tab 1
+ SUS Questionnaire (System Usability Scale)
+Instructions to participant:​
+"Please rate each statement from 1 to 5.​
+1 means Strongly Disagree, 5 means Strongly Agree."
+
+Scale:
+
+     -​   1 = Strongly Disagree
+     -​   2 = Disagree
+     -​   3 = Neutral
+     -​   4 = Agree
+     -​   5 = Strongly Agree
+
+Participant ID: 1​
+Date: 070426
+
+
+ #              Statement      1       2              3   4   5
+
+ 1              I think that                          x
+                I would like
+                to use this
+                product
+                frequently.
+
+ 2              I found the            x
+                product
+                unnecessa
+                rily
+                complex.
+
+ 3              I thought                                 x
+                the product
+                was easy
+                to use.
+
+ 4              I think that           x
+                I would
+                need the
+                support of
+                a technical
+                person to
+                be able to
+#    Statement     1   2   3   4   5
+
+     use this
+     product.
+
+5    I found the                   x
+     various
+     functions
+     in the
+     product
+     were well
+     integrated.
+
+6    I thought         x
+     there was
+     too much
+     inconsisten
+     cy in this
+     product.
+
+7    I imagine                     x
+     that most
+     people
+     would
+     learn to
+     use this
+     product
+     very
+     quickly.
+
+8    I found the           x
+     product
+     very
+     awkward
+     to use.
+
+9    I felt very           x
+     confident
+     using the
+     product.
+
+10   I needed to       x
+     learn a lot
+     of things
+     before I
+#   Statement    1   2   3   4   5
+
+    could get
+    going with
+    this
+    product.
+Tab 2
+SUS Questionnaire (System Usability Scale)
+Instructions to participant:​
+"Please rate each statement from 1 to 5.​
+1 means Strongly Disagree, 5 means Strongly Agree."
+
+Scale:
+
+     -​   1 = Strongly Disagree
+     -​   2 = Disagree
+     -​   3 = Neutral
+     -​   4 = Agree
+     -​   5 = Strongly Agree
+
+Participant ID: 2​
+Date: 080426
+
+
+ #              Statement      1       2              3   4   5
+
+ 1              I think that                              x
+                I would like
+                to use this
+                product
+                frequently.
+
+ 2              I found the                           x
+                product
+                unnecessa
+                rily
+                complex.
+
+ 3              I thought                             x
+                the product
+                was easy
+                to use.
+
+ 4              I think that           x
+                I would
+                need the
+                support of
+                a technical
+                person to
+                be able to
+#    Statement     1   2   3   4   5
+
+     use this
+     product.
+
+5    I found the               x
+     various
+     functions
+     in the
+     product
+     were well
+     integrated.
+
+6    I thought             x
+     there was
+     too much
+     inconsisten
+     cy in this
+     product.
+
+7    I imagine                 x
+     that most
+     people
+     would
+     learn to
+     use this
+     product
+     very
+     quickly.
+
+8    I found the       x
+     product
+     very
+     awkward
+     to use.
+
+9    I felt very           x
+     confident
+     using the
+     product.
+
+10   I needed to x
+     learn a lot
+     of things
+     before I
+#   Statement    1   2   3   4   5
+
+    could get
+    going with
+    this
+    product.
+Tab 3
+SUS Questionnaire (System Usability Scale)
+Instructions to participant:​
+"Please rate each statement from 1 to 5.​
+1 means Strongly Disagree, 5 means Strongly Agree."
+
+Scale:
+
+     -​   1 = Strongly Disagree
+     -​   2 = Disagree
+     -​   3 = Neutral
+     -​   4 = Agree
+     -​   5 = Strongly Agree
+
+Participant ID:​
+Date:
+
+
+ #              Statement      1       2              3   4   5
+
+ 1              I think that                                  x
+                I would like
+                to use this
+                product
+                frequently.
+
+ 2              I found the            x
+                product
+                unnecessa
+                rily
+                complex.
+
+ 3              I thought                                     x
+                the product
+                was easy
+                to use.
+
+ 4              I think that   x
+                I would
+                need the
+                support of
+                a technical
+                person to
+                be able to
+#    Statement     1   2   3   4   5
+
+     use this
+     product.
+
+5    I found the               x
+     various
+     functions
+     in the
+     product
+     were well
+     integrated.
+
+6    I thought     x
+     there was
+     too much
+     inconsisten
+     cy in this
+     product.
+
+7    I imagine                     x
+     that most
+     people
+     would
+     learn to
+     use this
+     product
+     very
+     quickly.
+
+8    I found the   x
+     product
+     very
+     awkward
+     to use.
+
+9    I felt very                   x
+     confident
+     using the
+     product.
+
+10   I needed to x
+     learn a lot
+     of things
+     before I
+#   Statement    1   2   3   4   5
+
+    could get
+    going with
+    this
+    product.
+Tab 4
+SUS Questionnaire (System Usability Scale)
+Instructions to participant:​
+"Please rate each statement from 1 to 5.​
+1 means Strongly Disagree, 5 means Strongly Agree."
+
+Scale:
+
+     -​   1 = Strongly Disagree
+     -​   2 = Disagree
+     -​   3 = Neutral
+     -​   4 = Agree
+     -​   5 = Strongly Agree
+
+Participant ID:4​
+Date:100426
+
+
+ #              Statement      1       2              3   4   5
+
+ 1              I think that                              x
+                I would like
+                to use this
+                product
+                frequently.
+
+ 2              I found the            x
+                product
+                unnecessa
+                rily
+                complex.
+
+ 3              I thought                                 x
+                the product
+                was easy
+                to use.
+
+ 4              I think that           x
+                I would
+                need the
+                support of
+                a technical
+                person to
+                be able to
+#    Statement     1   2   3   4   5
+
+     use this
+     product.
+
+5    I found the               x
+     various
+     functions
+     in the
+     product
+     were well
+     integrated.
+
+6    I thought         x
+     there was
+     too much
+     inconsisten
+     cy in this
+     product.
+
+7    I imagine             x
+     that most
+     people
+     would
+     learn to
+     use this
+     product
+     very
+     quickly.
+
+8    I found the       x
+     product
+     very
+     awkward
+     to use.
+
+9    I felt very               x
+     confident
+     using the
+     product.
+
+10   I needed to       x
+     learn a lot
+     of things
+     before I
+#   Statement    1   2   3   4   5
+
+    could get
+    going with
+    this
+    product.
+Tab 5
+SUS Questionnaire (System Usability Scale)
+Instructions to participant:​
+"Please rate each statement from 1 to 5.​
+1 means Strongly Disagree, 5 means Strongly Agree."
+
+Scale:
+
+     -​   1 = Strongly Disagree
+     -​   2 = Disagree
+     -​   3 = Neutral
+     -​   4 = Agree
+     -​   5 = Strongly Agree
+
+Participant ID:​
+Date:
+
+
+ #              Statement      1       2              3   4   5
+
+ 1              I think that                              x
+                I would like
+                to use this
+                product
+                frequently.
+
+ 2              I found the    x
+                product
+                unnecessa
+                rily
+                complex.
+
+ 3              I thought                                     x
+                the product
+                was easy
+                to use.
+
+ 4              I think that   x
+                I would
+                need the
+                support of
+                a technical
+                person to
+                be able to
+#    Statement     1   2   3   4   5
+
+     use this
+     product.
+
+5    I found the               x
+     various
+     functions
+     in the
+     product
+     were well
+     integrated.
+
+6    I thought         x
+     there was
+     too much
+     inconsisten
+     cy in this
+     product.
+
+7    I imagine                     x
+     that most
+     people
+     would
+     learn to
+     use this
+     product
+     very
+     quickly.
+
+8    I found the   x
+     product
+     very
+     awkward
+     to use.
+
+9    I felt very                   x
+     confident
+     using the
+     product.
+
+10   I needed to x
+     learn a lot
+     of things
+     before I
+#   Statement    1   2   3   4   5
+
+    could get
+    going with
+    this
+    product.
+

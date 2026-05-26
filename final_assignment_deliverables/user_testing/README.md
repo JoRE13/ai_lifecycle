@@ -1,4 +1,4 @@
-# User Testing Files
+﻿# User Testing Files
 
 Use these files for your final-project user testing sessions.
 
@@ -17,3 +17,10 @@ Use these files for your final-project user testing sessions.
 - `SUS_SCORING.md`: scoring instructions and formulas.
 - `sus_responses_template.csv`: one row per participant.
 - `findings_log_template.csv`: one row per finding.
+
+## Filled results (from imported PDFs)
+- `USER_TESTING_RESULTS_REPORT_READY.md`: consolidated narrative for report + presentation.
+- `sus_responses_filled.csv`: completed SUS responses and scores.
+- `task_results_filled.csv`: per-user, per-task completion/timing/notes.
+- `findings_log_filled.csv`: prioritized findings with evidence and status.
+- `raw_inputs/`: archived source PDFs and extracted text used for traceability.

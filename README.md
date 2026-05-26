@@ -43,6 +43,18 @@ Optional:
 - `LANGFUSE_PUBLIC_KEY`
 - `LANGFUSE_SECRET_KEY`
 - `LANGFUSE_HOST` / `LANGFUSE_BASE_URL`
+- `LLM_ROUTING_ENABLED` (`true` by default)
+- `LLM_REASONING_SOFT_TIMEOUT_SECONDS` (`15` by default)
+- `LLM_LEGIBILITY_SOFT_TIMEOUT_SECONDS` (`8` by default)
+- `LLM_FALLBACK_CHAIN` (optional comma-separated `provider:model:effort` entries)
+- `OPENAI_API_KEY` and `LLM_OPENAI_MODEL` for OpenAI fallback
+- `ANTHROPIC_API_KEY` and `LLM_ANTHROPIC_MODEL` for Anthropic fallback
+
+Default routing policy:
+- Try Gemini with the requested thinking level.
+- If configured and useful, retry the same Gemini model with lower thinking.
+- If provider keys are available, fall back to OpenAI, then Anthropic.
+- Deferred/background error analysis does not use an aggressive soft timeout unless `LLM_DEFERRED_SOFT_TIMEOUT_SECONDS` is set.
 
 ## Feedback Rating Format
 Feedback ratings are expected as:

@@ -1,0 +1,1404 @@
+Tab 1
+
+Session Notes Template
+Session ID: 1​
+User ID: 1​
+Facilitator: Sölvi Santos​
+Date: 070426​
+Start time: 2100​
+End time: 2130​
+Device: iPad
+
+Pre-Session
+-​
+-​
+-​
+
+External user (not in group): Yes
+Consent for note taking: Yes
+Logging active: Yes
+
+Task Results
+Task
+
+Completed
+(Y/N)
+
+Time (sec) Help needed
+(Y/N)
+
+Notes
+
+1. Login + folder
++ subfolder
+
+Y
+
+2:24 Y
+
+Accidentally
+made a
+secondary
+folder and not a
+subfolder.
+Unclear what is
+a subfolder
+
+2. Solve +
+review steps +
+show solution
+
+Y
+
+5:41 Y
+
+Slow writing,
+the pencil was
+not responsive.
+Took quite a
+few attempts to
+figure out
+where to write.
+Got right
+solution with a
+small error but
+ended up with
+correct answer.
+40 sek delay on
+
+Task
+
+Completed
+(Y/N)
+
+Time (sec) Help needed
+(Y/N)
+
+Notes
+
+the
+request.Second
+request took up
+to three
+minutes.
+Started to scroll
+around while
+waiting for the
+answer for
+show solution
+3. New problem
++ first step + hint
++ complete
+
+Y
+
+3:52 N
+
+Again, when
+trying to press
+camera,
+accidentally
+opens camera
+roll. Around a
+40 second for
+hint. Thought
+the buttons to
+switch pages
+was undo/redo.
+
+4. Seeded error
++ hint + recovery
+
+Y
+
+4:01 N
+
+At no point did
+the user crop
+the photos,
+only zoomed in.
+Even thought
+the option is
+there. Around
+1:30 minute
+latency for the
+request which
+had the user
+scrolling
+around. Didn’t
+react to the
+error at first but
+after the AI told
+her about the
+error she
+
+Task
+
+Completed
+(Y/N)
+
+Time (sec) Help needed
+(Y/N)
+
+Notes
+
+immediately
+corrected the
+error and
+finished
+5. Open error
+bank entry
+
+Y
+
+9 sek N
+
+Found it
+straight away
+with no
+problems
+
+6. Create and
+export PDF
+submission
+
+Y
+
+1:54 Y
+
+Didn’t have
+name in the
+profile so had
+to go and input
+that first into
+the profile. A
+user doesn’t
+input their
+name when
+making a
+profile. Boxes
+are not fully
+clickable, only
+the parts with
+text. Frustrated
+
+Task 4 (Seeded Error) Detailed Fields
+-​
+-​
+-​
+-​
+-​
+-​
+-​
+
+Seeded wrong step used:
+User noticed seeded error: No
+User corrected before hint: No
+Hint requested: Yes
+Recovery success: Yes
+Time to recover (sec): 10
+Notes: Didn’t react to the error but after the AI told her about the error she immediately
+corrected the error
+
+Unexpected Actions
+Timestamp
+
+What user tried
+
+Expected by
+us? (Y/N)
+
+Outcome
+
+Notes
+
+To make a pdf
+but had to go to
+profile to attach
+a name to the
+profile since that
+was not a part of
+the profile
+creating process
+
+N
+
+The user figured
+it out and
+proceeded like
+intended
+
+This needs to be
+fixed, users
+must input their
+name when
+creating a
+profile.
+
+Latency Perception
+Moment
+
+User rating (1-5) User quote
+
+Waiting for getting a solution
+
+2 “Tók mjög langan tíma að fá
+niðustöðu, um þrjár mínútur”
+
+Errors or Failures
+Timestamp
+
+Error/Failure
+
+Blocking? (Y/N)
+
+Recovery path
+
+Debrief Answers
+1.​ Most confusing part: First, the folders were confusing.
+2.​ Point where unsure what to do next: No, other than that everything was straight forward.
+3.​ Feelings about AI responses: They were very good, the hints were good and when there
+was an error it was clear.
+4.​ Response time acceptable? Why: If I was using it right now I would not have the
+patience to wait and would simply go to other solutions like open AI models.
+
+5.​ What to change first: I would organize the folders better so the separation between
+folders and subfolders. Have more color separation between folders and subfolders.
+Make more contrast between things on the dashboard, things blend together to much.
+
+Key Quotes
+-​
+-​
+-​
+
+""
+""
+""
+
+Facilitator Summary
+-​
+-​
+-​
+-​
+
+Top finding #1: Latency way to high, left the user scrolling around
+Top finding #2: Folder structure not too clear, things blend in with each other
+Top finding #3: User didn’t use all features like full screen, cropping and different pages.
+Overall severity for this session: High
+
+Tab 2
+
+Session Notes Template
+Session ID:2​
+User ID:2​
+Facilitator:Sölvi Santos​
+Date:080426​
+Start time: 1810​
+End time: ​
+Device: ipad
+
+Pre-Session
+-​
+-​
+-​
+
+External user (not in group): Yes / No
+Consent for note taking: Yes / No
+Logging active: Yes / No
+
+Task Results
+Task
+
+Completed
+(Y/N)
+
+1. Login + folder
++ subfolder
+
+Y
+
+Time (sec) Help needed
+(Y/N)
+3:39 Y
+
+Notes
+
+Boxes need to
+be fully
+clickable, users
+usually click on
+the right side of
+the text in the
+box, that should
+open it. Icons
+chosen need to
+be more visible
+that they are
+chosen.
+Struggled to find
+where to create
+a subfolder,
+started to do a
+problem. Finally
+ended up
+making the
+subfolder after
+quite some time.
+
+Task
+
+Completed
+(Y/N)
+
+Time (sec) Help needed
+(Y/N)
+
+Notes
+
+2. Solve +
+review steps +
+show solution
+
+Y
+
+3:11 N
+
+Instantly sent
+the review their
+answer before
+checking the
+prerequisite for
+getting entire
+solution. Latency
+was
+considerably
+lower than
+before since we
+changed
+models.
+Otherwise, no
+problems, other
+than didn’t input
+image at first.
+Again though,
+when user first
+pressed camera
+they get the
+camera roll for
+some reason but
+after that they
+get the camera.
+
+3. New problem
++ first step + hint
++ complete
+
+Y
+
+4:42 Y
+
+Latency around
+20 seconds for
+the hint, much
+better. Didn’t
+have to much
+space but didnt
+go fullscreen,
+looked like he
+didn’t see it. I
+told him out of
+convenience but
+this should be
+more obvious
+
+Task
+
+Completed
+(Y/N)
+
+Time (sec) Help needed
+(Y/N)
+
+4. Seeded error
++ hint + recovery
+
+Y
+
+4:09 N
+
+5. Open error
+bank entry
+
+Y
+
+17 sek N
+
+6. Create and
+export PDF
+submission
+
+Y
+
+2:49 N
+
+Notes
+
+Hint took around
+40 seconds, a
+bit long. Similar
+wait for the
+getting a full
+solution.
+Worked
+smoothly
+Also ran into the
+name thing for
+around 30
+seconds but
+actually found
+his way to the
+profile and
+changed it. The
+error message
+was not clear
+but he figured it
+out. This is a
+major flaw either
+way
+
+Task 4 (Seeded Error) Detailed Fields
+-​
+-​
+-​
+-​
+-​
+-​
+-​
+
+Seeded wrong step used:
+User noticed seeded error: No
+User corrected before hint: No
+Hint requested: Yes
+Recovery success: Yes
+Time to recover (sec): few seconds
+Notes: Got a hint how to fix the current step, did and went on to the next step
+
+Unexpected Actions
+Timestamp
+
+What user tried
+
+Expected by
+us? (Y/N)
+
+Outcome
+
+Notes
+
+Latency Perception
+Moment
+
+User rating (1-5) User quote
+
+Errors or Failures
+Timestamp
+
+Error/Failure
+
+Blocking? (Y/N)
+
+Recovery path
+
+Debrief Answers
+1.​ Most confusing part: Creating a subfolder and choosing that you have to make a
+subfolder. The fullscreen was not clear. Thought there was no undo button (its location is
+not good). Not clear that a subfolder is a subfolder. Not to much maneuverability in the
+writing area of a problem and not being able to zoom out. When choosing an icon, not
+clear which is chosen.
+2.​ Point where unsure what to do next: Unsure how to export, i.e. didn’t know what “deila”
+did. Note: this person is not an avid ipad user.
+3.​ Feelings about AI responses: Found the answers good, but maybe gave a bit too much
+of a hint. Points exactly out where the error is, not too much wiggle room for that “aha”
+moment.
+4.​ Response time acceptable? Why: Slightly too much waiting. Still within acceptable
+range.
+5.​ What to change first: Folders more clear.
+
+Key Quotes
+-​
+-​
+-​
+
+"In the error bank, it would be nice to see the actual problem itself so I could remember
+the situation in which I did it."
+"Sometimes enter works for entering into a field but sometimes you have to press a
+button."
+""
+
+Facilitator Summary
+-​
+-​
+-​
+-​
+
+Top finding #1: Folder structure needs fixing
+Top finding #2: Things not clear enough
+Top finding #3: Slightly too much waiting
+Overall severity for this session: High
+
+Tab 3
+
+Session Notes Template
+Session ID:3​
+User ID:3​
+Facilitator: Jóhannes​
+Date: 100426​
+Start time:17:00​
+End time:17:32​
+Device:ipad
+
+Pre-Session
+-​
+-​
+-​
+
+External user (not in group): Yes / No
+Consent for note taking: Yes / No
+Logging active: Yes / No
+
+Task Results
+Task
+
+Completed
+(Y/N)
+
+Time (sec) Help needed
+(Y/N)
+
+Notes
+
+1. Login + folder
++ subfolder
+
+Y
+
+01:47 N
+
+Happy with
+login. No
+problem with
+login, had
+problem finding
+the create folder
+button. Folder
+structure
+confusing.
+Pressed
+different buttons.
+Didnt find the
+folder structure
+intuitive.
+
+2. Solve +
+review steps +
+show solution
+
+Y
+
+6:30 Y
+
+Had problems
+with opening
+camera. Knew
+right away
+where to write.
+Checked
+
+Task
+
+Completed
+(Y/N)
+
+Time (sec) Help needed
+(Y/N)
+
+Notes
+
+solution directly
+after solving.
+Latency not
+good, user
+started messing
+around. Gemini
+servers were
+most likely
+down, timeout
+too long. Got
+irritated.
+Messing around
+while he waited.
+Got a timeout
+and tried again
+directly. Got a
+server error as
+well as legibility
+was turned on,
+which took
+almost 3 mins.
+3. New problem
++ first step + hint
++ complete
+
+Y
+
+5:27 N
+
+Always used the
+window in
+smaller mode.
+Asked for hint
+without problem.
+A little irritated
+while waiting.
+Scrolling.
+Latency not too
+bad though.
+Wanted to
+double tap pen
+for eraser,
+irritated.
+Changed to
+lines without
+problem.
+Suspected he
+made an error,
+
+Task
+
+Completed
+(Y/N)
+
+Time (sec) Help needed
+(Y/N)
+
+Notes
+
+made llm review
+solution, user a
+bit “eirðarlaus”
+while waiting for
+answer started
+drawing, Had a
+wrong answer,
+but llm noticed
+but still gave
+correct verdict.
+4. Seeded error
++ hint + recovery
+
+Y
+
+3:38 N
+
+Eirðarlaus while
+waiting for
+response, starts
+drawing, takes
+the feedback
+from the llm and
+solves. Uses the
+fullscreen. User
+little irritated,
+even tough
+shorter latency.
+
+5. Open error
+bank entry
+
+Y
+
+27 N
+
+Didn’t know
+initially where to
+look initially,
+didnt realise he
+could select the
+error to look at it
+closer.
+
+6. Create and
+export PDF
+submission
+
+Y
+
+1:17 N
+
+Found the
+export button
+directly, irritated
+because of
+name, but
+realized that he
+had to update it
+in the profile.
+Then went back
+to export it.
+
+Task 4 (Seeded Error) Detailed Fields
+-​
+-​
+-​
+-​
+-​
+-​
+-​
+
+Seeded wrong step used:
+User noticed seeded error: Yes
+User corrected before hint: No
+Hint requested: Yes
+Recovery success: Yes
+Time to recover (sec): 38
+Notes: Asked for hint got wrong verdict, fixed and solved the problem
+
+Unexpected Actions
+Timestamp
+
+What user tried
+
+Expected by
+us? (Y/N)
+
+Outcome
+
+Notes
+
+Latency Perception
+Moment
+
+User rating (1-5) User quote
+4 Fine even though little long,
+gave time to think on problem
+
+Errors or Failures
+Timestamp
+
+Error/Failure
+
+Blocking? (Y/N)
+
+Recovery path
+
+Debrief Answers
+1.​ Most confusing part: The folder structure was a little weird. The button should be close
+where folders are listed.
+2.​ Point where unsure what to do next: No never felt unsure.
+
+3.​ Feelings about AI responses: He said they were acceptable, helpful and clear.
+4.​ Response time acceptable? Why: It is fine but problem with a server error in the first
+task.
+5.​ What to change first: Change the folder structure and make writing experience more
+smooth
+
+Key Quotes
+-​
+-​
+-​
+
+"I wish I could double tap to change between pens"
+""
+""
+
+Facilitator Summary
+-​
+-​
+-​
+-​
+
+Top finding #1: Folder structure needs to be more smooth
+Top finding #2: Better fallback if Gemini server down
+Top finding #3: Needs a smoother writing experience
+Overall severity for this session: Medium
+
+Tab 4
+
+Session Notes Template
+Session ID: 4​
+User ID: 4​
+Facilitator: Sölvi Santos​
+Date: 100426​
+Start time: 1850​
+End time:19:20​
+Device: ipad
+
+Pre-Session
+-​
+-​
+-​
+
+External user (not in group): Yes
+Consent for note taking: Yes
+Logging active: Yes
+
+Task Results
+Task
+
+Completed
+(Y/N)
+
+Time (sec) Help needed
+(Y/N)
+
+Notes
+
+1. Login + folder
++ subfolder
+
+Y
+
+2:51 N
+
+User didn’t know
+which icon they
+were picking,
+like the other
+two users I
+tested. Found
+the new
+subfolder under
+the “Aðgerðir
+fyrir möppu…”
+
+2. Solve +
+review steps +
+show solution
+
+Y
+
+4:37 Y
+
+When in the
+initial screen of
+the inserting an
+image, since the
+toolkit for the
+pencil is visible
+thought that they
+could start
+writing. Wasn’t
+clear from the
+
+Task
+
+Completed
+(Y/N)
+
+Time (sec) Help needed
+(Y/N)
+
+Notes
+
+beginning that
+they NEEDED to
+put in an image.
+Same error with
+the pressing
+camera but
+getting camera
+roll. Good
+latency from
+model.
+3. New problem
++ first step + hint
++ complete
+
+Y
+
+4:57 Y
+
+Thought that
+adding a page
+was adding a
+new problem.
+Decided to not
+crop for some
+unknown
+reason. Got a
+response from
+the model that
+the image had to
+be readjusted.
+Wanted to
+double tap to
+change to
+eraser. Did not
+opt for full
+screen
+
+4. Seeded error
++ hint + recovery
+
+Y
+
+4:38 N
+
+It has to be more
+obvious that
+when getting a
+hint if there is an
+error that there
+is an error and it
+is actually not
+giving a hint for
+the next step
+(maybe).
+
+Task
+
+Completed
+(Y/N)
+
+Time (sec) Help needed
+(Y/N)
+
+Notes
+
+5. Open error
+bank entry
+
+Y
+
+54:49 N
+
+Started from the
+problem and
+thought that the
+steps were error
+bank.
+
+6. Create and
+export PDF
+submission
+
+Y
+
+1:45 N
+
+Again, same
+thing with the
+name. Had to
+navigate to
+profile first,
+figured out
+herself
+
+Task 4 (Seeded Error) Detailed Fields
+-​
+-​
+-​
+-​
+-​
+-​
+-​
+
+Seeded wrong step used:
+User noticed seeded error: No
+User corrected before hint: Yes
+Hint requested: Yes
+Recovery success: Yes
+Time to recover (sec): Twenty seconds
+Notes:
+
+Unexpected Actions
+Timestamp
+
+What user tried
+
+Expected by
+us? (Y/N)
+
+Outcome
+
+Latency Perception
+Moment
+
+User rating (1-5) User quote
+
+Notes
+
+Moment
+
+User rating (1-5) User quote
+
+Errors or Failures
+Timestamp
+
+Error/Failure
+
+Blocking? (Y/N)
+
+Recovery path
+
+Debrief Answers
+1.​ Most confusing part: The folder structure. The subfolder/folder organization. Either color
+code or some indication that a subfolder is an actual subfolder of a folder. Confused that
+a new page in a problem wasn’t a new problem. (editors note: maybe we need to be
+more clear about that each problem is its own problem but we kind of already do.)
+2.​ Point where unsure what to do next: Multiple points where I wasn’t completely sure of
+what to do, but I managed to figure it out quickly.
+3.​ Feelings about AI responses: They were good and thought-provoking, and it was also
+nice that they praised you for doing a good job.
+4.​ Response time acceptable? Why: I could imagine for the younger generation that their
+attention span would be too short.
+5.​ What to change first: The folders and color-coding the problems so they are the same
+color as the folder in which they reside.
+
+Key Quotes
+-​
+
+-​
+-​
+
+"Possibility of having a large notes section where you can lasso areas and get
+assistance from the LLM on only that section. Where you essentially don’t take any
+pictures of problems, the LLM only has to infer context from your writing. Something to
+think about in the future."
+"The folders and color-coding the problems so they are the same color as the folder in
+which they reside."
+"Multiple points where I wasn’t completely sure of what to do, but I managed to figure it
+out quickly."
+
+Facilitator Summary
+-​
+-​
+
+Top finding #1: Folder/subfolder structure not clear.
+Top finding #2: Should still aim to lower latency even though we have drastically
+decreased it.
+
+-​
+
+-​
+
+Top finding #3: Asking for a hint for something that is wrong gives you a hint for how to
+change it. Maybe not to that right away, but just initially tell the user that there is an error,
+and then they can follow up for getting a hint on how to fix it.
+Overall severity for this session: Medium
+
+Tab 5
+
+Session Notes Template
+Session ID:5​
+User ID:5​
+Facilitator: Jóhannes​
+Date:130426​
+Start time:17:45​
+End time: 18:23​
+Device:iPad
+
+Pre-Session
+-​
+-​
+-​
+
+External user (not in group): Yes
+Consent for note taking: Yes
+Logging active: Yes
+
+Task Results
+Task
+
+Completed
+(Y/N)
+
+1. Login + folder
++ subfolder
+
+Y
+
+Time (sec) Help needed
+(Y/N)
+1:43 N
+
+Notes
+
+The app was
+unresponsive for
+a few seconds
+after startup
+which annoyed
+user. Enjoyed
+user icons.
+Everything went
+smooth with
+signup. Found
+folders almost
+right away, but a
+little confused
+what rótarmappa
+was. Figured
+quickly though
+on how to create
+subfolder.
+
+Task
+
+Completed
+(Y/N)
+
+Time (sec) Help needed
+(Y/N)
+
+Notes
+
+2. Solve +
+review steps +
+show solution
+
+Y
+
+1:40 N
+
+Found create
+problem right
+away, used both
+zoom and crop
+to select
+relevant
+problem.
+Hesitated a bit
+before writing
+but solving went
+smooth, did not
+fullscreen. Was
+initially confused
+on how to get
+solution but
+figured it out
+after seeing the
+info. Latency
+was good,
+around 10
+seconds for
+each, user
+seemed fine with
+wait and
+responses
+
+3. New problem
++ first step + hint
++ complete
+
+Y
+
+3:37 N
+
+User initially
+looked for button
+to create a new
+problem in the
+problem view
+but figured it out
+and created a
+new problem.
+The llm
+response was
+very slow and
+also bad for the
+hint generation,
+gave exact
+formula as well
+
+Task
+
+Completed
+(Y/N)
+
+Time (sec) Help needed
+(Y/N)
+
+Notes
+
+as formatting
+errors for the
+output. User
+noted weird
+commas in
+output. Used
+hint to solve
+problem and got
+a correct verdict
+for problem in
+only a few
+seconds.
+4. Seeded error
++ hint + recovery
+
+Y
+
+1:51 N
+
+Everything went
+smooth, user did
+not really think
+about error and
+asked for a hint
+directly after
+setup but
+noticed after the
+response, fixed
+the problem and
+solved. llm
+responses were
+good and
+latency was low.
+Still a little fiddly
+while waiting for
+response.
+
+5. Open error
+bank entry
+
+Y
+
+58 N
+
+Started looking
+around in the
+problem view
+but noticed it
+directly when
+user went out of
+problem view.
+Pressed the
+error but not
+
+Task
+
+Completed
+(Y/N)
+
+Time (sec) Help needed
+(Y/N)
+
+Notes
+
+again to see the
+entire step.
+6. Create and
+export PDF
+submission
+
+Y
+
+41 N
+
+Everything went
+very smooth, I
+noticed however
+that the user
+had created all
+the problems in
+the generic
+folder not the
+subfolder. User
+did not seem to
+notice though.
+
+Task 4 (Seeded Error) Detailed Fields
+-​
+-​
+-​
+-​
+-​
+-​
+-​
+
+Seeded wrong step used:
+User noticed seeded error: No
+User corrected before hint: No
+Hint requested: Yes
+Recovery success: Yes
+Time to recover (sec): 10
+Notes: Went very smooth
+
+Unexpected Actions
+Timestamp
+
+What user tried
+
+Expected by
+us? (Y/N)
+
+Outcome
+
+Notes
+
+Latency Perception
+Moment
+
+User rating (1-5) User quote
+
+Hint in task 3
+
+2 Is it always so slow.
+
+Errors or Failures
+Timestamp
+
+Error/Failure
+
+Blocking? (Y/N)
+
+Recovery path
+
+Task 3
+
+Bad llm response,
+error in math
+formatting and
+answer against
+prompt
+
+N
+
+Did not affect the task
+but not the response
+we want
+
+Debrief Answers
+1.​ Most confusing part: What rótarmappa is.
+2.​ Point where unsure what to do next: For a while when asked to get solution from
+teacher.
+3.​ Feelings about AI responses: Felt they were useful except.
+4.​ Response time acceptable? Why: Yes, except for the one in task 3. Around 10 seconds
+and got a little time to think on problem.
+5.​ What to change first: User did not have a concrete answer.
+
+Key Quotes
+-​
+-​
+-​
+
+"Is it always so slow"
+"I like the user icons"
+""
+
+Facilitator Summary
+-​
+-​
+-​
+
+Top finding #1: We must have a better fallback for bad prompts, set the timeout to be
+less.
+Top finding #2: Hint should not give exact formula needed.
+Top finding #3: It might be more intuitive for users to be able to create problems directly
+from problem view.
+
+-​
+
+Overall severity for this session: Medium
+
+

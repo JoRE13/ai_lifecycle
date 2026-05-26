@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import base64
+import json
 import logging
 import os
 import time
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
+from dataclasses import dataclass
 from datetime import datetime
+from io import BytesIO
 from pathlib import Path
 from typing import Any, Sequence
 
@@ -30,6 +35,48 @@ COST_SPIKE_THRESHOLD_USD = float(os.getenv("COST_SPIKE_THRESHOLD_USD", "0.005"))
 
 # In-memory baseline for simple spike detection (first call seeds baseline only).
 previous_estimated_call_cost_usd: float | None = None
+
+LLM_ROUTING_ENABLED = os.getenv("LLM_ROUTING_ENABLED", "true").strip().lower() in {"1", "true", "yes", "on"}
+LLM_ROUTE_MAX_WORKERS = int(os.getenv("LLM_ROUTE_MAX_WORKERS", "8"))
+LLM_MAX_RETRIES_PER_ROUTE = int(os.getenv("LLM_MAX_RETRIES_PER_ROUTE", "2"))
+LLM_PROVIDER_HTTP_TIMEOUT_SECONDS = float(os.getenv("LLM_PROVIDER_HTTP_TIMEOUT_SECONDS", "60"))
+LLM_OPENAI_MODEL = os.getenv("LLM_OPENAI_MODEL", "gpt-5-mini")
+LLM_OPENAI_REASONING_EFFORT = os.getenv("LLM_OPENAI_REASONING_EFFORT", "low")
+LLM_ANTHROPIC_MODEL = os.getenv("LLM_ANTHROPIC_MODEL", "claude-3-5-haiku-20241022")
+LLM_ANTHROPIC_API_URL = os.getenv("LLM_ANTHROPIC_API_URL", "https://api.anthropic.com/v1/messages")
+LLM_ANTHROPIC_VERSION = os.getenv("LLM_ANTHROPIC_VERSION", "2023-06-01")
+LLM_ANTHROPIC_MAX_TOKENS = int(os.getenv("LLM_ANTHROPIC_MAX_TOKENS", "2048"))
+LLM_REASONING_SOFT_TIMEOUT_SECONDS = float(os.getenv("LLM_REASONING_SOFT_TIMEOUT_SECONDS", "15"))
+LLM_LEGIBILITY_SOFT_TIMEOUT_SECONDS = float(os.getenv("LLM_LEGIBILITY_SOFT_TIMEOUT_SECONDS", "8"))
+LLM_DEFERRED_SOFT_TIMEOUT_SECONDS = os.getenv("LLM_DEFERRED_SOFT_TIMEOUT_SECONDS")
+_route_executor: ThreadPoolExecutor | None = None
+
+
+@dataclass(frozen=True)
+class ModelRoute:
+    provider: str
+    model: str
+    thinking_level: str | None
+    soft_timeout_seconds: float | None
+
+
+@dataclass(frozen=True)
+class ProviderCallResult:
+    response_text: str
+    model_name: str
+    tokens_in: int
+    tokens_out: int
+    tokens_thoughts: int
+    tokens_total: int
+    estimated_call_cost_usd: float | None
+
+
+class ModelSoftTimeout(RuntimeError):
+    pass
+
+
+class ProviderUnavailable(RuntimeError):
+    pass
 
 
 class LLMResponse(BaseModel):
@@ -185,6 +232,171 @@ def _warn_if_cost_spike(current_cost_usd: float) -> None:
             increase,
         )
     previous_estimated_call_cost_usd = current_cost_usd
+
+
+def _route_pool() -> ThreadPoolExecutor:
+    global _route_executor
+    if _route_executor is None:
+        _route_executor = ThreadPoolExecutor(max_workers=max(1, LLM_ROUTE_MAX_WORKERS))
+    return _route_executor
+
+
+def _env_float_or_none(value: str | None) -> float | None:
+    if value is None:
+        return None
+    stripped = value.strip()
+    if not stripped:
+        return None
+    parsed = float(stripped)
+    return parsed if parsed > 0 else None
+
+
+def _soft_timeout_for_call(*, mode: str, response_schema: type[BaseModel]) -> float | None:
+    if not LLM_ROUTING_ENABLED:
+        return None
+    if response_schema is LegibilityResponse or mode.endswith("_legibility"):
+        return LLM_LEGIBILITY_SOFT_TIMEOUT_SECONDS
+    if response_schema is DeferredErrorResponse or "deferred" in mode:
+        return _env_float_or_none(LLM_DEFERRED_SOFT_TIMEOUT_SECONDS)
+    return LLM_REASONING_SOFT_TIMEOUT_SECONDS
+
+
+def _configured_route_chain(
+    *,
+    primary_model: str,
+    primary_thinking_level: str | None,
+    soft_timeout_seconds: float | None,
+) -> list[ModelRoute]:
+    primary = ModelRoute(
+        provider="gemini",
+        model=primary_model,
+        thinking_level=primary_thinking_level,
+        soft_timeout_seconds=soft_timeout_seconds,
+    )
+    if not LLM_ROUTING_ENABLED:
+        return [primary]
+
+    raw_chain = os.getenv("LLM_FALLBACK_CHAIN")
+    if raw_chain:
+        routes = [primary]
+        for raw_item in raw_chain.split(","):
+            parts = [part.strip() for part in raw_item.split(":")]
+            if len(parts) < 2 or not parts[0] or not parts[1]:
+                logger.warning("Ignoring invalid LLM_FALLBACK_CHAIN item: %s", raw_item)
+                continue
+            routes.append(
+                ModelRoute(
+                    provider=parts[0].lower(),
+                    model=parts[1],
+                    thinking_level=parts[2] if len(parts) >= 3 and parts[2] else None,
+                    soft_timeout_seconds=soft_timeout_seconds,
+                )
+            )
+        return _disable_timeout_without_fallback(_dedupe_routes(routes))
+
+    routes = [primary]
+    if (primary_thinking_level or "").lower() not in {"low", "minimal", "none"}:
+        routes.append(
+            ModelRoute(
+                provider="gemini",
+                model=primary_model,
+                thinking_level="low",
+                soft_timeout_seconds=soft_timeout_seconds,
+            )
+        )
+    if os.getenv("OPENAI_API_KEY"):
+        routes.append(
+            ModelRoute(
+                provider="openai",
+                model=LLM_OPENAI_MODEL,
+                thinking_level=LLM_OPENAI_REASONING_EFFORT,
+                soft_timeout_seconds=soft_timeout_seconds,
+            )
+        )
+    if os.getenv("ANTHROPIC_API_KEY"):
+        routes.append(
+            ModelRoute(
+                provider="anthropic",
+                model=LLM_ANTHROPIC_MODEL,
+                thinking_level=None,
+                soft_timeout_seconds=soft_timeout_seconds,
+            )
+        )
+    return _disable_timeout_without_fallback(_dedupe_routes(routes))
+
+
+def _dedupe_routes(routes: list[ModelRoute]) -> list[ModelRoute]:
+    deduped: list[ModelRoute] = []
+    seen: set[tuple[str, str, str | None]] = set()
+    for route in routes:
+        key = (route.provider, route.model, route.thinking_level)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(route)
+    return deduped
+
+
+def _disable_timeout_without_fallback(routes: list[ModelRoute]) -> list[ModelRoute]:
+    if len(routes) != 1:
+        return routes
+    route = routes[0]
+    if route.soft_timeout_seconds is None:
+        return routes
+    return [
+        ModelRoute(
+            provider=route.provider,
+            model=route.model,
+            thinking_level=route.thinking_level,
+            soft_timeout_seconds=None,
+        )
+    ]
+
+
+def _run_with_soft_timeout(fn, *, timeout_seconds: float | None) -> ProviderCallResult:
+    if timeout_seconds is None:
+        return fn()
+    future = _route_pool().submit(fn)
+    try:
+        return future.result(timeout=timeout_seconds)
+    except FutureTimeoutError as exc:
+        future.cancel()
+        raise ModelSoftTimeout(f"model route exceeded soft timeout after {timeout_seconds:.1f}s") from exc
+
+
+def _pil_to_png_data_url(image: Any) -> str:
+    buffer = BytesIO()
+    image.save(buffer, format="PNG")
+    encoded = base64.b64encode(buffer.getvalue()).decode("ascii")
+    return f"data:image/png;base64,{encoded}"
+
+
+def _pil_to_base64_png(image: Any) -> str:
+    buffer = BytesIO()
+    image.save(buffer, format="PNG")
+    return base64.b64encode(buffer.getvalue()).decode("ascii")
+
+
+def _json_schema_for_provider(response_schema: type[BaseModel]) -> dict[str, Any]:
+    schema = response_schema.model_json_schema()
+    return _sanitize_json_schema(schema)
+
+
+def _sanitize_json_schema(value: Any) -> Any:
+    if isinstance(value, list):
+        return [_sanitize_json_schema(item) for item in value]
+    if not isinstance(value, dict):
+        return value
+
+    sanitized: dict[str, Any] = {}
+    for key, item in value.items():
+        if key in {"title", "default", "examples"}:
+            continue
+        sanitized[key] = _sanitize_json_schema(item)
+
+    if sanitized.get("type") == "object" or "properties" in sanitized:
+        sanitized.setdefault("additionalProperties", False)
+    return sanitized
 
 
 def _start_trace(
@@ -421,6 +633,273 @@ def _build_multipage_contents(*, prompt: str, prob_image: Any, sol_images: Seque
     return contents
 
 
+def _call_gemini_route_once(
+    *,
+    route: ModelRoute,
+    contents: list[Any],
+    response_schema: type[BaseModel],
+) -> ProviderCallResult:
+    config: dict[str, Any] = {
+        "response_mime_type": "application/json",
+        "response_json_schema": response_schema.model_json_schema(),
+    }
+    if route.thinking_level:
+        config["thinking_config"] = {"thinking_level": route.thinking_level}
+
+    resp = client.models.generate_content(
+        model=route.model,
+        contents=contents,
+        config=config,
+    )
+
+    usage = getattr(resp, "usage_metadata", None)
+    tokens_in = getattr(usage, "prompt_token_count", 0)
+    tokens_out = getattr(usage, "candidates_token_count", 0)
+    tokens_total = getattr(usage, "total_token_count", 0)
+    tokens_thoughts = getattr(usage, "thoughts_token_count", 0)
+    estimated_call_cost_usd = _estimate_call_cost_usd(
+        tokens_in=tokens_in,
+        tokens_out=tokens_out,
+        tokens_thoughts=tokens_thoughts,
+    )
+    _warn_if_cost_spike(estimated_call_cost_usd)
+    return ProviderCallResult(
+        response_text=resp.text,
+        model_name=route.model,
+        tokens_in=tokens_in,
+        tokens_out=tokens_out,
+        tokens_thoughts=tokens_thoughts,
+        tokens_total=tokens_total,
+        estimated_call_cost_usd=estimated_call_cost_usd,
+    )
+
+
+def _call_openai_route_once(
+    *,
+    route: ModelRoute,
+    prompt: str,
+    prob_image: Any,
+    sol_images: Sequence[Any],
+    response_schema: type[BaseModel],
+) -> ProviderCallResult:
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise ProviderUnavailable("OPENAI_API_KEY is not set")
+
+    import httpx
+
+    content: list[dict[str, Any]] = [
+        {"type": "input_text", "text": prompt},
+        {"type": "input_text", "text": "Problem image:"},
+        {"type": "input_image", "image_url": _pil_to_png_data_url(prob_image), "detail": "auto"},
+    ]
+    sol_images_list = list(sol_images)
+    for page_index, page_image in enumerate(sol_images_list, start=1):
+        content.append(
+            {
+                "type": "input_text",
+                "text": f"Student solution page {page_index} of {len(sol_images_list)} (ordered).",
+            }
+        )
+        content.append({"type": "input_image", "image_url": _pil_to_png_data_url(page_image), "detail": "auto"})
+
+    body: dict[str, Any] = {
+        "model": route.model,
+        "input": [{"role": "user", "content": content}],
+        "text": {
+            "format": {
+                "type": "json_schema",
+                "name": response_schema.__name__,
+                "schema": _json_schema_for_provider(response_schema),
+                "strict": True,
+            }
+        },
+    }
+    if route.thinking_level:
+        body["reasoning"] = {"effort": route.thinking_level}
+
+    with httpx.Client(timeout=LLM_PROVIDER_HTTP_TIMEOUT_SECONDS) as http_client:
+        response = http_client.post(
+            "https://api.openai.com/v1/responses",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json=body,
+        )
+        response.raise_for_status()
+        payload = response.json()
+
+    response_text = _extract_openai_response_text(payload)
+    usage = payload.get("usage") or {}
+    output_details = usage.get("output_tokens_details") or {}
+    tokens_in = int(usage.get("input_tokens") or 0)
+    tokens_out = int(usage.get("output_tokens") or 0)
+    tokens_thoughts = int(output_details.get("reasoning_tokens") or 0)
+    tokens_total = int(usage.get("total_tokens") or (tokens_in + tokens_out))
+    return ProviderCallResult(
+        response_text=response_text,
+        model_name=f"openai:{payload.get('model') or route.model}",
+        tokens_in=tokens_in,
+        tokens_out=tokens_out,
+        tokens_thoughts=tokens_thoughts,
+        tokens_total=tokens_total,
+        estimated_call_cost_usd=None,
+    )
+
+
+def _extract_openai_response_text(payload: dict[str, Any]) -> str:
+    direct = payload.get("output_text")
+    if isinstance(direct, str) and direct.strip():
+        return direct
+
+    chunks: list[str] = []
+    for item in payload.get("output") or []:
+        if not isinstance(item, dict):
+            continue
+        for content in item.get("content") or []:
+            if not isinstance(content, dict):
+                continue
+            text = content.get("text")
+            if isinstance(text, str):
+                chunks.append(text)
+    text = "".join(chunks).strip()
+    if not text:
+        raise RuntimeError("OpenAI response did not include output text")
+    return text
+
+
+def _call_anthropic_route_once(
+    *,
+    route: ModelRoute,
+    prompt: str,
+    prob_image: Any,
+    sol_images: Sequence[Any],
+    response_schema: type[BaseModel],
+) -> ProviderCallResult:
+    api_key = os.getenv("ANTHROPIC_API_KEY")
+    if not api_key:
+        raise ProviderUnavailable("ANTHROPIC_API_KEY is not set")
+
+    import httpx
+
+    content: list[dict[str, Any]] = [{"type": "text", "text": prompt}]
+    content.append(
+        {
+            "type": "image",
+            "source": {
+                "type": "base64",
+                "media_type": "image/png",
+                "data": _pil_to_base64_png(prob_image),
+            },
+        }
+    )
+    sol_images_list = list(sol_images)
+    for page_index, page_image in enumerate(sol_images_list, start=1):
+        content.append(
+            {
+                "type": "text",
+                "text": f"Student solution page {page_index} of {len(sol_images_list)} (ordered).",
+            }
+        )
+        content.append(
+            {
+                "type": "image",
+                "source": {
+                    "type": "base64",
+                    "media_type": "image/png",
+                    "data": _pil_to_base64_png(page_image),
+                },
+            }
+        )
+
+    body = {
+        "model": route.model,
+        "max_tokens": LLM_ANTHROPIC_MAX_TOKENS,
+        "messages": [{"role": "user", "content": content}],
+        "tools": [
+            {
+                "name": "emit_json",
+                "description": "Return the response as structured JSON matching the required schema.",
+                "input_schema": _json_schema_for_provider(response_schema),
+            }
+        ],
+        "tool_choice": {"type": "tool", "name": "emit_json"},
+    }
+
+    with httpx.Client(timeout=LLM_PROVIDER_HTTP_TIMEOUT_SECONDS) as http_client:
+        response = http_client.post(
+            LLM_ANTHROPIC_API_URL,
+            headers={
+                "x-api-key": api_key,
+                "anthropic-version": LLM_ANTHROPIC_VERSION,
+                "content-type": "application/json",
+            },
+            json=body,
+        )
+        response.raise_for_status()
+        payload = response.json()
+
+    response_text = _extract_anthropic_response_text(payload)
+    usage = payload.get("usage") or {}
+    tokens_in = int(usage.get("input_tokens") or 0)
+    tokens_out = int(usage.get("output_tokens") or 0)
+    return ProviderCallResult(
+        response_text=response_text,
+        model_name=f"anthropic:{payload.get('model') or route.model}",
+        tokens_in=tokens_in,
+        tokens_out=tokens_out,
+        tokens_thoughts=0,
+        tokens_total=tokens_in + tokens_out,
+        estimated_call_cost_usd=None,
+    )
+
+
+def _extract_anthropic_response_text(payload: dict[str, Any]) -> str:
+    text_chunks: list[str] = []
+    for content in payload.get("content") or []:
+        if not isinstance(content, dict):
+            continue
+        if content.get("type") == "tool_use" and isinstance(content.get("input"), dict):
+            return json.dumps(content["input"], ensure_ascii=False)
+        if content.get("type") == "text" and isinstance(content.get("text"), str):
+            text_chunks.append(content["text"])
+    text = "".join(text_chunks).strip()
+    if not text:
+        raise RuntimeError("Anthropic response did not include JSON text or tool input")
+    return text
+
+
+def _call_provider_route_once(
+    *,
+    route: ModelRoute,
+    contents: list[Any],
+    prompt: str,
+    prob_image: Any,
+    sol_images: Sequence[Any],
+    response_schema: type[BaseModel],
+) -> ProviderCallResult:
+    if route.provider == "gemini":
+        return _call_gemini_route_once(route=route, contents=contents, response_schema=response_schema)
+    if route.provider == "openai":
+        return _call_openai_route_once(
+            route=route,
+            prompt=prompt,
+            prob_image=prob_image,
+            sol_images=sol_images,
+            response_schema=response_schema,
+        )
+    if route.provider == "anthropic":
+        return _call_anthropic_route_once(
+            route=route,
+            prompt=prompt,
+            prob_image=prob_image,
+            sol_images=sol_images,
+            response_schema=response_schema,
+        )
+    raise ProviderUnavailable(f"Unsupported provider: {route.provider}")
+
+
 def _call_model_with_retry_internal(
     *,
     prompt: str,
@@ -443,6 +922,15 @@ def _call_model_with_retry_internal(
 
     sol_images_list = list(sol_images)
     contents = _build_multipage_contents(prompt=prompt, prob_image=prob_image, sol_images=sol_images_list)
+    soft_timeout_seconds = _soft_timeout_for_call(mode=mode, response_schema=response_schema)
+    routes = _configured_route_chain(
+        primary_model=model_name,
+        primary_thinking_level=thinking_level,
+        soft_timeout_seconds=soft_timeout_seconds,
+    )
+    retries_per_route = max_retries
+    if LLM_ROUTING_ENABLED and soft_timeout_seconds is not None:
+        retries_per_route = max(1, min(max_retries, LLM_MAX_RETRIES_PER_ROUTE))
 
     t0 = time.time()
     trace, trace_id = _start_trace(
@@ -455,104 +943,196 @@ def _call_model_with_retry_internal(
         metadata=trace_metadata,
     )
 
-    for attempt in range(max_retries):
-        try:
-            config: dict[str, Any] = {
-                "response_mime_type": "application/json",
-                "response_json_schema": response_schema.model_json_schema(),
-            }
-            if thinking_level:
-                config["thinking_config"] = {"thinking_level": thinking_level}
+    route_errors: list[str] = []
+    total_attempt_count = 0
 
-            resp = client.models.generate_content(
-                model=model_name,
-                contents=contents,
-                config=config,
-            )
+    for route_index, route in enumerate(routes):
+        fallback_used = route_index > 0
+        _trace_event(
+            trace,
+            name="model_route_started",
+            metadata={
+                "routeIndex": route_index,
+                "provider": route.provider,
+                "model": route.model,
+                "thinkingLevel": route.thinking_level,
+                "softTimeoutSeconds": route.soft_timeout_seconds,
+                "fallbackUsed": fallback_used,
+            },
+        )
 
-            usage = getattr(resp, "usage_metadata", None)
-            tokens_in = getattr(usage, "prompt_token_count", 0)
-            tokens_out = getattr(usage, "candidates_token_count", 0)
-            tokens_total = getattr(usage, "total_token_count", 0)
-            tokens_thoughts = getattr(usage, "thoughts_token_count", 0)
-            latency = time.time() - t0
-            retry_count = attempt
-            estimated_call_cost_usd = _estimate_call_cost_usd(
-                tokens_in=tokens_in,
-                tokens_out=tokens_out,
-                tokens_thoughts=tokens_thoughts,
-            )
-            _warn_if_cost_spike(estimated_call_cost_usd)
+        for attempt in range(retries_per_route):
+            total_attempt_count += 1
+            route_started = time.time()
+            try:
+                result = _run_with_soft_timeout(
+                    lambda route=route: _call_provider_route_once(
+                        route=route,
+                        contents=contents,
+                        prompt=prompt,
+                        prob_image=prob_image,
+                        sol_images=sol_images_list,
+                        response_schema=response_schema,
+                    ),
+                    timeout_seconds=route.soft_timeout_seconds,
+                )
 
-            observation_id = _trace_generation(
-                trace,
-                model=model_name,
-                prompt=prompt,
-                output=resp.text,
-                mode=mode,
-                latency=latency,
-                tokens_in=tokens_in,
-                tokens_out=tokens_out,
-                tokens_total=tokens_total,
-                tokens_thoughts=tokens_thoughts,
-            )
-            end_metadata = dict(trace_metadata or {})
-            end_metadata.update({"success": True, "retryCount": retry_count})
-            _end_trace(trace, output=resp.text, metadata=end_metadata)
-            if langfuse is not None and hasattr(langfuse, "flush"):
-                langfuse.flush()
-
-            return {
-                "response_text": resp.text,
-                "prompt": prompt,
-                "mode": mode,
-                "model_name": model_name,
-                "timestamp": datetime.now(),
-                "latency_seconds": latency,
-                "tokens_in": tokens_in,
-                "tokens_out": tokens_out,
-                "tokens_thoughts": tokens_thoughts,
-                "tokens_total": tokens_total,
-                "estimated_call_cost_usd": estimated_call_cost_usd,
-                "retry_count": retry_count,
-                "trace_id": trace_id,
-                "observation_id": observation_id,
-                "message_id": None,
-                "request_id": request_id,
-            }
-
-        except ServerError as exc:
-            is_last_attempt = attempt == max_retries - 1
-            _trace_event(
-                trace,
-                name="server_error",
-                metadata={"attempt": attempt + 1, "max_retries": max_retries, "error": str(exc)},
-            )
-            if is_last_attempt:
-                logger.exception("Gemini server error after %s attempts", max_retries)
+                latency = time.time() - t0
+                route_latency = time.time() - route_started
+                observation_id = _trace_generation(
+                    trace,
+                    model=result.model_name,
+                    prompt=prompt,
+                    output=result.response_text,
+                    mode=mode,
+                    latency=latency,
+                    tokens_in=result.tokens_in,
+                    tokens_out=result.tokens_out,
+                    tokens_total=result.tokens_total,
+                    tokens_thoughts=result.tokens_thoughts,
+                )
                 end_metadata = dict(trace_metadata or {})
-                end_metadata.update({"success": False, "retryCount": attempt + 1, "error": str(exc)})
-                _end_trace(trace, output={"error": str(exc)}, metadata=end_metadata)
-                raise
+                end_metadata.update(
+                    {
+                        "success": True,
+                        "retryCount": total_attempt_count - 1,
+                        "routeIndex": route_index,
+                        "provider": route.provider,
+                        "model": route.model,
+                        "thinkingLevel": route.thinking_level,
+                        "fallbackUsed": fallback_used,
+                        "routeLatencySeconds": route_latency,
+                    }
+                )
+                _end_trace(trace, output=result.response_text, metadata=end_metadata)
+                if langfuse is not None and hasattr(langfuse, "flush"):
+                    langfuse.flush()
 
-            wait_seconds = 2**attempt
-            logger.warning(
-                "Gemini server error on attempt %s/%s. Retrying in %ss",
-                attempt + 1,
-                max_retries,
-                wait_seconds,
-            )
-            time.sleep(wait_seconds)
+                return {
+                    "response_text": result.response_text,
+                    "prompt": prompt,
+                    "mode": mode,
+                    "model_name": result.model_name,
+                    "timestamp": datetime.now(),
+                    "latency_seconds": latency,
+                    "tokens_in": result.tokens_in,
+                    "tokens_out": result.tokens_out,
+                    "tokens_thoughts": result.tokens_thoughts,
+                    "tokens_total": result.tokens_total,
+                    "estimated_call_cost_usd": result.estimated_call_cost_usd,
+                    "retry_count": total_attempt_count - 1,
+                    "trace_id": trace_id,
+                    "observation_id": observation_id,
+                    "message_id": None,
+                    "request_id": request_id,
+                    "routing_provider": route.provider,
+                    "routing_route_index": route_index,
+                    "routing_fallback_used": fallback_used,
+                }
 
-        except Exception as exc:
-            _trace_event(trace, name="unexpected_error", metadata={"error": str(exc)})
-            logger.exception("Gemini request failed with non-retryable error")
-            end_metadata = dict(trace_metadata or {})
-            end_metadata.update({"success": False, "retryCount": attempt, "error": str(exc)})
-            _end_trace(trace, output={"error": str(exc)}, metadata=end_metadata)
-            raise
+            except ModelSoftTimeout as exc:
+                error_text = str(exc)
+                route_errors.append(f"{route.provider}:{route.model}:soft_timeout:{error_text}")
+                _trace_event(
+                    trace,
+                    name="model_route_soft_timeout",
+                    metadata={
+                        "routeIndex": route_index,
+                        "provider": route.provider,
+                        "model": route.model,
+                        "attempt": attempt + 1,
+                        "error": error_text,
+                    },
+                )
+                logger.warning(
+                    "Model route timed out: provider=%s model=%s attempt=%s timeout=%s",
+                    route.provider,
+                    route.model,
+                    attempt + 1,
+                    route.soft_timeout_seconds,
+                )
+                break
 
-    raise RuntimeError("Gemini request failed unexpectedly")
+            except ServerError as exc:
+                error_text = str(exc)
+                route_errors.append(f"{route.provider}:{route.model}:server_error:{error_text}")
+                _trace_event(
+                    trace,
+                    name="model_route_server_error",
+                    metadata={
+                        "routeIndex": route_index,
+                        "provider": route.provider,
+                        "model": route.model,
+                        "attempt": attempt + 1,
+                        "maxRetries": retries_per_route,
+                        "error": error_text,
+                    },
+                )
+                if attempt < retries_per_route - 1:
+                    wait_seconds = 2**attempt
+                    logger.warning(
+                        "Provider server error on route %s/%s attempt %s/%s. Retrying in %ss",
+                        route.provider,
+                        route.model,
+                        attempt + 1,
+                        retries_per_route,
+                        wait_seconds,
+                    )
+                    time.sleep(wait_seconds)
+                    continue
+                break
+
+            except ProviderUnavailable as exc:
+                error_text = str(exc)
+                route_errors.append(f"{route.provider}:{route.model}:unavailable:{error_text}")
+                _trace_event(
+                    trace,
+                    name="model_route_unavailable",
+                    metadata={
+                        "routeIndex": route_index,
+                        "provider": route.provider,
+                        "model": route.model,
+                        "error": error_text,
+                    },
+                )
+                break
+
+            except Exception as exc:
+                error_text = f"{type(exc).__name__}: {exc}"
+                route_errors.append(f"{route.provider}:{route.model}:error:{error_text}")
+                _trace_event(
+                    trace,
+                    name="model_route_error",
+                    metadata={
+                        "routeIndex": route_index,
+                        "provider": route.provider,
+                        "model": route.model,
+                        "attempt": attempt + 1,
+                        "error": error_text,
+                    },
+                )
+                logger.exception(
+                    "Model route failed: provider=%s model=%s attempt=%s",
+                    route.provider,
+                    route.model,
+                    attempt + 1,
+                )
+                break
+
+    final_error = " | ".join(route_errors) or "No model routes were attempted"
+    end_metadata = dict(trace_metadata or {})
+    end_metadata.update(
+        {
+            "success": False,
+            "retryCount": total_attempt_count,
+            "routingErrors": route_errors,
+            "routeCount": len(routes),
+        }
+    )
+    _end_trace(trace, output={"error": final_error}, metadata=end_metadata)
+    if langfuse is not None and hasattr(langfuse, "flush"):
+        langfuse.flush()
+    raise RuntimeError(f"All model routes failed: {final_error}")
 
 
 def call_legibility_with_retry(

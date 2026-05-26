@@ -247,6 +247,7 @@ def _build_unclear_payload(
         "error_confidence": None,
         "all_readable": False,
         "ambiguous_steps": regions,
+        "ambiguous_regions": regions,
     }
 
 
@@ -318,7 +319,7 @@ def _record_event(
     session: Session,
     user_id: UUID,
     problem_id: UUID,
-    attempt_id: UUID,
+    attempt_id: UUID | None,
     event_type: str,
     mode: str,
     verdict: str | None = None,
@@ -494,6 +495,7 @@ def _build_confirm_reading_payload(
         "reading_confidence": confidence_value,
         "interpreted_reading": interpreted_reading,
         "ambiguous_steps": ambiguous_steps,
+        "ambiguous_regions": ambiguous_steps,
     }
 
 
@@ -514,6 +516,9 @@ def _extract_llm_result(
     str | None,
     str,
     int | None,
+    str | None,
+    int | None,
+    bool | None,
 ]:
     if isinstance(result, dict):
         resp_text = result.get("response_text")
@@ -528,6 +533,9 @@ def _extract_llm_result(
         message_id = _text_or_none(result.get("message_id"), max_len=128)
         request_id = _text_or_none(result.get("request_id"), max_len=128) or default_request_id
         retry_count = _as_int_or_none(result.get("retry_count"))
+        routing_provider = _text_or_none(result.get("routing_provider"), max_len=64)
+        routing_route_index = _as_int_or_none(result.get("routing_route_index"))
+        routing_fallback_used = _as_bool_or_none(result.get("routing_fallback_used"))
     else:
         resp_text = result[0] if isinstance(result, tuple) else result
         model_name = _text_or_none(result[5], max_len=128) if isinstance(result, tuple) else None
@@ -541,6 +549,9 @@ def _extract_llm_result(
         message_id = None
         request_id = default_request_id
         retry_count = None
+        routing_provider = None
+        routing_route_index = None
+        routing_fallback_used = None
 
     if not isinstance(resp_text, str) or not resp_text.strip():
         raise HTTPException(status_code=502, detail="LLM request failed")
@@ -558,6 +569,9 @@ def _extract_llm_result(
         message_id,
         request_id,
         retry_count,
+        routing_provider,
+        routing_route_index,
+        routing_fallback_used,
     )
 
 
@@ -1234,6 +1248,9 @@ async def query(
     message_id: str | None = None
     request_id: str = reasoning_request_id
     retry_count: int | None = None
+    routing_provider: str | None = None
+    routing_route_index: int | None = None
+    routing_fallback_used: bool | None = None
     legibility_stage_latency_ms: int | None = None
     legibility_stage_tokens_in: int | None = None
     legibility_stage_tokens_out: int | None = None
@@ -1279,6 +1296,9 @@ async def query(
                 legibility_message_id,
                 legibility_request_id,
                 legibility_retry_count,
+                legibility_routing_provider,
+                legibility_routing_route_index,
+                legibility_routing_fallback_used,
             ) = _extract_llm_result(legibility_result, default_request_id=legibility_request_id)
             legibility_payload_raw = json.loads(legibility_resp_text)
         except json.JSONDecodeError as exc:
@@ -1305,6 +1325,9 @@ async def query(
         message_id = legibility_message_id
         request_id = legibility_request_id
         retry_count = legibility_retry_count
+        routing_provider = legibility_routing_provider
+        routing_route_index = legibility_routing_route_index
+        routing_fallback_used = legibility_routing_fallback_used
         legibility_stage_latency_ms = (
             int(legibility_latency_seconds * 1000) if legibility_latency_seconds is not None else None
         )
@@ -1365,6 +1388,9 @@ async def query(
                 reasoning_message_id,
                 reasoning_request_id,
                 reasoning_retry_count,
+                reasoning_routing_provider,
+                reasoning_routing_route_index,
+                reasoning_routing_fallback_used,
             ) = _extract_llm_result(reasoning_result, default_request_id=reasoning_request_id)
             reasoning_payload_raw = json.loads(reasoning_resp_text)
         except json.JSONDecodeError as exc:
@@ -1386,6 +1412,9 @@ async def query(
         message_id = reasoning_message_id
         request_id = reasoning_request_id
         retry_count = reasoning_retry_count
+        routing_provider = reasoning_routing_provider
+        routing_route_index = reasoning_routing_route_index
+        routing_fallback_used = reasoning_routing_fallback_used
         reasoning_stage_latency_ms = (
             int(reasoning_latency_seconds * 1000) if reasoning_latency_seconds is not None else None
         )
@@ -1395,6 +1424,44 @@ async def query(
         reasoning_stage_retry_count = reasoning_retry_count
 
     if _text_or_none(payload.get("response_type"), max_len=64) == "confirm_reading":
+        if user.consent_analytics:
+            ambiguous_steps = payload.get("ambiguous_steps")
+            interpreted_reading = payload.get("interpreted_reading")
+            _record_event(
+                session=session,
+                user_id=user.id,
+                problem_id=problem.id,
+                attempt_id=None,
+                event_type="reading_confirmation_requested",
+                mode=mode,
+                verdict="unclear",
+                metadata_json=json.dumps(
+                    {
+                        "page_count": resolved_page_count,
+                        "prompt_variant": prompt_variant,
+                        "legibility_prompt_variant": legibility_prompt_variant,
+                        "pipeline_mode": pipeline_mode,
+                        "expert_mode": resolved_expert_mode,
+                        "reading_confidence": _as_float_or_none(payload.get("reading_confidence")),
+                        "ambiguous_region_count": (
+                            len(ambiguous_steps) if isinstance(ambiguous_steps, list) else 0
+                        ),
+                        "interpreted_reading_count": (
+                            len(interpreted_reading) if isinstance(interpreted_reading, list) else 0
+                        ),
+                        "trace_id": trace_id,
+                        "observation_id": observation_id,
+                        "request_id": request_id,
+                        "routing_provider": routing_provider,
+                        "routing_route_index": routing_route_index,
+                        "routing_fallback_used": routing_fallback_used,
+                        "client_request_id": resolved_client_request_id,
+                        "session_id": resolved_session_id,
+                    }
+                ),
+            )
+            session.commit()
+
         response_payload = dict(payload)
         response_payload["expert_mode"] = resolved_expert_mode
         response_payload["observability"] = {
@@ -1405,6 +1472,9 @@ async def query(
             "modelName": model_name,
             "promptVersion": selected_prompt_version,
             "retryCount": retry_count,
+            "routingProvider": routing_provider,
+            "routingRouteIndex": routing_route_index,
+            "routingFallbackUsed": routing_fallback_used,
             "clientRequestId": resolved_client_request_id,
             "sessionId": resolved_session_id,
         }
@@ -1636,6 +1706,9 @@ async def query(
         "modelName": model_name,
         "promptVersion": selected_prompt_version,
         "retryCount": retry_count,
+        "routingProvider": routing_provider,
+        "routingRouteIndex": routing_route_index,
+        "routingFallbackUsed": routing_fallback_used,
         "clientRequestId": resolved_client_request_id,
         "sessionId": resolved_session_id,
     }

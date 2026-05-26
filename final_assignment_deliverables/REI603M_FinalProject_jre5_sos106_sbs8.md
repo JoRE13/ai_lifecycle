@@ -15,7 +15,7 @@ Our understanding of the problem evolved materially since Assignment 1. Initiall
 Ratatoskur is implemented as an iOS frontend with a Python backend and external model/storage services. The architecture intentionally separates interaction, orchestration, persistence, and observability concerns.
 
 **Figure 1. System architecture (same diagram as presentation):**
-![Ratatoskur system architecture](./background.png)
+![Ratatoskur system architecture](https://raw.githubusercontent.com/JoRE13/ai_lifecycle/main/final_assignment_deliverables/background.png)
 
 From a data-flow perspective, the primary path begins when a user creates or opens a problem and writes one or more handwritten pages. The frontend sends problem image data, solution pages, drawing payloads, selected mode, and context metadata to `/query`. The backend validates payload structure and limits, runs legibility and reasoning (or single-pass reasoning, depending on runtime settings), persists artifacts and attempt metadata, and returns structured feedback. Attempts, error events, and stage metrics are then available for analytics summaries, error-bank views, and personalized exam targeting.
 
@@ -71,16 +71,16 @@ This monitoring layer is not only diagnostic; it informs product priorities. For
 **Monitoring evidence from real usage:**
 
 Figure 2. Langfuse trace view (`/query` request stage breakdown)
-![Langfuse trace view](./trace_view.png)
+![Langfuse trace view](https://raw.githubusercontent.com/JoRE13/ai_lifecycle/main/final_assignment_deliverables/trace_view.png)
 
 Figure 3. Latency over time
-![Latency over time dashboard](./latency_overtime.png)
+![Latency over time dashboard](https://raw.githubusercontent.com/JoRE13/ai_lifecycle/main/final_assignment_deliverables/latency_overtime.png)
 
 Figure 4. Average latency and average token usage
-![Average latency and token usage dashboard](./avglatency_and_avgtokens.png)
+![Average latency and token usage dashboard](https://raw.githubusercontent.com/JoRE13/ai_lifecycle/main/final_assignment_deliverables/avglatency_and_avgtokens.png)
 
 Figure 5. Analytics/admin dashboard view
-![Admin analytics dashboard view](./dashboard_view.png)
+![Admin analytics dashboard view](https://raw.githubusercontent.com/JoRE13/ai_lifecycle/main/final_assignment_deliverables/dashboard_view.png)
 
 ## 4.6 Feature Plan Retrospective
 In Assignment 6 we planned five core improvements. Table 1 revisits each planned item and states its final status.
