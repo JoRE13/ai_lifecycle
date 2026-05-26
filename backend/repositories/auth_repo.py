@@ -73,6 +73,9 @@ def create_user(
     email: str,
     password: str,
     full_name: str | None = None,
+    consent_analytics: bool = False,
+    consent_dataset_internal: bool = False,
+    consent_dataset_publish: bool = False,
 ) -> User:
     normalized_name = full_name.strip() if full_name is not None else None
     if normalized_name == "":
@@ -81,6 +84,10 @@ def create_user(
         email=email.lower().strip(),
         password_hash=hash_password(password),
         full_name=normalized_name,
+        consent_analytics=consent_analytics,
+        consent_dataset_internal=consent_dataset_internal,
+        consent_dataset_publish=consent_dataset_publish,
+        consent_updated_at=utcnow(),
     )
     session.add(user)
     session.commit()

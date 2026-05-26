@@ -30,7 +30,7 @@ class User(SQLModel, table=True):
         sa_column=Column(String(320), nullable=False, unique=True, index=True)
     )
     full_name: Optional[str] = Field(default=None, sa_column=Column(String(128)))
-    consent_analytics: bool = Field(default=True, sa_column=Column(Boolean, nullable=False))
+    consent_analytics: bool = Field(default=False, sa_column=Column(Boolean, nullable=False))
     consent_dataset_internal: bool = Field(default=False, sa_column=Column(Boolean, nullable=False))
     consent_dataset_publish: bool = Field(default=False, sa_column=Column(Boolean, nullable=False))
     consent_updated_at: Optional[datetime] = Field(

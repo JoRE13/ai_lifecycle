@@ -6,6 +6,9 @@ class RegisterRequest(BaseModel):
     full_name: str | None = Field(default=None, min_length=1, max_length=128)
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
+    consent_analytics: bool = False
+    consent_dataset_internal: bool = False
+    consent_dataset_publish: bool = False
 
 
 class LoginRequest(BaseModel):

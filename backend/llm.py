@@ -116,6 +116,10 @@ class LegibilityResponse(BaseModel):
     ambiguous_steps: list[LegibilityRegion] = Field(default_factory=list)
 
 
+class ExamAnswerExtractionResponse(BaseModel):
+    answer_text: str | None = None
+
+
 class DeferredErrorResponse(BaseModel):
     class ErrorBox(BaseModel):
         page: int | None = None
@@ -1226,6 +1230,37 @@ def call_deferred_error_with_retry(
         trace_session_id=trace_session_id,
         request_id=request_id,
     )
+
+
+def call_exam_answer_extraction_with_retry(
+    *,
+    prompt: str,
+    answer_image: Any,
+    request_id: str | None = None,
+) -> dict[str, Any]:
+    t0 = time.time()
+    response = client.models.generate_content(
+        model="models/gemini-3-flash-preview",
+        contents=[prompt, answer_image],
+        config={
+            "response_mime_type": "application/json",
+            "response_json_schema": ExamAnswerExtractionResponse.model_json_schema(),
+            "thinking_config": {"thinking_level": "low"},
+        },
+    )
+    latency = time.time() - t0
+    return {
+        "response_text": response.text,
+        "prompt": prompt,
+        "mode": "exam_answer_extraction",
+        "model_name": "gemini:models/gemini-3-flash-preview",
+        "timestamp": datetime.now(),
+        "latency_seconds": latency,
+        "request_id": request_id,
+        "routing_provider": "gemini",
+        "routing_route_index": 0,
+        "routing_fallback_used": False,
+    }
 
 
 def call_model_with_retry(

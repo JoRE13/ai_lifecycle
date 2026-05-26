@@ -156,21 +156,16 @@ def extract_answer_text_from_image(
     answer_format: str,
 ) -> str | None:
     # Import lazily to avoid requiring GEMINI_API_KEY during app startup for non-exam routes.
-    from backend.llm import client as gemini_client
+    from backend.llm import call_exam_answer_extraction_with_retry
 
     image_bytes = _decode_base64_image(answer_image_base64)
     image = _load_exam_answer_image(image_bytes)
     prompt = _build_answer_extraction_prompt(question_text=question_text, answer_format=answer_format)
-    resp = gemini_client.models.generate_content(
-        model="models/gemini-3-flash-preview",
-        contents=[prompt, image],
-        config={
-            "response_mime_type": "application/json",
-            "response_json_schema": ExtractedExamAnswer.model_json_schema(),
-            "thinking_config": {"thinking_level": "low"},
-        },
+    result = call_exam_answer_extraction_with_retry(
+        prompt=prompt,
+        answer_image=image,
     )
-    payload = json.loads(resp.text)
+    payload = json.loads(result["response_text"])
     parsed = ExtractedExamAnswer.model_validate(payload)
     return _normalize_extracted_answer(parsed.answer_text, answer_format=answer_format)
 

@@ -66,6 +66,9 @@ def register(payload: RegisterRequest, resp: Response, session: Session = Depend
         payload.email,
         payload.password,
         payload.full_name,
+        consent_analytics=payload.consent_analytics,
+        consent_dataset_internal=payload.consent_dataset_internal,
+        consent_dataset_publish=payload.consent_dataset_publish,
     )
 
     # Create refresh token + set cookie
