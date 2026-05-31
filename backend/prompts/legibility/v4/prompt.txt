@@ -22,7 +22,7 @@ OUTPUT JSON ONLY:
   "ambiguous_steps": [
     {
       "page": 1,
-      "snippet": "optional short excerpt of the ambiguous step",
+      "snippet": "optional short excerpt of the ambiguous step using MathJax",
       "reason": "short Icelandic explanation of what is ambiguous"
     }
   ]
@@ -38,3 +38,4 @@ RULES:
 - `reading_confidence` must be a float between 0.0 and 1.0
 - `ambiguous_steps` must be ordered from earliest to latest in the student's work
 - Each ambiguous step should be as localized as possible while still understandable to the user
+- Use MathJax
